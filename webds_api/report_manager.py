@@ -42,13 +42,13 @@ class ReportManager(object):
                 ###self._lock.release()
                 sleep(0.0001)
                 ###print ("working on %s" % self._counter)
-            self.reset()
             print("Stopping as you wish.")
         except Exception as e:
-            print(tc)
+            print(e)
             if tc is not None:
                 print("report sse disconnect tc")
                 tc.disconnect()
+            self.setState('stop')
             raise
 
     def reset(self):
@@ -58,10 +58,12 @@ class ReportManager(object):
 
     def getReport(self):
         ###self._lock.acquire()
+        if (self._state == 'stop'):
+            raise Exception("get report stopped!")
         data = self._report
         ###self._lock.release()
         return data, self._frame_count
-            
+
     def setState(self, state):
         print("Set state:", state)
         self._state = state
@@ -76,3 +78,4 @@ class ReportManager(object):
                 self._counter -= 1
                 if self._counter is 0:
                     self._thread.do_run = False
+                    self.reset()
