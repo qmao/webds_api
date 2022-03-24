@@ -14,8 +14,61 @@ class ProgrammerManager(object):
     def __init__(self):
         print("ProgrammerManager singleton object is created")
 
+    def isMultiChip():
+        isMulti = None
+
+        tc = TouchcommManager()
+        id = tc.identify()
+        print(id)
+
+        if id['mode'] == 'application':
+            feature = tc.getInstance().getFeatures()
+            if feature['separateChip']:
+                isMulti = True
+            else:
+                isMulti = False
+
+            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE)
+            id = tc.identify()
+            print(id)
+
+        if id['mode'] == 'tddi_bootloader':
+            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
+            id = tc.identify()
+            print(id)
+
+        if (id['mode'] == 'tddi_slave_bootloader'):
+            isMulti = True
+            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
+            id = tc.identify()
+            print(id)
+
+        if (id['mode'] == 'rombootloader'):
+            try:
+                id = tc.getInstance().romIdentify()
+                print(id)
+                info = tc.getInstance().getRomBootInfo()
+                print(info)
+                isMulti = True
+            except Exception as e:
+                isMulti = False
+                pass
+
+        if isMulti is None:
+            message = "Cannot determin TDDI type"
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+
+        return isMulti
+
     def program(filename):
         ### disconnect tcm if exist
+        isTddi = False
+        is_multi_chip = False
+
+        if ".ihex" in filename:
+            isTddi = True
+            is_multi_chip = ProgrammerManager.isMultiChip()
+
         try:
             tc = TouchcommManager()
             tc.disconnect()
@@ -25,6 +78,11 @@ class ProgrammerManager(object):
 
         tc.lock(True)
         try:
-            AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
+            if isTddi:
+                print("program IHex File")
+                AsicProgrammer.programIHexFile(filename, is_multi_chip=is_multi_chip)
+            else:
+                print("program Hex File")
+                AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
         finally:
             tc.lock(False)
