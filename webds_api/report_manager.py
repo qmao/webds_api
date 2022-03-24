@@ -55,6 +55,7 @@ class ReportManager(object):
         self._report = ('timeout', None)
         self._frame_count = 1
         self._state = 'stop'
+        self._counter = 0
 
     def getReport(self):
         ###self._lock.acquire()
