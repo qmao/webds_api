@@ -98,18 +98,22 @@ class TouchcommManager(object):
         ### print(data)
         return data
 
-    def getAppInfo(self):
-        data = {}
-        self._lock.acquire()
-        try:
-            data = self._tc.getAppInfo()
-        except Exception as e:
-            print('Touchcomm getAppInfo exception:{}'.format(e))
-        finally:
-            self._lock.release()
-        return data
-
     def getInstance(self):
         if self._tc is None:
             raise Exception("Failed to initiate ReportStreamer")
         return self._tc
+
+    def function(self, fn, args = None):
+        data = {}
+        self._lock.acquire()
+        try:
+            if args is None:
+                data = getattr(self._tc, fn)()
+            else:
+                data = getattr(self._tc, fn)(*args)
+        except Exception as e:
+            print('Touchcomm {} exception:{}'.format(fn, e))
+            raise e
+        finally:
+            self._lock.release()
+        return data

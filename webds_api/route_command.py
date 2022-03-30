@@ -34,12 +34,12 @@ class CommandHandler(APIHandler):
 
         try:
             tc = TouchcommManager()
-            if query == 'identify':
-                info = tc.identify()
+            if query == 'app-info':
+                info = tc.function('getAppInfo')
                 self.finish(json.dumps(info))
                 return
-            elif query == 'app-info':
-                info = tc.getAppInfo()
+            else:
+                info = tc.function(query)
                 self.finish(json.dumps(info))
                 return
 
