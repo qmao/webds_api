@@ -117,3 +117,9 @@ class TouchcommManager(object):
         finally:
             self._lock.release()
         return data
+
+    def lock(self, lock):
+        if lock:
+            self._lock.acquire()
+        else:
+            self._lock.release()

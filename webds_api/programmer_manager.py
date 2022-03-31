@@ -18,15 +18,23 @@ class ProgrammerManager(object):
         isMulti = None
 
         tc = TouchcommManager()
-        id = tc.identify()
-        print(id)
+
+        try:
+            id = tc.identify()
+            print(id)
+        except:
+            pass
+
+        if id['mode'] is None:
+            message = "Identify failed"
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
 
         if id['mode'] == 'application':
             feature = tc.getInstance().getFeatures()
             if feature['separateChip']:
-                isMulti = True
+                return True
             else:
-                isMulti = False
+                return False
 
             tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE)
             id = tc.identify()
@@ -38,10 +46,10 @@ class ProgrammerManager(object):
             print(id)
 
         if (id['mode'] == 'tddi_slave_bootloader'):
-            isMulti = True
-            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
-            id = tc.identify()
-            print(id)
+            return True
+            ##tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
+            ##id = tc.identify()
+            ##print(id)
 
         if (id['mode'] == 'rombootloader'):
             try:
@@ -68,6 +76,7 @@ class ProgrammerManager(object):
         if ".ihex" in filename:
             isTddi = True
             is_multi_chip = ProgrammerManager.isMultiChip()
+            print("Multi Chip: {}".format(is_multi_chip))
 
         try:
             tc = TouchcommManager()
