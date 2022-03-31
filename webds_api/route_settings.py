@@ -119,6 +119,7 @@ class SettingsHandler(APIHandler):
                     data["interface"] = protocol
                     if protocol == "i2c":
                         data["i2cAddr"] = obj.comm.i2cAddr
+                        data["speed"] = obj.comm.speed
                     elif protocol == "spi":
                         data["spiMode"] = obj.comm.spiMode
                         data["speed"] = obj.comm.speed
