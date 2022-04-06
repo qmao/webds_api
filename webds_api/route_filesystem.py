@@ -53,9 +53,6 @@ class FilesystemHandler(APIHandler):
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
 
-
-
-class FilesystemHandler(APIHandler):
     @tornado.web.authenticated
     def get(self):
         print(self.request.arguments)
