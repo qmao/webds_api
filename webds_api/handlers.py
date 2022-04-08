@@ -3,14 +3,15 @@ from jupyter_server.utils import url_path_join
 
 import tornado
 
-from .route_reprogram    import ProgramHandler
-from .route_general      import GeneralHandler
-from .route_packrat      import PackratHandler
-from .route_about        import AboutHandler
-from .route_filesystem   import FilesystemHandler
-from .route_command      import CommandHandler
-from .route_report       import ReportHandler
-from .route_settings     import SettingsHandler
+from .route_reprogram        import ProgramHandler
+from .route_general          import GeneralHandler
+from .route_packrat          import PackratHandler
+from .route_about            import AboutHandler
+from .route_filesystem       import FilesystemHandler
+from .route_command          import CommandHandler
+from .route_report           import ReportHandler
+from .route_settings         import SettingsHandler
+from .route_production_tests import ProductionTestsHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -33,6 +34,8 @@ def setup_handlers(web_app):
 
     settings_pattern = url_path_join(base_url, "webds", "settings/" + '(.*)?' + '(.*)')
 
+    production_tests_pattern = url_path_join(base_url, "webds", "production-tests" + '(.*)')
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -42,6 +45,7 @@ def setup_handlers(web_app):
                 (command_pattern, CommandHandler),
                 (report_pattern, ReportHandler),
                 (settings_pattern, SettingsHandler),
+                (production_tests_pattern, ProductionTestsHandler),
                ]
 
     web_app.add_handlers(host_pattern, handlers)
