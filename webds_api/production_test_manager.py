@@ -9,6 +9,8 @@ from .utils import SystemHandler
 
 from queue import Queue
 import time
+import sys
+import pytest
 
 PT_ROOT = "/home/pi/jupyter/workspace/Synaptics/Production_Tests/"
 PT_LIB_ROOT = PT_ROOT + "lib/"
@@ -18,9 +20,11 @@ PT_RUN = PT_ROOT + "run/"
 PT_SETS = PT_ROOT + "sets/"
 PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
 
-g_pt_output = None
+g_pt_stdout = None
 
-class StdoutPTHandler(Queue):
+sys.path.append(PT_WRAPPER)
+
+class PtStdout(Queue):
     _progress = 0
     _status = 'idle'
     _message = None
@@ -30,10 +34,10 @@ class StdoutPTHandler(Queue):
 
     def write(self,msg):
         try:
-            if "%" in msg:
-                progress = msg[12:-1]
-                self._progress = int(progress, base=10)
-            sys.__stdout__.write(msg)
+            ###if "run" in msg:
+            ###    sys.__stdout__.write(msg)
+            ###sys.__stdout__.write(msg)
+            sys.__stdout__.write("[QQQQ]" + msg)
         except Exception as e:
             print("Oops StdoutHandler write!", e.__class__, "occurred.")
             pass
@@ -66,9 +70,16 @@ class StdoutPTHandler(Queue):
 
 
 class ProductionTestsManager():
-    def __init__(self):
-        super().__init__()
+    _instance = None
+    std_default = None
 
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        print("ProductionTestsManager init")
 
     def updatePyTest(src, dst):
         ###print(src)
@@ -149,9 +160,14 @@ class ProductionTestsManager():
         if len(tests) is 0:
             raise tornado.web.HTTPError(status_code=400, log_message='production test {} :{} no tests'.format(partNumber, id))
 
-    def run():
+    def run(self):
+        std_default = sys.stdout
+        ###sys.stdout = PtStdout()
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
-        SystemHandler.CallSysCommand([export_wrapper, 'pytest', '--tb=no',  '--disable-pytest-warnings', PT_RUN])
+        cmd = ['--tb=no', '--disable-pytest-warnings', PT_RUN]
+        pytest.main(cmd)
+        ###SystemHandler.CallSysCommand([export_wrapper, 'pytest', '--tb=no',  '--disable-pytest-warnings', PT_RUN])
+        ###sys.stdout = std_default
 
     def getSets(partNumber):
         sets = {}

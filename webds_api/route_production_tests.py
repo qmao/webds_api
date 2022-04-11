@@ -119,6 +119,7 @@ class ProductionTestsHandler(APIHandler):
         if g_production_test_thread is not None and g_production_test_thread.is_alive():
             g_program_thread.join()
 
-        g_production_test_thread = threading.Thread(target=ProductionTestsManager.run)
+        pt = ProductionTestsManager()
+        g_production_test_thread = threading.Thread(target=pt.run)
         g_production_test_thread.start()
         print("production test thread start")
