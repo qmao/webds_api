@@ -4,6 +4,7 @@ import os
 from os import listdir
 from os.path import isfile, join, exists
 import json
+import re
 
 from . import webds
 from .utils import SystemHandler
@@ -21,18 +22,51 @@ class ProductionTestsManager():
     def __init__(self):
         super().__init__()
 
+
+    def updatePyTest(src, dst):
+        ###print(src)
+        ###print(dst)
+        try:
+            with open (src, 'r' ) as f:
+                content = f.read()
+                newContent = re.sub('main\(\)', 'test_main()', content)
+
+                regex = re.compile('(?<=class )\s*\w+(?=\(object\))')
+                found = regex.search(content)
+                className = found.group(0)
+                ### print('Found: ' + className)
+                ### \s*  optional spaces
+                ### (?=  beginning of positive lookahead
+                regex = re.compile('\w+(?=\s*=\s*' + className + ')')
+                found = regex.search(content)
+
+                testName = found.group()
+                ###print('Found: ' + testName)
+
+                asserStr = '\n        ' + 'assert ' + testName +'.result == True, \'Test failed\''
+                tarStr = 'Comm2Functions.ReportProgress(100)'
+                finalContent = newContent.replace(tarStr, tarStr + asserStr)
+
+                dstFile = open(dst, "w")
+                dstFile.write(finalContent)
+                print('[PASS ] ', dst, " created")
+        except:
+            print('[ERROR] ', dst, " not created!!!!!")
+            pass
+
     def setup(partNumber, tests):
         print("setup")
 
         for f in os.listdir(PT_RUN):
-            if os.path.islink(join(PT_RUN, f)):
-                os.unlink(join(PT_RUN, f))
+            if f.endswith('.py'):
+                os.remove(join(PT_RUN, f))
 
         common, cpath = ProductionTestsManager.getCommon()
         lib, ppath = ProductionTestsManager.getChipLib(partNumber)
+
         for idx, val in enumerate(tests):
             pyName = 'test_{}_{}.py'.format(str(idx + 1).zfill(3), val)
-            print(pyName)
+            ###print(pyName)
             if val in common:
                 src = join(cpath, val + '.py')
             elif val in lib:
@@ -40,7 +74,8 @@ class ProductionTestsManager():
             else:
                 raise tornado.web.HTTPError(status_code=400, log_message='unknown script: {}'.format(pyName))
 
-            os.symlink(src, join(PT_RUN, pyName))
+            dst = join(PT_RUN, pyName)
+            ProductionTestsManager.updatePyTest(src, dst)
 
     def getScriptList(partNumber, id = None):
         tests = []
@@ -66,7 +101,7 @@ class ProductionTestsManager():
         print(tests)
 
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
-        SystemHandler.CallSysCommand([export_wrapper, 'python', '-m', 'pytest', PT_RUN])
+        SystemHandler.CallSysCommand([export_wrapper, 'pytest', '--tb=no',  '--disable-pytest-warnings', PT_RUN])
 
     def getSets(partNumber):
         sets = {}
@@ -167,7 +202,7 @@ class ProductionTestsHandler(APIHandler):
 
             ####test code
             ProductionTestsManager.run(partNumber, "ee0d8223-d754-40cd-8d04-9b0900003d87")
-            ProductionTestsManager.run(partNumber)
+            ###ProductionTestsManager.run(partNumber)
 
             self.finish(data)
 
