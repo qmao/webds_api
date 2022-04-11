@@ -6,8 +6,8 @@ from os import listdir
 from os.path import isfile, join, exists
 from . import webds
 from .utils import SystemHandler
+import threading
 
-from queue import Queue
 import time
 import sys
 import pytest
@@ -20,58 +20,13 @@ PT_RUN = PT_ROOT + "run/"
 PT_SETS = PT_ROOT + "sets/"
 PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
 
-g_pt_stdout = None
-
 sys.path.append(PT_WRAPPER)
 
-class PtStdout(Queue):
-    _progress = 0
-    _status = 'idle'
-    _message = None
-
-    def __init__(self):
-        super().__init__()
-
-    def write(self,msg):
-        try:
-            ###if "run" in msg:
-            ###    sys.__stdout__.write(msg)
-            ###sys.__stdout__.write(msg)
-            sys.__stdout__.write("[QQQQ]" + msg)
-        except Exception as e:
-            print("Oops StdoutHandler write!", e.__class__, "occurred.")
-            pass
-
-    def flush(self):
-        sys.__stdout__.flush()
-
-    def get_progress(self):
-        return self._progress
-
-    def set_progress(self, num):
-        self._progress = num
-
-    def reset(self):
-        self._status = 'idle'
-        self._progress = 0
-        self._message = ''
-
-    def set_status(self, status):
-        self._status = status
-
-    def get_status(self):
-        return self._status
-
-    def get_message(self):
-        return self._message
-
-    def set_message(self, message):
-        self._message = message
-
+from testBridge import TestBridge
 
 class ProductionTestsManager():
     _instance = None
-    std_default = None
+    _event = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -80,6 +35,7 @@ class ProductionTestsManager():
 
     def __init__(self):
         print("ProductionTestsManager init")
+        self._event = threading.Event()
 
     def updatePyTest(src, dst):
         ###print(src)
@@ -116,7 +72,7 @@ class ProductionTestsManager():
         print("setup")
 
         for f in os.listdir(PT_RUN):
-            if f.endswith('.py'):
+            if f.endswith('.py') and f != "conftest.py":
                 os.remove(join(PT_RUN, f))
 
         common, cpath = ProductionTestsManager.getCommon()
@@ -159,15 +115,13 @@ class ProductionTestsManager():
         print(tests)
         if len(tests) is 0:
             raise tornado.web.HTTPError(status_code=400, log_message='production test {} :{} no tests'.format(partNumber, id))
+        TestBridge().reset()
 
     def run(self):
         std_default = sys.stdout
-        ###sys.stdout = PtStdout()
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
         cmd = ['--tb=no', '--disable-pytest-warnings', PT_RUN]
         pytest.main(cmd)
-        ###SystemHandler.CallSysCommand([export_wrapper, 'pytest', '--tb=no',  '--disable-pytest-warnings', PT_RUN])
-        ###sys.stdout = std_default
 
     def getSets(partNumber):
         sets = {}
@@ -213,3 +167,7 @@ class ProductionTestsManager():
         with open(sets_file, 'w') as f:
             json.dump(data, f)
         return sets_file
+
+    def checkTestBridge(self):
+        report = TestBridge().getQueue()
+        return report

@@ -12,15 +12,37 @@ g_production_test_thread = None
 class ProductionTestsHandler(APIHandler):
     def sse(self):
         try:
+            pt = ProductionTestsManager()
             while True:
-                if self is not None:
+                ### nodeid state result
+                result = pt.checkTestBridge()
+                if result[0] is None:
+                    print("[TESTING FINISHED  ]@@@")
+                    break
+
+                if result[1] == 'started':
+                    print("*******", result[0])
                     send = {
-                        "progress": "111",
+                        "total" : 4,
+                        "index" : 3,
+                        "name" :  result[0],
+                        "status" : result[1]
+                        ###result?: "pass"/"fail"
                     }
                     yield self.publish(json.dumps(send))
-                    yield gen.sleep(0.0001)
+                elif result[1] == 'done':
+                    print("*******", result[0])
+                    print("*******", result[2])
+                    send = {
+                        "total" : 4,
+                        "index" : 3,
+                        "name"  :  result[0],
+                        "status" : result[1],
+                        "result" : result[2]
+                    }
+                    yield self.publish(json.dumps(send))
                 else:
-                    yield gen.sleep(1)
+                    print("   ")
 
         except StreamClosedError:
             message="stream closed"
