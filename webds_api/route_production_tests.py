@@ -148,6 +148,7 @@ class ProductionTestsManager():
             json.dump(data, f)
         return sets_file
 
+
 class ProductionTestsHandler(APIHandler):
     def sse(self):
         try:
@@ -199,10 +200,6 @@ class ProductionTestsHandler(APIHandler):
             print(partNumber)
 
             data = ProductionTestsManager.getTests(partNumber)
-
-            ####test code
-            ProductionTestsManager.run(partNumber, "ee0d8223-d754-40cd-8d04-9b0900003d87")
-            ###ProductionTestsManager.run(partNumber)
 
             self.finish(data)
 
