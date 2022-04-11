@@ -9,6 +9,10 @@ import re
 from . import webds
 from .utils import SystemHandler
 
+import threading
+from queue import Queue
+import time
+
 PT_ROOT = "/home/pi/jupyter/workspace/Synaptics/Production_Tests/"
 PT_LIB_ROOT = PT_ROOT + "lib/"
 PT_LIB_COMMON = PT_LIB_ROOT + "common/"
@@ -16,6 +20,53 @@ PT_WRAPPER = PT_ROOT + "wrapper/"
 PT_RUN = PT_ROOT + "run/"
 PT_SETS = PT_ROOT + "sets/"
 PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
+
+g_production_test_thread = None
+g_pt_output = None
+
+class StdoutPTHandler(Queue):
+    _progress = 0
+    _status = 'idle'
+    _message = None
+
+    def __init__(self):
+        super().__init__()
+
+    def write(self,msg):
+        try:
+            if "%" in msg:
+                progress = msg[12:-1]
+                self._progress = int(progress, base=10)
+            sys.__stdout__.write(msg)
+        except Exception as e:
+            print("Oops StdoutHandler write!", e.__class__, "occurred.")
+            pass
+
+    def flush(self):
+        sys.__stdout__.flush()
+
+    def get_progress(self):
+        return self._progress
+
+    def set_progress(self, num):
+        self._progress = num
+
+    def reset(self):
+        self._status = 'idle'
+        self._progress = 0
+        self._message = ''
+
+    def set_status(self, status):
+        self._status = status
+
+    def get_status(self):
+        return self._status
+
+    def get_message(self):
+        return self._message
+
+    def set_message(self, message):
+        self._message = message
 
 
 class ProductionTestsManager():
@@ -93,13 +144,16 @@ class ProductionTestsManager():
                 raise tornado.web.HTTPError(status_code=400, log_message='production test run {} :{} not found'.format(partNumber, id))
         return tests
 
-    def run(partNumber, id = None):
+    def preRun(partNumber, id = None):
         print('production test run {} :{}'.format(partNumber, id))
 
         tests = ProductionTestsManager.getScriptList(partNumber, id)
         ProductionTestsManager.setup(partNumber, tests)
         print(tests)
+        if len(tests) is 0:
+            raise tornado.web.HTTPError(status_code=400, log_message='production test {} :{} no tests'.format(partNumber, id))
 
+    def run():
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
         SystemHandler.CallSysCommand([export_wrapper, 'pytest', '--tb=no',  '--disable-pytest-warnings', PT_RUN])
 
@@ -117,7 +171,7 @@ class ProductionTestsManager():
     def getChipLib(partNumber):
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, PT_LIB_SCRIPT_SUBDIR)
         if not exists(chip_lib):
-            return []
+            raise tornado.web.HTTPError(status_code=400, log_message='production test {} lib not found'.format(partNumber))
         return [f[:-3] for f in listdir(chip_lib) if isfile(join(chip_lib, f))], chip_lib
 
     def getTests(partNumber):
@@ -218,10 +272,14 @@ class ProductionTestsHandler(APIHandler):
 
             test = input_data["test"]
             print(test)
+
             if test == "all":
                 print("run all tests")
+                self.run(partNumber)
             else:
                 print("run test: ", test)
+                self.run(partNumber, test)
+
         else:
             raise tornado.web.HTTPError(status_code=400, log_message=str('partnumber not found'))
 
@@ -247,3 +305,14 @@ class ProductionTestsHandler(APIHandler):
             raise tornado.web.HTTPError(status_code=400, log_message=str('partnumber not found'))
 
         self.finish(data)
+
+
+    def run(self, partNumber, id = None):
+        ProductionTestsManager.preRun(partNumber, id)
+        global g_production_test_thread
+        if g_production_test_thread is not None and g_production_test_thread.is_alive():
+            g_program_thread.join()
+
+        g_production_test_thread = threading.Thread(target=ProductionTestsManager.run)
+        g_production_test_thread.start()
+        print("production test thread start")
