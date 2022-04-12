@@ -1,0 +1,1 @@
+[{"name": "Test Set 1", "id": "ee0d8223-d754-40cd-8d04-9b0900003d87", "tests": ["FirmwareID", "AdcRangeTest", "TrxTrxShortTest", "FullRawCapTest", "NoiseTest", "SensorSpeedTest", "DevicePackageTest"]}, {"name": "Test Set 2", "id": "b7f7ec88-f551-4593-9087-7a230be5a483", "tests": []}]
