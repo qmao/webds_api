@@ -1,4 +1,5 @@
 from jupyter_server.base.handlers import APIHandler
+import tornado
 import json
 import re
 import os
@@ -58,6 +59,11 @@ class ProductionTestsManager():
                 asserStr = '\n        ' + 'assert ' + testName +'.result == True, \'Test failed\''
                 tarStr = 'Comm2Functions.ReportProgress(100)'
                 finalContent = newContent.replace(tarStr, tarStr + asserStr)
+
+                tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
+                if tarStr in finalContent:
+                    asserStr = '\n    Comm2Functions.SetTestName(test.name)\n'
+                    finalContent = finalContent.replace(tarStr, tarStr + asserStr)
 
                 dstFile = open(dst, "w")
                 dstFile.write(finalContent)
