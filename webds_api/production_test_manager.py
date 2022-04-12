@@ -26,7 +26,6 @@ from testBridge import TestBridge
 
 class ProductionTestsManager():
     _instance = None
-    _event = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -35,7 +34,6 @@ class ProductionTestsManager():
 
     def __init__(self):
         print("ProductionTestsManager init")
-        self._event = threading.Event()
 
     def updatePyTest(src, dst):
         ###print(src)
@@ -170,4 +168,20 @@ class ProductionTestsManager():
 
     def checkTestBridge(self):
         report = TestBridge().getQueue()
-        return report
+        index = name = status = outcome = None
+        if report is None:
+            name = None
+        else:
+            nodeid = report[0]
+            status = report[1]
+            outcome = report[2]
+            if status != 'finished':
+                regex = re.compile('\w+(?=\.py)')
+                found = regex.search(nodeid)
+                name = found.group(0)
+
+                regex = re.compile('(?<=_)\w+(?=\_)')
+                found = regex.search(name)
+                index = found.group(0)
+
+        return index, name, status, outcome

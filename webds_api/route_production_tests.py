@@ -1,4 +1,6 @@
 import tornado
+from tornado.iostream import StreamClosedError
+from tornado import gen
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
@@ -10,47 +12,6 @@ import threading
 g_production_test_thread = None
 
 class ProductionTestsHandler(APIHandler):
-    def sse(self):
-        try:
-            pt = ProductionTestsManager()
-            while True:
-                ### nodeid state result
-                result = pt.checkTestBridge()
-                if result[0] is None:
-                    print("[TESTING FINISHED  ]@@@")
-                    break
-
-                if result[1] == 'started':
-                    print("*******", result[0])
-                    send = {
-                        "total" : 4,
-                        "index" : 3,
-                        "name" :  result[0],
-                        "status" : result[1]
-                        ###result?: "pass"/"fail"
-                    }
-                    yield self.publish(json.dumps(send))
-                elif result[1] == 'done':
-                    print("*******", result[0])
-                    print("*******", result[2])
-                    send = {
-                        "total" : 4,
-                        "index" : 3,
-                        "name"  :  result[0],
-                        "status" : result[1],
-                        "result" : result[2]
-                    }
-                    yield self.publish(json.dumps(send))
-                else:
-                    print("   ")
-
-        except StreamClosedError:
-            message="stream closed"
-            print(message)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
-
-        print("sse finished")
-
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def publish(self, data):
@@ -67,16 +28,51 @@ class ProductionTestsHandler(APIHandler):
             raise
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, subpath: str = "", cluster_id: str = ""):
         print(self.request)
-        print(subpath)
-        print(cluster_id)
-        print(self.request.arguments)
+        print("subpath:", subpath)
+        ###print(cluster_id)
+        ###print(self.request.arguments)
 
         data = json.loads("{}")
         if subpath is "":
             ### GET/SSE
-            sse()
+            pt = ProductionTestsManager()
+            while True:
+                try:
+                    index, name, status, outcome = pt.checkTestBridge()
+                    if name is not None:
+                        if status == 'started':
+                            send = {
+                                "index" : index,
+                                "name" :  name,
+                                "status" : status
+                            }
+                            yield self.publish(json.dumps(send))
+                        elif status == 'done':
+                            send = {
+                                "index" : index,
+                                "name"  :  name,
+                                "status" : status,
+                                "result" : outcome
+                            }
+                            yield self.publish(json.dumps(send))
+                        else:
+                            print("unknown status: ", )
+                    else:
+                        if status == 'finished':
+                            print("[TEST FINISHED]")
+                            self.finish(json.dumps({
+                                "status" : "finished"
+                            }))
+                            break
+                    yield gen.sleep(0.0001)
+
+                except StreamClosedError:
+                    message="stream closed"
+                    print(message)
+                    raise tornado.web.HTTPError(status_code=400, log_message=message)
         else:
             partNumber = subpath[1:]
             print(partNumber)
