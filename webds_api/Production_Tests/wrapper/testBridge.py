@@ -27,5 +27,5 @@ class TestBridge():
         return result
         
     def reset(self):
-        ###self._queue.Queue.clear()
+        self._queue.queue.clear()
         print("TestBridge reset")

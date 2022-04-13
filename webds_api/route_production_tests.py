@@ -63,6 +63,9 @@ class ProductionTestsHandler(APIHandler):
                     else:
                         if status == 'finished':
                             print("[TEST FINISHED]")
+                            self.set_header('content-type', 'text/event-stream')
+                            self.write('id: finished\n')
+                            self.write('data: {}\n\n')
                             self.finish(json.dumps({
                                 "status" : "finished"
                             }))
