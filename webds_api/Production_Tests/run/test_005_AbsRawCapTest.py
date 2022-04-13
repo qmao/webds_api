@@ -1,10 +1,10 @@
 ## DO NOT MODIFY
-## 6dd26d92b5d37e14954f6e03db7f570db46c4512-1.0.0.7
+## 9cd467f0efbe2d3217a0d895d345929d686ea96a-1.0.0.8
 ## DO NOT MODIFY
 ## Metadata:
 # <?xml version="1.0" encoding="utf-8"?>
-# <metadata name="Adc Range Test" description="Adc Range" bin="24" product="S3908">
-#       <parameter name="Limits" type="string[][]" description="Limits for Adc Range Test"
+# <metadata name="Abs Raw Cap Test" description="Abs Raw Cap" bin="16" product="S3908">
+#       <parameter name="Limits" type="string[][]" description="Limits for Abs Raw Cap Test"
 #                   isoptional="false"
 #                   islimit = "true"
 #                   hint="Go to global settings to import test limit file." />
@@ -214,12 +214,12 @@ class ReportBasedTest(object):
                 Comm2Functions.Comm2DsCore_DestroyPacket(static_packet)
 
     def setup(self):
-        if self.data_collecting_type == 'production_test':
-            return
         """
         Sets up FW to begin polling for report data
         :return:
         """
+        if self.data_collecting_type == 'production_test':
+            return
         self.enable_diagnostic_reporting()
         Comm2Functions.Trace("Collecting report type {} samples...".format(self.report_id))
         if self.data_collecting_type == 'delegate':
@@ -237,10 +237,11 @@ class ReportBasedTest(object):
         for i in range(0, len(self._image_process_funcs)):
             self.apply_one_image_process_func(self._image_process_funcs[i])
 
-    """return one packet of report data. This is used to get diagnostic report
-    """
-
     def poll_one_diagnostic_report_packet(self):
+        """
+        return one packet of report data. This is used to get diagnostic report
+        :return:
+        """
         if self.data_collecting_type != 'diagnostic':
             raise TestException('poll_diagnostic_report is not used to get report {0}'.format(self.report_id))
         Comm2Functions.ReportProgress(40)
@@ -280,11 +281,11 @@ class ReportBasedTest(object):
             Comm2Functions.Comm2DsCore_DestroyPacket(packet)
             raise e
 
-    """
-    get_delegation_result_packets() is delegating collecting of report to upper layer.
-    """
-
     def get_delegation_result_packets(self):
+        """
+        get_delegation_result_packets() is delegating collecting of report to upper layer.
+        :return:
+        """
         if self.data_collecting_type != 'delegate':
             raise TestException('get_delegation_result_packets is not used to get report {0}'.format(self.report_id))
         start = datetime.now()
@@ -302,17 +303,13 @@ class ReportBasedTest(object):
         if count == self._sample_count:
             collected_packets = []
             packet = Comm2Functions.Comm2DsCore.CreatePacket()
-            try:
-                for idx in range(self._sample_count):
-                    correct_packet, timestamp = Comm2Functions.Comm2DsCore.GetCollectedPacket(self.name, idx, packet)
-                    if not correct_packet:
-                        Comm2Functions.Trace("Incorrect Packet")
-                        raise TestException('Got packets back, but they are not what we requested!')
-                    collected_packets.append(packet)
-                return collected_packets
-            except Exception as e:
-                Comm2Functions.Comm2DsCore_DestroyPacket(packet)
-                raise e
+            for idx in range(self._sample_count):
+                correct_packet, timestamp = Comm2Functions.Comm2DsCore.GetCollectedPacket(self.name, idx, packet)
+                if not correct_packet:
+                    Comm2Functions.Trace("Incorrect Packet")
+                    raise TestException('Got packets back, but they are not what we requested!')
+                collected_packets.append(packet)
+            return collected_packets
         else:
             Comm2Functions.Trace("collected " + str(count) + " packet(s)")
             raise TestException("Cannot obtain requested number of samples")
@@ -370,18 +367,19 @@ class ReportBasedTest(object):
 
     def data_byte_array_to_matrix(self, byte_array):
         payload_len = len(byte_array)
-        expected_len = self.num_cols * self.num_rows * 2
+        expected_len = (self.num_cols + self.num_rows) * 4
         if payload_len < expected_len:
             err_str = 'Expect {0} bytes of payload, but only got {1}'.format(expected_len,
                                                                              payload_len)
             Comm2Functions.Trace(err_str)
             raise TestException(err_str)
         converted_array = self.convert_report_data(byte_array)
-        matrix = Comm2Functions.CreateMatrix(self.num_cols, self.num_rows)
+        matrix = Comm2Functions.CreateMatrix(self.num_rows + self.num_cols,
+                                             1)
         Comm2Functions.Trace("Adding frame to result matrix")
         i = 0
-        for row in range(0, self.num_rows):
-            for column in range(0, self.num_cols):
+        for row in range(0, len(matrix)):
+            for column in range(0, len(matrix[0])):
                 matrix[row][column] = converted_array[i]
                 i += 1
         return matrix
@@ -390,15 +388,15 @@ class ReportBasedTest(object):
         if self._report_data_converter is None:
             self._report_data_converter = self._default_report_data_converter
         return self._report_data_converter(byte_array=byte_array,
-                                           image_row_num=self.num_rows,
-                                           image_col_num=self.num_cols,
-                                           word_size=int(self._bit_per_pixel / 8))
+                                           image_row_num=1,
+                                           image_col_num=(self.num_rows + self.num_cols),
+                                           word_size=4)
 
     def analyze_data(self):
         if not self.result_matrix:
             raise TestException("No test results found.")
 
-        self.pass_fail_matrix = Comm2Functions.CreateMatrix(self.num_cols, self.num_rows)
+        self.pass_fail_matrix = Comm2Functions.CreateMatrix(self.num_cols + self.num_rows, 1)
         Comm2Functions.ReportProgress(80)
         Comm2Functions.Trace("Checking result matrix against limits")
         compare_func = None
@@ -410,21 +408,21 @@ class ReportBasedTest(object):
         finally:
             if compare_func is None:
                 raise TestException('no compare logic function!')
-        for row in range(0, self.num_rows):
-            for column in range(0, self.num_cols):
+        for row in range(0, len(self.result_matrix)):
+            for column in range(0, len(self.result_matrix[0])):
                 if self._limit_desc == 'single':
                     compare_result = compare_func(data=self.result_matrix[row][column],
                                                   limit=self.limit_matrix[row][column],
-                                                  row_size=self.num_rows,
-                                                  col_size=self.num_cols,
+                                                  row_size=len(self.result_matrix),
+                                                  col_size=len(self.result_matrix[0]),
                                                   current_row=row,
                                                   current_col=column)
                 else:
                     compare_result = compare_func(data=self.result_matrix[row][column],
                                                   limit_lower=self.min_limit_matrix[row][column],
                                                   limit_upper=self.max_limit_matrix[row][column],
-                                                  row_size=self.num_rows,
-                                                  col_size=self.num_cols,
+                                                  row_size=len(self.result_matrix),
+                                                  col_size=len(self.result_matrix[0]),
                                                   current_row=row,
                                                   current_col=column)
                 if compare_result:
@@ -540,22 +538,22 @@ def judgement_func(**kwargs):
     return False
 
 
-def adc_range_report_data_converter(byte_array,
-                                    image_row_num,
-                                    image_col_num,
-                                    word_size=2):
+def four_byte_word_report_data_converter(byte_array,
+                                         image_row_num,
+                                         image_col_num,
+                                         word_size=4):
     """
-    Takes raw data byte array and converts to signed 16 bit report data
+    Takes raw data byte array and converts to signed 32 bit report data
     Arguments:
         byte_array (bytearray): report data
         image_row_num (int): number of rows of output image
         image_col_num (int): number of columns of output image
         word_size (int): size of one word in bytes
     Return:
-        list of unsigned short
+        list of unsigned int
     """
-    if word_size != 2:
-        raise TestException('currently only support 2-byte word size')
+    if word_size != 4:
+        raise TestException('currently only support 4-byte word size')
     # Trim to expected data
     data_len_row = image_row_num * word_size
     data_len_bytes = data_len_row * image_col_num
@@ -563,23 +561,25 @@ def adc_range_report_data_converter(byte_array,
     converted_array = []
     indices = range(0, len(expected_array), word_size)
     for i in indices:
-        # convert to 16-bit unsigned short
-        short_val = unpack("<H",
-                           unhexlify(str('%02x' % expected_array[i]) + str('%02x' % expected_array[i + 1])))[0]
-        converted_array.append(short_val)
+        value_str = unhexlify('{0:02x}{1:02x}{2:02x}{3:02x}'.format(expected_array[i],
+                                                                    expected_array[i + 1],
+                                                                    expected_array[i + 2],
+                                                                    expected_array[i + 3]))
+        value = unpack("<i", value_str)[0]
+        converted_array.append(value)
     return converted_array
 
 
-def test_main():
+def main():
     track_back_msg = None
     Comm2Functions.Trace("Test STARTED")
     test = ReportBasedTest()
     test.data_collect_timeout = 10
-    test.report_id = 0x11
-    test.name = 'Adc Range Test'
+    test.report_id = 0x12
     test.data_collecting_type = 'production_test'
+    test.name = 'Abs Raw Cap Test'
     test.add_compare_func('multiple', judgement_func)
-    test.report_data_converter = adc_range_report_data_converter
+    test.report_data_converter = four_byte_word_report_data_converter
     xml_generator = XMLTestResultGenerator.XMLTestResultGenerator()
     Comm2Functions.SetTestName(test.name)
 
@@ -594,8 +594,9 @@ def test_main():
         test.run()
 
         Comm2Functions.Trace("Creating custom xml")
-        xml_generator.set_row_headers(["{0}".format(element) for element in range(0, int(test.num_rows))])
-        xml_generator.set_column_headers(["{0}".format(element) for element in range(0, int(test.num_cols))])
+        xml_generator.set_row_headers(["{0}".format(element) for element in range(0, int(1))])
+        xml_generator.set_column_headers(
+            ["{0}".format(element) for element in range(0, int(test.num_rows + test.num_cols))])
         xml_generator.add_matrix(test.pass_fail_matrix,
                                  xml_generator.MATRIX_TYPE_LONG,
                                  "testResult")
@@ -625,8 +626,12 @@ def test_main():
             Comm2Functions.Trace(track_back_msg)
         Comm2Functions.Trace("Test FINISHED")
         Comm2Functions.ReportProgress(100)
-        assert test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'

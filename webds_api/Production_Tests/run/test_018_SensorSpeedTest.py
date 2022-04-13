@@ -542,7 +542,7 @@ def judgement_func(**kwargs):
     return False
 
 
-def test_main():
+def main():
     track_back_msg = None
     Comm2Functions.Trace("Test STARTED")
     test = ReportBasedTest()
@@ -596,8 +596,12 @@ def test_main():
             Comm2Functions.Trace(track_back_msg)
         Comm2Functions.Trace("Test FINISHED")
         Comm2Functions.ReportProgress(100)
-        assert test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'

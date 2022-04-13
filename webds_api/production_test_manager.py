@@ -36,43 +36,58 @@ class ProductionTestsManager():
     def __init__(self):
         print("ProductionTestsManager init")
 
+    ##def convertPyTest(content):
+    ##    newContent = re.sub('main\(\)', 'test_main()', content)
+    ##    regex = re.compile('(?<=class )\s*\w+(?=\(object\))')
+    ##    found = regex.search(content)
+    ##    className = found.group(0)
+    ##    ### print('Found: ' + className)
+    ##    ### \s*  optional spaces
+    ##    ### (?=  beginning of positive lookahead
+    ##    regex = re.compile('\w+(?=\s*=\s*' + className + ')')
+    ##    found = regex.search(content)
+    ##
+    ##    testName = found.group()
+    ##    ###print('Found: ' + testName)
+    ##
+    ##    tarStr = 'Comm2Functions.ReportProgress(100)'
+    ##    ### check space
+    ##    space_group = re.findall(r'\n\s*(?=Comm2Functions.ReportProgress\(100\))', content)
+    ##    space = space_group[-1]
+    ##
+    ##    assertStr = '\n' + space + 'assert ' + testName +'.result == True, \'Test failed\''
+    ##    finalContent = newContent.replace(tarStr, tarStr + assertStr)
+    ##
+    ##    tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
+    ##    if tarStr in finalContent and 'test.name' in finalContent:
+    ##        ### check space
+    ##        space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', content)
+    ##        space = space_group[-1]
+    ##        space = space[0: len(space) - len(space.lstrip())]
+    ##
+    ##        assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
+    ##        finalContent = finalContent.replace(tarStr, tarStr + assertStr)
+    ##    return finalContent
+
     def convertPyTest(content):
-        newContent = re.sub('main\(\)', 'test_main()', content)
-
-        regex = re.compile('(?<=class )\s*\w+(?=\(object\))')
-        found = regex.search(content)
-        className = found.group(0)
-        ### print('Found: ' + className)
-        ### \s*  optional spaces
-        ### (?=  beginning of positive lookahead
-        regex = re.compile('\w+(?=\s*=\s*' + className + ')')
-        found = regex.search(content)
-
-        testName = found.group()
-        ###print('Found: ' + testName)
-
-        tarStr = 'Comm2Functions.ReportProgress(100)'
-        ### check space
-        space_group = re.findall(r'\n\s*(?=Comm2Functions.ReportProgress\(100\))', content)
-        space = space_group[-1]
-
-        assertStr = '\n' + space + 'assert ' + testName +'.result == True, \'Test failed\''
-        finalContent = newContent.replace(tarStr, tarStr + assertStr)
+        assertStr = '\n\ndef test_main():\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+        finalContent = content + assertStr
 
         tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
         if tarStr in finalContent and 'test.name' in finalContent:
             ### check space
-            space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', content)
+            space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', finalContent)
             space = space_group[-1]
             space = space[0: len(space) - len(space.lstrip())]
 
             assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
             finalContent = finalContent.replace(tarStr, tarStr + assertStr)
+
         return finalContent
 
     def updatePyTest(src, dst):
         ###print(src)
-        ###print(dst)
+        print(dst)
         try:
             with open (src, 'r' ) as f:
                 content = f.read()
@@ -82,7 +97,7 @@ class ProductionTestsManager():
                 dstFile.write(finalContent)
                 print('[CREATE] ', dst, " created")
         except:
-            print('[ERROR] ', dst, " not created!!!!!")
+            print('[ERROR ] ', dst, " not created!!!!!")
             pass
 
     def setup(partNumber, tests):
@@ -114,7 +129,7 @@ class ProductionTestsManager():
             ### run all
             common, cpath = ProductionTestsManager.getCommon()
             lib, ppath = ProductionTestsManager.getChipLib(partNumber)
-            tests = sorted(common) + sorted(lib)
+            tests = common + lib
         else:
             try:
                 sets = ProductionTestsManager.getSets(partNumber)
@@ -149,28 +164,15 @@ class ProductionTestsManager():
         return sets
 
     def getTestList(path):
-        tests = []
-        for test in listdir(path):
-            if isfile(join(path, test)):
-                try:
-                    with open (join(path, test), 'r' ) as f:
-                        print("4******", join(path, test))
-                        ProductionTestsManager.convertPyTest(f.read())
-                    tests.append(test[: -3])
-                except Exception as e:
-                    print(e)
-                    pass
-        return tests
+        return sorted([f[:-3] for f in listdir(path) if isfile(join(path, f))])
 
     def getCommon():
-        ###return [f[:-3] for f in listdir(PT_LIB_COMMON) if isfile(join(PT_LIB_COMMON, f))], PT_LIB_COMMON
         return ProductionTestsManager.getTestList(PT_LIB_COMMON), PT_LIB_COMMON
 
     def getChipLib(partNumber):
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, PT_LIB_SCRIPT_SUBDIR)
         if not exists(chip_lib):
             raise tornado.web.HTTPError(status_code=400, log_message='production test {} lib not found'.format(partNumber))
-        ####return [f[:-3] for f in listdir(chip_lib) if isfile(join(chip_lib, f))], chip_lib
         return ProductionTestsManager.getTestList(chip_lib), chip_lib
 
     def getTests(partNumber):

@@ -67,7 +67,7 @@ class TestException(Exception):
         self.message = message
 
 
-def test_main():
+def main():
     Comm2Functions.Trace("Firmware ID Test STARTED")
     fw_id_test = FirmwareIDTest()
 
@@ -95,8 +95,12 @@ def test_main():
     finally:
         Comm2Functions.Trace("Firmware ID Test FINISHED")
         Comm2Functions.ReportProgress(100)
-        assert fw_id_test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'

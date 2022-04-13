@@ -1,24 +1,23 @@
 ## DO NOT MODIFY
-## c711ca15f3a1e53e0a02533489e31b2d0446891d-1.0.0.7
+## 113d4338937ec571783f0987b9b52c595e3e5c5f-1.0.0.7
 ## DO NOT MODIFY
 ## Metadata:
 # <?xml version="1.0" encoding="utf-8"?>
-# <metadata name="Noise Test" description="Noise Test" bin="40" product="S3908">
-#       <parameter name="Limits" type="string[][]" description="Limits for Noise Test"
+# <metadata name="GPIO Open Test" description="GPIO Open Test" bin="32" product="S3908">
+#       <parameter name="Limits" type="string[][]" description="Limits for GPIO Open Test"
 #                   isoptional="false"
 #                   islimit = "true"
 #                   hint="Go to global settings to import test limit file." />
-#        <parameter name="SampleCount" type="int" description="Sample Count" isoptional="false" >
-#            <default>1</default>
-#        </parameter>
 # </metadata>
 ##
 
+
+import traceback
+from binascii import unhexlify
 from datetime import datetime
 from struct import unpack
-from binascii import unhexlify
 from time import sleep
-import traceback
+
 import Comm2Functions
 import XMLTestResultGenerator
 
@@ -30,13 +29,23 @@ class TestException(Exception):
 
 class ReportBasedTest(object):
     def __init__(self):
-        self._bit_per_pixel = 16
+        self.NUM_OF_GPIO = "numGpioPins"
+        self.GPIO_MASK = "gpioPinToOmitMask"
+
+        self.EXTRA_GPIO = "numExtraGpioPins"
+        self.EXTRA_GPIO_MASK = "extraGpioPinToOmitMask"
+
+        self.STATIC_CONFIGURATION = "staticConfiguration"
+        self.BIT_PER_PIXEL = 16
+        self.REPORT_ID = 0x13
+        self.NAME = 'GPIO Open Test'
+        self.DATA_COLLECTION_TYPE = 'production_test'
+
         self._data_collect_timeout = 10  # in seconds
         self._sample_count = 1
-        self._report_id = 18  # default is RT18, delta cap image
+
         self._valid_data_collecting_type = ['delegate', 'production_test', 'diagnostic']
-        self._data_collecting_type = 'delegate'
-        self._name = ''
+
         self.message = ""
         self.result = False
         self.num_rows = None
@@ -52,6 +61,10 @@ class ReportBasedTest(object):
         self._image_process_funcs = []
         self._limit_desc = None
 
+        # static vars
+        self.num_of_gpio = 0
+        self.gpio_mask = 0
+
     @property
     def data_collect_timeout(self):
         """Get data collection timeout in seconds
@@ -64,14 +77,6 @@ class ReportBasedTest(object):
     def data_collect_timeout(self, data_collect_timeout):
         self._data_collect_timeout = data_collect_timeout
 
-    @property
-    def report_id(self):
-        return self._report_id
-
-    @report_id.setter
-    def report_id(self, report_id):
-        self._report_id = report_id
-
     """Specify whether the report is a production test report.
        A production test report is the result of a certain kind of production test,
        and it is the response of production test command ($2A)
@@ -79,22 +84,14 @@ class ReportBasedTest(object):
 
     @property
     def data_collecting_type(self):
-        return self._data_collecting_type
+        return self.DATA_COLLECTION_TYPE
 
     @data_collecting_type.setter
     def data_collecting_type(self, val):
         if val.lower() in self._valid_data_collecting_type:
-            self._data_collecting_type = val
+            self.DATA_COLLECTION_TYPE = val
         else:
             raise TestException('{0} is not a valid option'.format(val))
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
 
     def add_compare_func(self, limit_desc, func):
         """Add a function, which implements the logic to compare data with limit
@@ -119,33 +116,29 @@ class ReportBasedTest(object):
         self._report_data_converter = converter
 
     @staticmethod
-    def _default_report_data_converter(byte_array,
-                                       image_row_num,
-                                       image_col_num,
-                                       word_size=2):
+    def _default_report_data_converter(byte_array):
         """
-        Takes raw data byte array and converts to signed 16 bit report data
         Arguments:
             byte_array (bytearray): report data
-            image_row_num (int): number of rows of output image
-            image_col_num (int): number of columns of output image
-            word_size (int): size of one word in bytes
         Return:
             list of signed short
         """
-        if word_size != 2:
-            raise TestException('currently only support 2-byte word size')
         # Trim to expected data
-        data_len_row = image_row_num * word_size
-        data_len_bytes = data_len_row * image_col_num
-        expected_array = byte_array[:data_len_bytes]
+        expected_array = byte_array[:2]
         converted_array = []
-        indices = range(0, len(expected_array), word_size)
+        indices = range(0, 2)
         for i in indices:
-            short_val = unpack("<h",
-                               unhexlify(str('%02x' % expected_array[i]) + str('%02x' % expected_array[i + 1])))[0]
-            converted_array.append(short_val)
-        return converted_array
+            val = unpack("<B", unhexlify(str('%02x' % expected_array[i])))[0]
+            converted_array.append(val)
+
+        binary_array = []
+        temp = []
+        for char in converted_array:
+            del temp[:]
+            temp.append(str("{0:08b}".format(char))[::-1])
+            for x in range(len(temp[0])):
+                binary_array.append(int(temp[0][x]))
+        return binary_array
 
     def add_image_process_func(self, func):
         self._image_process_funcs.append(func)
@@ -157,10 +150,10 @@ class ReportBasedTest(object):
         """
         packet = None
         try:
-            Comm2Functions.Trace("Execute Enable Report 0x05 with payload of {}".format(self.report_id))
+            Comm2Functions.Trace("Execute Enable Report 0x05 with payload of {}".format(self.REPORT_ID))
             packet = Comm2Functions.Comm2DsCore.CreatePacket()
-            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x05, [self.report_id], packet) != 0:
-                raise TestException("Failed to enable report type {} reporting.".format(self.report_id))
+            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x05, [self.REPORT_ID], packet) != 0:
+                raise TestException("Failed to enable report type {} reporting.".format(self.REPORT_ID))
         finally:
             if packet is not None:
                 Comm2Functions.Comm2DsCore.DestroyPacket(packet)
@@ -174,47 +167,63 @@ class ReportBasedTest(object):
             return
 
         packet = None
+
         try:
-            Comm2Functions.Trace("Execute Disable Report 0x06 with payload of {}".format(self.report_id))
+            Comm2Functions.Trace("Execute Disable Report 0x06 with payload of {}".format(self.REPORT_ID))
             packet = Comm2Functions.Comm2DsCore.CreatePacket()
-            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x06, [self.report_id], packet) != 0:
-                raise TestException("Failed to disable report type {} reporting.".format(self.report_id))
+            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x06, [self.REPORT_ID], packet) != 0:
+                raise TestException("Failed to disable report type {} reporting.".format(self.REPORT_ID))
         finally:
             if packet is not None:
                 Comm2Functions.Comm2DsCore.DestroyPacket(packet)
 
-    def get_static_config_info(self):
+    def get_required_vars(self):
         """
-        Gets numTx and numRx from static config packet
+        Get required vars from static config
         :return:
         """
         static_packet = None
-
         try:
-            static_packet = Comm2Functions.Comm2DsCore_CreatePacket()
-
-            if Comm2Functions.Comm2DsCore_GetHelper("staticConfiguration") is None:
+            if Comm2Functions.Comm2DsCore_GetHelper(self.STATIC_CONFIGURATION) is None:
                 raise TestException("Missing static configuration packet helper.")
 
+            static_packet = Comm2Functions.Comm2DsCore.CreatePacket()
+
             if Comm2Functions.Comm2DsCore_ExecuteCommand(0x21, [], static_packet) != 0:
-                raise TestException("Cannot get static config packet from device.")
+                raise TestException("Cannot read static configuration from device.")
+
+            temp = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, self.STATIC_CONFIGURATION, self.NUM_OF_GPIO)
+            if temp is None:
+                raise TestException("Cannot read {0} from device.".format(self.NUM_OF_GPIO))
+
+            self.num_of_gpio = temp[0]
+
+            temp = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, self.STATIC_CONFIGURATION, self.EXTRA_GPIO)
+            if temp is None:
+                Comm2Functions.Trace("No extra GPIO pins found.")
             else:
-                # Rows = Tx
-                # Col = Rx
+                self.num_of_gpio += temp[0]
 
-                rx_count = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, "staticConfiguration", "rxCount")
-                if rx_count is None or len(rx_count) != 1:
-                    raise TestException("Failed to get rx count from device.")
+            self.num_rows = 1
+            self.num_cols = self.num_of_gpio
 
-                tx_count = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, "staticConfiguration", "txCount")
-                if tx_count is None or len(tx_count) != 1:
-                    raise TestException("Failed to get tx count from device.")
+            temp = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, self.STATIC_CONFIGURATION, self.GPIO_MASK)
+            if temp is None:
+                raise TestException("Cannot read {0} from device.".format(self.GPIO_MASK))
 
-                self.num_cols = rx_count[0]
-                self.num_rows = tx_count[0]
+            self.gpio_mask = temp[0]
+
+            temp = Comm2Functions.Comm2DsCore_GetVarValues(static_packet, self.STATIC_CONFIGURATION, self.EXTRA_GPIO_MASK)
+            if temp is None:
+                Comm2Functions.Trace("No extra GPIO pin mask found.")
+            else:
+                self.gpio_mask = (temp[0] << 8) | self.gpio_mask
+
+            Comm2Functions.Trace("GPIO Mask found: {0}".format(self.gpio_mask))
+
         finally:
             if static_packet is not None:
-                Comm2Functions.Comm2DsCore_DestroyPacket(static_packet)
+                Comm2Functions.Comm2DsCore.DestroyPacket(static_packet)
 
     def setup(self):
         """
@@ -223,12 +232,11 @@ class ReportBasedTest(object):
         """
         if self.data_collecting_type == 'production_test':
             return
-
         self.enable_diagnostic_reporting()
-        Comm2Functions.Trace("Collecting report type {} samples...".format(self.report_id))
+        Comm2Functions.Trace("Collecting report type {} samples...".format(self.REPORT_ID))
         if self.data_collecting_type == 'delegate':
-            Comm2Functions.Comm2DsCore.SetCollectPacketInfo(self.name,
-                                                            self.report_id,
+            Comm2Functions.Comm2DsCore.SetCollectPacketInfo(self.NAME,
+                                                            self.REPORT_ID,
                                                             self._sample_count)
 
     def apply_one_image_process_func(self, func):
@@ -247,7 +255,7 @@ class ReportBasedTest(object):
         :return:
         """
         if self.data_collecting_type != 'diagnostic':
-            raise TestException('poll_diagnostic_report is not used to get report {0}'.format(self.report_id))
+            raise TestException('poll_diagnostic_report is not used to get report {0}'.format(self.REPORT_ID))
         Comm2Functions.ReportProgress(40)
         packet = Comm2Functions.Comm2DsCore.CreatePacket()
         Comm2Functions.Trace("Getting test report...")
@@ -257,8 +265,8 @@ class ReportBasedTest(object):
             read_packet_ret = Comm2Functions.Comm2DsCore.ReadPacket(packet)
             Comm2Functions.Trace('Read packet ret = {0}'.format(read_packet_ret))
             Comm2Functions.Trace('Packet report type = {0}'.format(packet.ReportType))
-            if packet.ReportType == self._report_id:
-                Comm2Functions.Trace('Got report {0}'.format(self.report_id))
+            if packet.ReportType == self.REPORT_ID:
+                Comm2Functions.Trace('Got report {0}'.format(self.REPORT_ID))
                 break
             else:
                 retry += 1
@@ -273,12 +281,12 @@ class ReportBasedTest(object):
 
     def get_one_production_test_response_packet(self):
         if self.data_collecting_type != 'production_test':
-            raise TestException('get_production_test_report is not used to get report {0}'.format(self.report_id))
+            raise TestException('get_production_test_report is not used to get report {0}'.format(self.REPORT_ID))
         Comm2Functions.ReportProgress(40)
-        Comm2Functions.Trace("Getting test report PID = ${:02X}".format(self.report_id))
+        Comm2Functions.Trace("Getting test report PID = ${:02X}".format(self.REPORT_ID))
         packet = Comm2Functions.Comm2DsCore.CreatePacket()
         try:
-            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x2A, [self.report_id], packet) != 0:
+            if Comm2Functions.Comm2DsCore.ExecuteCommand(0x2A, [self.REPORT_ID], packet) != 0:
                 raise TestException("Failed to receive production test data from device.")
             return packet
         except Exception as e:
@@ -291,14 +299,14 @@ class ReportBasedTest(object):
         :return:
         """
         if self.data_collecting_type != 'delegate':
-            raise TestException('get_delegation_result_packets is not used to get report {0}'.format(self.report_id))
+            raise TestException('get_delegation_result_packets is not used to get report {0}'.format(self.REPORT_ID))
         start = datetime.now()
         total = 0
         count = 0
         while total < self.data_collect_timeout:
             # This just gives you the information on the collected packet information.
             # There could be a possibility that the collected packets does not equal the request packet count.
-            count = Comm2Functions.Comm2DsCore.GetCollectPacketInfo(self.name)[0]
+            count = Comm2Functions.Comm2DsCore.GetCollectPacketInfo(self.NAME)[0]
             if count == self._sample_count:
                 Comm2Functions.Trace("Collected " + str(self._sample_count) + " packets")
                 break
@@ -309,7 +317,7 @@ class ReportBasedTest(object):
             packet = Comm2Functions.Comm2DsCore.CreatePacket()
             try:
                 for idx in range(self._sample_count):
-                    correct_packet, timestamp = Comm2Functions.Comm2DsCore.GetCollectedPacket(self.name, idx, packet)
+                    correct_packet, timestamp = Comm2Functions.Comm2DsCore.GetCollectedPacket(self.NAME, idx, packet)
                     if not correct_packet:
                         Comm2Functions.Trace("Incorrect Packet")
                         raise TestException('Got packets back, but they are not what we requested!')
@@ -354,9 +362,11 @@ class ReportBasedTest(object):
     def run(self):
         packets = None
         try:
-            self.get_static_config_info()
+            self.get_required_vars()
             self.setup()
+            Comm2Functions.SendMessageBox("Please place ground plate down.")
             packets = self.get_packets()
+            Comm2Functions.SendMessageBox("Please remove ground plate.")
             matrices = self.map_packets_to_matrices(packets)
             Comm2Functions.Trace("Creating result matrix...")
             self.result_matrix = self.reduce_matrices(matrices)
@@ -375,7 +385,7 @@ class ReportBasedTest(object):
 
     def data_byte_array_to_matrix(self, byte_array):
         payload_len = len(byte_array)
-        expected_len = self.num_cols * self.num_rows * 2
+        expected_len = 2
         if payload_len < expected_len:
             err_str = 'Expect {0} bytes of payload, but only got {1}'.format(expected_len,
                                                                              payload_len)
@@ -394,10 +404,7 @@ class ReportBasedTest(object):
     def convert_report_data(self, byte_array):
         if self._report_data_converter is None:
             self._report_data_converter = self._default_report_data_converter
-        return self._report_data_converter(byte_array=byte_array,
-                                           image_row_num=self.num_rows,
-                                           image_col_num=self.num_cols,
-                                           word_size=int(self._bit_per_pixel / 8))
+        return self._report_data_converter(byte_array=byte_array)
 
     def analyze_data(self):
         if not self.result_matrix:
@@ -419,20 +426,17 @@ class ReportBasedTest(object):
             for column in range(0, self.num_cols):
                 if self._limit_desc == 'single':
                     compare_result = compare_func(data=self.result_matrix[row][column],
-                                                  limit=self.limit_matrix[row][column],
-                                                  row_size=self.num_rows,
-                                                  col_size=self.num_cols,
-                                                  current_row=row,
-                                                  current_col=column)
+                                                  limit=self.limit_matrix[row][column])
                 else:
                     compare_result = compare_func(data=self.result_matrix[row][column],
                                                   limit_lower=self.min_limit_matrix[row][column],
-                                                  limit_upper=self.max_limit_matrix[row][column],
-                                                  row_size=self.num_rows,
-                                                  col_size=self.num_cols,
-                                                  current_row=row,
-                                                  current_col=column)
-                if compare_result:
+                                                  limit_upper=self.max_limit_matrix[row][column])
+                n_bit_set = (self.gpio_mask & (1 << column)) >> column
+
+                if n_bit_set:
+                    # -1 is disable
+                    self.pass_fail_matrix[row][column] = -1
+                elif compare_result and not n_bit_set:
                     # row = rx
                     # column = tx
                     self.pass_fail_matrix[row][column] = 1
@@ -469,10 +473,10 @@ class ReportBasedTest(object):
                 idx = Comm2Functions.GetInputIndex("Limits", [row, column])
                 try:
                     stripped_value = str(Comm2Functions.GetInputParamEx("Limits", idx)).strip("'").strip("\"")
-                    self.limit_matrix[row][column] = int(stripped_value)
+                    self.limit_matrix[row][column] = float(stripped_value)
                 except ValueError:
                     stripped_value = str(Comm2Functions.GetInputParamEx("Limits", idx))[1:].strip("'").strip("\"")
-                    self.limit_matrix[row][column] = int(stripped_value)
+                    self.limit_matrix[row][column] = float(stripped_value)
                     continue
         return True
 
@@ -491,7 +495,6 @@ class ReportBasedTest(object):
             raise TestException("No test limits provided.")
 
         Comm2Functions.Trace("Creating min limit matrix...")
-        # Limit format is min,max; default limits are 250,750
         self.min_limit_matrix = Comm2Functions.CreateMatrix(limit_dim[1], limit_dim[0])
 
         Comm2Functions.Trace("Creating max limit matrix...")
@@ -530,33 +533,23 @@ class ReportBasedTest(object):
 def judgement_func(**kwargs):
     try:
         data = kwargs.pop('data', 0)
-        limit_lower = kwargs.pop('limit_lower', 0)
-        limit_upper = kwargs.pop('limit_upper', 0)
-        row_size = kwargs.pop('row_size', 0)
-        col_size = kwargs.pop('col_size', 0)
-        current_row = kwargs.pop('current_row', 0)
-        current_col = kwargs.pop('current_col', 0)
+        limit = kwargs.pop('limit', 0)
     except KeyError as key_err:
         raise key_err
     if kwargs:
         raise TypeError('Unexpected **kwargs: %r' % kwargs)
-    if data > limit_upper or data < limit_lower:
+    if int(data) != int(limit):
         return True
     return False
 
 
-def test_main():
+def main():
     track_back_msg = None
     Comm2Functions.Trace("Test STARTED")
     test = ReportBasedTest()
-    test.data_collect_timeout = 10
-    test.report_id = 0xa
-    test.data_collecting_type = 'production_test'
-    test.name = 'Noise Test'
-    test.add_compare_func('multiple', judgement_func)
-    xml_generator = XMLTestResultGenerator.XMLTestResultGenerator()
-    Comm2Functions.SetTestName(test.name)
 
+    test.add_compare_func('single', judgement_func)
+    xml_generator = XMLTestResultGenerator.XMLTestResultGenerator()
 
     try:
         Comm2Functions.Trace("Checking input params")
@@ -564,7 +557,7 @@ def test_main():
         if not test.get_input_params():
             raise TestException("Invalid input parameters")
 
-        Comm2Functions.Trace("Running {} test now...".format(test.name))
+        Comm2Functions.Trace("Running {} test now...".format(test.NAME))
         test.run()
 
         Comm2Functions.Trace("Creating custom xml")
@@ -599,8 +592,12 @@ def test_main():
             Comm2Functions.Trace(track_back_msg)
         Comm2Functions.Trace("Test FINISHED")
         Comm2Functions.ReportProgress(100)
-        assert test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'

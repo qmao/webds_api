@@ -1,10 +1,10 @@
 ## DO NOT MODIFY
-## 3bb36311916688375e8372f03500bbb249d3b7a8-1.0.0.6
+## 6dd26d92b5d37e14954f6e03db7f570db46c4512-1.0.0.7
 ## DO NOT MODIFY
 ## Metadata:
 # <?xml version="1.0" encoding="utf-8"?>
-# <metadata name="Full Raw Cap Test" description="Full Raw Cap" bin="15" product="S3908">
-#       <parameter name="Limits" type="string[][]" description="Limits for Full Raw Cap Test"
+# <metadata name="Adc Range Test" description="Adc Range" bin="24" product="S3908">
+#       <parameter name="Limits" type="string[][]" description="Limits for Adc Range Test"
 #                   isoptional="false"
 #                   islimit = "true"
 #                   hint="Go to global settings to import test limit file." />
@@ -214,12 +214,12 @@ class ReportBasedTest(object):
                 Comm2Functions.Comm2DsCore_DestroyPacket(static_packet)
 
     def setup(self):
+        if self.data_collecting_type == 'production_test':
+            return
         """
         Sets up FW to begin polling for report data
         :return:
         """
-        if self.data_collecting_type == 'production_test':
-            return
         self.enable_diagnostic_reporting()
         Comm2Functions.Trace("Collecting report type {} samples...".format(self.report_id))
         if self.data_collecting_type == 'delegate':
@@ -237,11 +237,10 @@ class ReportBasedTest(object):
         for i in range(0, len(self._image_process_funcs)):
             self.apply_one_image_process_func(self._image_process_funcs[i])
 
+    """return one packet of report data. This is used to get diagnostic report
+    """
+
     def poll_one_diagnostic_report_packet(self):
-        """
-        return one packet of report data. This is used to get diagnostic report
-        :return:
-        """
         if self.data_collecting_type != 'diagnostic':
             raise TestException('poll_diagnostic_report is not used to get report {0}'.format(self.report_id))
         Comm2Functions.ReportProgress(40)
@@ -281,11 +280,11 @@ class ReportBasedTest(object):
             Comm2Functions.Comm2DsCore_DestroyPacket(packet)
             raise e
 
+    """
+    get_delegation_result_packets() is delegating collecting of report to upper layer.
+    """
+
     def get_delegation_result_packets(self):
-        """
-        get_delegation_result_packets() is delegating collecting of report to upper layer.
-        :return:
-        """
         if self.data_collecting_type != 'delegate':
             raise TestException('get_delegation_result_packets is not used to get report {0}'.format(self.report_id))
         start = datetime.now()
@@ -350,6 +349,7 @@ class ReportBasedTest(object):
     def run(self):
         packets = None
         try:
+            self.get_static_config_info()
             self.setup()
             packets = self.get_packets()
             matrices = self.map_packets_to_matrices(packets)
@@ -362,8 +362,8 @@ class ReportBasedTest(object):
             if not self.message:
                 self.result = True
         finally:
-            # clean up packets that are no longer needed
             if packets is not None:
+                # clean up packets that are no longer needed
                 for packet in packets:
                     Comm2Functions.Comm2DsCore.DestroyPacket(packet)
                 Comm2Functions.Trace("packets no longer needed are cleanup.")
@@ -487,16 +487,16 @@ class ReportBasedTest(object):
 
         Comm2Functions.Trace("Creating min limit matrix...")
         # Limit format is min,max; default limits are 250,750
-        self.min_limit_matrix = Comm2Functions.CreateMatrix(self.num_cols, self.num_rows)
+        self.min_limit_matrix = Comm2Functions.CreateMatrix(limit_dim[1], limit_dim[0])
 
         Comm2Functions.Trace("Creating max limit matrix...")
-        self.max_limit_matrix = Comm2Functions.CreateMatrix(self.num_cols, self.num_rows)
+        self.max_limit_matrix = Comm2Functions.CreateMatrix(limit_dim[1], limit_dim[0])
 
         Comm2Functions.Trace("Creating combined limit matrix...")
-        self.limit_matrix = Comm2Functions.CreateMatrix(self.num_cols, self.num_rows)
+        self.limit_matrix = Comm2Functions.CreateMatrix(limit_dim[1], limit_dim[0])
 
-        for row in range(self.num_rows):
-            for column in range(self.num_cols):
+        for row in range(0, limit_dim[0]):
+            for column in range(0, limit_dim[1]):
                 idx = Comm2Functions.GetInputIndex("Limits", [row, column])
                 try:
                     raw_data = str(Comm2Functions.GetInputParamEx("Limits", idx)).split(":")
@@ -540,10 +540,20 @@ def judgement_func(**kwargs):
     return False
 
 
-def full_raw_cap_report_data_converter(byte_array,
-                                       image_row_num,
-                                       image_col_num,
-                                       word_size=2):
+def adc_range_report_data_converter(byte_array,
+                                    image_row_num,
+                                    image_col_num,
+                                    word_size=2):
+    """
+    Takes raw data byte array and converts to signed 16 bit report data
+    Arguments:
+        byte_array (bytearray): report data
+        image_row_num (int): number of rows of output image
+        image_col_num (int): number of columns of output image
+        word_size (int): size of one word in bytes
+    Return:
+        list of unsigned short
+    """
     if word_size != 2:
         raise TestException('currently only support 2-byte word size')
     # Trim to expected data
@@ -560,16 +570,16 @@ def full_raw_cap_report_data_converter(byte_array,
     return converted_array
 
 
-def test_main():
+def main():
     track_back_msg = None
     Comm2Functions.Trace("Test STARTED")
     test = ReportBasedTest()
     test.data_collect_timeout = 10
-    test.report_id = 0x05
-    test.name = 'Full Raw Cap Test'
+    test.report_id = 0x11
+    test.name = 'Adc Range Test'
     test.data_collecting_type = 'production_test'
     test.add_compare_func('multiple', judgement_func)
-    test.report_data_converter = full_raw_cap_report_data_converter
+    test.report_data_converter = adc_range_report_data_converter
     xml_generator = XMLTestResultGenerator.XMLTestResultGenerator()
     Comm2Functions.SetTestName(test.name)
 
@@ -577,8 +587,6 @@ def test_main():
     try:
         Comm2Functions.Trace("Checking input params")
         Comm2Functions.ReportProgress(10)
-        test.get_static_config_info()
-
         if not test.get_input_params():
             raise TestException("Invalid input parameters")
 
@@ -617,8 +625,12 @@ def test_main():
             Comm2Functions.Trace(track_back_msg)
         Comm2Functions.Trace("Test FINISHED")
         Comm2Functions.ReportProgress(100)
-        assert test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'

@@ -86,7 +86,7 @@ class DevicePackageTest(object):
             self.device_package_from_device) + '; Package string to compare: ' + str(self.device_package_to_compare)
 
 
-def test_main():
+def main():
     track_back_msg = None
     Comm2Functions.Trace('Device Package Test STARTED')
     package_test = DevicePackageTest()
@@ -118,8 +118,12 @@ def test_main():
             Comm2Functions.Trace(track_back_msg)
         Comm2Functions.Trace('Device Package Test FINISHED')
         Comm2Functions.ReportProgress(100)
-        assert package_test.result == True, 'Test failed'
 
 
 if __name__ == '__main__':
-    test_main()
+    main()
+
+
+def test_main():
+    main()
+    assert Comm2Functions.GetTestResult() == True, 'Test failed'
