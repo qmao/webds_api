@@ -11,6 +11,7 @@ PT_RUN = PT_ROOT + "run/"
 
 df = None
 test_name = None
+test_result = None
 
 input_params_json = '{"Firmware ID": [3318382], "Device Package": ["s3908-15.0.0"]}'
 input_params = json.loads(input_params_json)
@@ -150,7 +151,14 @@ def ReportProgress(progress):
     print("{}% completed".format(progress))
 
 def SetTestResult(result):
+    global test_result
+    test_result = result
     print("Pass" if result else "Fail")
+
+def GetTestResult():
+    global test_result
+    result = test_result
+    return result
 
 def SetStringResult(result):
     print(result)
