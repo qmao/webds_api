@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<recipe>
+  <init>
+    <packets>
+      <json file="PR3021906-config.json" />
+    </packets>
+    <customerOTPsettings>
+      <appendToSerial value="" />
+    </customerOTPsettings>
+    <useDefaultLogPath value="true" />
+    <customLogPath value="C:\Users\Syna1234\Documents\Synaptics\Design Studio 6\Log\ProductionTests" />
+    <logFileNameStyle value="cpn:TestLogFile, dte:MM-dd-yyyy_HH-mm-ss, pfl:OK:NG, csr:_, fen:txt" />
+  </init>
+  <events>
+  </events>
+  <limits file="" />
+  <command scriptname="Connect_1.0.0.3.py" isconstant="1">
+    <metadata name="Connect" description="Make connection" constantorder="2">
+      <parameter name="ConnectionString" type="string" description="Connection String" isoptional="false" isConnectionString="true" hint="Make sure connection parameters are correct" />
+      <parameter name="OnBefore" type="string" description="Event OnBefore" isoptional="true" hint="Select appropriate command" isEvent="true" />
+      <parameter name="OnSuccess" type="string" description="Event OnSuccess" isoptional="true" hint="Select appropriate command" isEvent="true" />
+      <parameter name="OnFailure" type="string" description="Event OnFailure" isoptional="true" hint="Select appropriate command" isEvent="true" />
+    </metadata>
+    <input>
+      <arg name="ConnectionString" type="string">"&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;lastconnection&gt;&lt;converter hash="-2128830753" id="" /&gt;&lt;protocol type="RED"&gt;&lt;Group name="Network"&gt;&lt;Var name="RedAddress" displayname="Network Address" type="string" value="localhost" uivalue="localhost" isHex="False" /&gt;&lt;Var name="RedPort" displayname="Port" type="uint" value="10001" uivalue="10001" isHex="False" /&gt;&lt;Var name="RedResetEnabled" displayname="Reset on Connection" type="customBool" value="False" uivalue="Disabled" isHex="False" /&gt;&lt;Var name="InterruptMode" displayname="Attention Mode" type="intModeList" value="1" uivalue="Interrupt" isHex="False" /&gt;&lt;Var name="PollingDelay" displayname="Polling Span" type="int" value="100" uivalue="100" isHex="False" /&gt;&lt;/Group&gt;&lt;Group name="Advanced Settings"&gt;&lt;Var name="RedBridgeLocation" displayname="ADB Location" type="string" value="Auto" uivalue="Auto" isHex="False" /&gt;&lt;Var name="RedStartBat" displayname="RED Remote Bat" type="string" value="" uivalue="" isHex="False" /&gt;&lt;Var name="RedAPK" displayname="RED Remote Apk" type="string" value="" uivalue="" isHex="False" /&gt;&lt;Var name="InstallRed" displayname="InstallRed" type="button" value="" uivalue="" isHex="False" /&gt;&lt;Var name="UninstallRed" displayname="UninstallRed" type="button" value="" uivalue="" isHex="False" /&gt;&lt;/Group&gt;&lt;Group name="Discovery"&gt;&lt;Var name="DiscoveryPackrat" displayname="Packrat" type="ulong" value="Discover" uivalue="Discover" isHex="False" /&gt;&lt;/Group&gt;&lt;/protocol&gt;&lt;/lastconnection&gt;"</arg>
+      <arg name="Firmware ID" type="int">3555538</arg>
+      <arg name="Device Package" type="string">S3916 A1A0-16.2</arg>
+    </input>
+  </command>
+</recipe>

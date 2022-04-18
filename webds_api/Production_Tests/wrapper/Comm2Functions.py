@@ -2,21 +2,53 @@ import sys
 import json
 import pandas as pd
 
-sys.path.append("/usr/local/syna/lib/python")
 
+sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 
 PT_ROOT = "/home/pi/jupyter/workspace/Synaptics/Production_Tests/"
 PT_RUN = PT_ROOT + "run/"
 
 df = None
-test_name = None
-test_result = None
-
-input_params_json = '{"Firmware ID": [3318382], "Device Package": ["s3908-15.0.0"]}'
-input_params = json.loads(input_params_json)
-
 tc = TouchComm.make('report_streamer')
+
+import xml.etree.ElementTree as ET
+class XmlParser():
+    def GetTestLimit(name):
+        tree = ET.parse(PT_RUN +'./Recipe.xml')
+        root = tree.getroot()
+        for argument in root.iter('arg'):
+            print(argument.attrib)
+            if argument.attrib['name'] == name:
+                if argument.attrib['type'] == 'int':
+                    return [int(argument.text)]
+                elif argument.attrib['type'] == 'bool':
+                    return int(argument.text)
+                return [argument.text]
+        return None
+
+class TestInfo():
+    _instance = None
+    _counter = 0
+    _test_name = ""
+    _test_result = ""
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        print("TestsInfo init")
+
+    def setValue(self, varname, new_value):
+        value = setattr(self, "_" + varname, new_value)
+
+    def getValue(self, varname):
+        value = getattr(self, "_" + varname)
+        return value
+
+info = TestInfo()
 
 class Packet(object):
     def __init__(self):
@@ -100,6 +132,12 @@ class Comm2DsCore(object):
     def __init__(self):
         pass
 
+    def SetInterruptCounter(counter):
+        info.setValue("counter", counter)
+
+    def GetInterruptCounter():
+        return info.getValue("counter")
+
 def Comm2DsCore_GetHelper(helper):
     if helper == "staticConfiguration":
         return True
@@ -122,12 +160,16 @@ def Comm2DsCore_SetVarValue(packet, block, key, value):
 
 def GetInputParam(key):
     global df
+
+    ### parse from xls file
     if key == "Limits":
+        test_name = info.getValue("test_name")
         df = pd.read_excel(PT_RUN + "./limits.xls", sheet_name=test_name, header=None)
         return df
-    if key not in input_params:
-        return None
-    return input_params[key]
+
+    ### parse from xml file
+    limit = XmlParser.GetTestLimit(key)
+    return limit
 
 def GetInputDimension(key):
     if key == "Limits" and df is not None:
@@ -151,13 +193,11 @@ def ReportProgress(progress):
     print("{}% completed".format(progress))
 
 def SetTestResult(result):
-    global test_result
-    test_result = result
+    info.setValue("test_result", result)
     print("Pass" if result else "Fail")
 
 def GetTestResult():
-    global test_result
-    result = test_result
+    result = info.getValue("test_result")
     return result
 
 def SetStringResult(result):
@@ -170,5 +210,4 @@ def SetSessionVar(session, var):
     pass
 
 def SetTestName(name):
-    global test_name
-    test_name = name
+    info.setValue("test_name", name)
