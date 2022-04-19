@@ -132,10 +132,15 @@ class Comm2DsCore(object):
     def __init__(self):
         pass
 
+    def TbcFunction():
+        print("********* [TBC] ********* ")
+
     def SetInterruptCounter(counter):
         info.setValue("counter", counter)
+        Comm2DsCore.TbcFunction()
 
     def GetInterruptCounter():
+        Comm2DsCore.TbcFunction()
         return info.getValue("counter")
 
 def Comm2DsCore_GetHelper(helper):

@@ -86,8 +86,6 @@ class ProductionTestsManager():
         return finalContent
 
     def updatePyTest(src, dst):
-        ###print(src)
-        print(dst)
         try:
             with open (src, 'r' ) as f:
                 content = f.read()
@@ -166,14 +164,22 @@ class ProductionTestsManager():
     def getTestList(path):
         return sorted([f[:-3] for f in listdir(path) if isfile(join(path, f))])
 
+    def getSupportedList(src):
+        supported_lib = ["AdcRangeTest", "TrxTrxShortTest", "FullRawCapTest", "NoiseTest", "SensorSpeedTest", "DevicePackageTest"]
+        tests = []
+        for test in src:
+            if test in supported_lib:
+                tests.append(test)
+        return tests
+
     def getCommon():
-        return ProductionTestsManager.getTestList(PT_LIB_COMMON), PT_LIB_COMMON
+        return ProductionTestsManager.getSupportedList(ProductionTestsManager.getTestList(PT_LIB_COMMON)), PT_LIB_COMMON
 
     def getChipLib(partNumber):
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, PT_LIB_SCRIPT_SUBDIR)
         if not exists(chip_lib):
             raise tornado.web.HTTPError(status_code=400, log_message='production test {} lib not found'.format(partNumber))
-        return ProductionTestsManager.getTestList(chip_lib), chip_lib
+        return ProductionTestsManager.getSupportedList(ProductionTestsManager.getTestList(chip_lib)), chip_lib
 
     def getTests(partNumber):
         data = json.loads("{}")
