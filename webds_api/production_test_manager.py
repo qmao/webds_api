@@ -154,7 +154,7 @@ class ProductionTestsManager():
         pytest.main(cmd)
 
     def getSets(partNumber):
-        sets = {}
+        sets = []
         sets_file = os.path.join(PT_SETS, partNumber + ".json")
         if exists(sets_file):
             with open(sets_file) as json_file:
@@ -185,13 +185,10 @@ class ProductionTestsManager():
         data = json.loads("{}")
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, "TestStudio/Scripts/")
         if not exists(chip_lib):
-            return data
+            raise tornado.web.HTTPError(status_code=400, log_message='production test {} not found'.format(chip_lib))
 
         chip_scripts, path = ProductionTestsManager.getChipLib(partNumber)
-        print(chip_scripts)
-
         common_scripts, path = ProductionTestsManager.getCommon()
-        print(common_scripts)
 
         sets = ProductionTestsManager.getSets(partNumber)
 
@@ -200,6 +197,8 @@ class ProductionTestsManager():
           "lib": chip_scripts,
           "sets": sets
           }
+
+        print(data)
         return data
 
     def setTests(partNumber, data):
