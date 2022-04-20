@@ -10,7 +10,8 @@ PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
 PT_RUN = PT_ROOT + "run/"
 
 df = None
-tc = TouchComm.make('report_streamer')
+tc = None
+info = None
 
 import xml.etree.ElementTree as ET
 class XmlParser():
@@ -47,8 +48,6 @@ class TestInfo():
     def getValue(self, varname):
         value = getattr(self, "_" + varname)
         return value
-
-info = TestInfo()
 
 class Packet(object):
     def __init__(self):
@@ -216,3 +215,8 @@ def SetSessionVar(session, var):
 
 def SetTestName(name):
     info.setValue("test_name", name)
+
+def Init():
+    global tc, info
+    tc = TouchComm.make('report_streamer')
+    info = TestInfo()

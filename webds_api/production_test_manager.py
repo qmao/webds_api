@@ -71,7 +71,7 @@ class ProductionTestsManager():
     ##    return finalContent
 
     def convertPyTest(content):
-        assertStr = '\n\ndef test_main():\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+        assertStr = '\n\ndef test_main():\n    Comm2Functions.Init()\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         finalContent = content + assertStr
 
         tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
