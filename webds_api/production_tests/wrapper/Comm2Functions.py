@@ -6,7 +6,7 @@ import pandas as pd
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 
-PT_ROOT = "/home/pi/jupyter/workspace/Synaptics/Production_Tests/"
+PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
 PT_RUN = PT_ROOT + "run/"
 
 df = None

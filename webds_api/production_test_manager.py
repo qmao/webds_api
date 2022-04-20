@@ -7,13 +7,14 @@ from os import listdir
 from os.path import isfile, join, exists
 from . import webds
 from .utils import SystemHandler
+from . import webds
 import threading
 
 import time
 import sys
 import pytest
 
-PT_ROOT = "/home/pi/jupyter/workspace/Synaptics/Production_Tests/"
+PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
 PT_LIB_ROOT = PT_ROOT + "lib/"
 PT_LIB_COMMON = PT_LIB_ROOT + "common/"
 PT_WRAPPER = PT_ROOT + "wrapper/"
@@ -204,8 +205,10 @@ class ProductionTestsManager():
     def setTests(partNumber, data):
         sets_file = os.path.join(PT_SETS, partNumber + ".json")
         print(sets_file)
-        with open(sets_file, 'w') as f:
+        temp_file = webds.PRODUCTION_TEST_JSON_TEMP
+        with open(temp_file, 'w') as f:
             json.dump(data, f)
+        SystemHandler.CallSysCommand(['mv', temp_file, sets_file])
         return sets_file
 
     def checkTestBridge(self):
