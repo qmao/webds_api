@@ -24,7 +24,7 @@ PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
 
 sys.path.append(PT_WRAPPER)
 
-from testBridge import TestBridge
+from TestBridge import TestBridge
 
 class ProductionTestsManager():
     _instance = None
@@ -153,6 +153,9 @@ class ProductionTestsManager():
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
         cmd = ['--tb=no', '--disable-pytest-warnings', PT_RUN]
         pytest.main(cmd)
+
+    def stopTests(self):
+        TestBridge().setState('stop')
 
     def getSets(partNumber):
         sets = []

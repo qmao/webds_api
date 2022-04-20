@@ -6,6 +6,8 @@ class TestBridge():
     _instance = None
     _event = None
     _queue = Queue()
+    _state = 'idle'
+    _stop = False
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -27,5 +29,12 @@ class TestBridge():
         return result
         
     def reset(self):
-        self._queue.queue.clear()
         print("TestBridge reset")
+        self._queue.queue.clear()
+        self.setState('idle')
+        
+    def setState(self, state):
+        self._state = state
+
+    def getState(self):
+        return self._state

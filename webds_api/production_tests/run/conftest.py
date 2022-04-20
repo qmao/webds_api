@@ -1,10 +1,13 @@
 import pytest
-from testBridge import TestBridge
+from TestBridge import TestBridge
 
 def pytest_report_teststatus(report, config):
     if report.when == 'call':
         TestBridge().setTestResult(report.nodeid, 'done', report.outcome)
-
+    if TestBridge().getState() == 'stop':
+        message = 'stop by user'
+        print(message)
+        pytest.exit(message)
 
 def pytest_sessionstart(session):
     """

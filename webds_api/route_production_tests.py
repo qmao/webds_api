@@ -75,6 +75,7 @@ class ProductionTestsHandler(APIHandler):
                 except StreamClosedError:
                     message="stream closed"
                     print(message)
+                    pt.stopTests()
                     raise tornado.web.HTTPError(status_code=400, log_message=message)
         else:
             partNumber = subpath[1:]
@@ -137,7 +138,7 @@ class ProductionTestsHandler(APIHandler):
         ProductionTestsManager.preRun(partNumber, id)
         global g_production_test_thread
         if g_production_test_thread is not None and g_production_test_thread.is_alive():
-            g_program_thread.join()
+            g_production_test_thread.join()
 
         pt = ProductionTestsManager()
         g_production_test_thread = threading.Thread(target=pt.run)
