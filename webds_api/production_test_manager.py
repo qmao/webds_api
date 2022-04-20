@@ -146,10 +146,9 @@ class ProductionTestsManager():
         print(tests)
         if len(tests) is 0:
             raise tornado.web.HTTPError(status_code=400, log_message='production test {} :{} no tests'.format(partNumber, id))
-        TestBridge().reset()
 
     def run(self):
-        std_default = sys.stdout
+        TestBridge().reset()
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
         cmd = ['--tb=no', '--disable-pytest-warnings', PT_RUN]
         pytest.main(cmd)

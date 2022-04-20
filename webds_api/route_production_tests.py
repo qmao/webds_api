@@ -136,11 +136,12 @@ class ProductionTestsHandler(APIHandler):
 
     def run(self, partNumber, id = None):
         ProductionTestsManager.preRun(partNumber, id)
+        pt = ProductionTestsManager()
         global g_production_test_thread
         if g_production_test_thread is not None and g_production_test_thread.is_alive():
+            pt.stopTests()
             g_production_test_thread.join()
 
-        pt = ProductionTestsManager()
         g_production_test_thread = threading.Thread(target=pt.run)
         g_production_test_thread.start()
         print("production test thread start")
