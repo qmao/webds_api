@@ -110,7 +110,7 @@ class ProductionTestsManager():
 
         for f in os.listdir(PT_RUN):
             if f.endswith('.py') and f != "conftest.py":
-                os.remove(join(PT_RUN, f))
+                SystemHandler.CallSysCommand(['rm', join(PT_RUN, f)])
 
         common, cpath = ProductionTestsManager.getCommon()
         lib, ppath = ProductionTestsManager.getChipLib(partNumber)
