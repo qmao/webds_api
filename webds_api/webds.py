@@ -11,3 +11,4 @@ CONNECTION_SETTINGS_FILE_TEMP = WORKSPACE_CACHE_DIR + 'connection_params.json'
 
 # production tests
 PRODUCTION_TEST_JSON_TEMP = WORKSPACE_CACHE_DIR + '/ptset.json.cache'
+PRODUCTION_TEST_PY_TEMP = WORKSPACE_CACHE_DIR + '/ptset.py.cache'

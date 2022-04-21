@@ -86,14 +86,20 @@ class ProductionTestsManager():
 
         return finalContent
 
+    def copyRootFile(src, dst):
+        SystemHandler.CallSysCommand(['mv', src, dst])
+        SystemHandler.CallSysCommand(['chown', 'root:root', dst])
+
     def updatePyTest(src, dst):
+        temp_file = webds.PRODUCTION_TEST_PY_TEMP
         try:
             with open (src, 'r' ) as f:
                 content = f.read()
                 finalContent = ProductionTestsManager.convertPyTest(content)
 
-                dstFile = open(dst, "w")
+                dstFile = open(temp_file, "w")
                 dstFile.write(finalContent)
+                ProductionTestsManager.copyRootFile(temp_file, dst)
                 print('[CREATE] ', dst, " created")
         except:
             print('[ERROR ] ', dst, " not created!!!!!")
@@ -210,7 +216,7 @@ class ProductionTestsManager():
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
             json.dump(data, f)
-        SystemHandler.CallSysCommand(['mv', temp_file, sets_file])
+            ProductionTestsManager.copyRootFile(temp_file, sets_file)
         return sets_file
 
     def checkTestBridge(self):
