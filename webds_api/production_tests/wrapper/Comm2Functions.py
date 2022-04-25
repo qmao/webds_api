@@ -25,30 +25,31 @@ class XmlParser():
         for command in root.findall('command'):
             for metadata in command.findall('metadata'):
                 dataname = metadata.get('name')
-                print(dataname)
                 if dataname == test:
                     command_root = command
                     for param in command_root.iter('parameter'):
                         if param.attrib['name'] == name:
                             datatype = param.attrib['type']
                             for default in param.iter('default'):
-                                print(default.text)
                                 value = default.text
                     break
 
         if command_root is not None:
             for argument in command_root.iter('arg'):
-                print(argument.attrib)
                 if argument.attrib['name'] == name:
                     value = argument.text
                     break
-
+            print(test, name, datatype, value)
             if datatype == 'int':
+                return [int(value)]
+            if datatype == 'int[]':
                 return [int(value)]
             elif datatype == 'bool':
                 return int(value)
             elif datatype == 'double':
                 return [float(value)]
+            elif datatype == 'string[]':
+                return list(value.split(","))
             else:
                 return [value]
 

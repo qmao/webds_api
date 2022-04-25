@@ -54,7 +54,7 @@
                isoptional="false" isSolutionFile="false" sourceFileType=""/>
     </metadata>
     <input>
-       <arg name="Device Package" type="string">3318382</arg>
+       <arg name="Device Package" type="string">s3908-15.0.0</arg>
     </input>
   </command>
 
@@ -71,6 +71,12 @@
        <parameter name="CRC length" type="int[]" description="CRC length"
                isoptional="false" isConfigBlockPart="true" source="CRClength" />
     </metadata>
+    <input>
+       <arg name="customerConfigId" type="int[]">0011223344556677</arg>
+       <arg name="solutionCRC" type="int[]">0011</arg>
+       <arg name="CRC offset" type="int[]">0</arg>
+       <arg name="CRC length" type="int[]">10</arg>
+    </input>
   </command>
   
   <command scriptname="HighResistanceTest.py" isconstant="1">
@@ -102,5 +108,34 @@
     </metadata>
   </command>
 
+  <command scriptname="SyncConnectionTest.py" isconstant="1">
+    <metadata name="Sync Connection Test" description="Sync Connection Test" bin="66" product="S3908">
+       <parameter name="Limits" type="string[][]" description="Limits for Sync Connection Test"
+                   isoptional="false"
+                   islimit = "true"
+                   hint="Go to global settings to import test limit file." />
+       <parameter name="Sync Pin Locations" type="string[]" description="Sync Pin Locations"
+                   hint="Enter locations as comma separated values."
+                   isoptional="false">
+                       <default>0,1</default>
+       </parameter>
+    </metadata>
+  </command>
 
+  <command scriptname="SyncShortTest.py" isconstant="1">
+    <metadata name="Sync Short Test"
+       description="Sync Short Test (FW variable 'HSYNC trigger Mode Enable' needs to be 1 for this test to work.)"
+       bin="46" product="S3908">
+       <parameter name="Limits" type="string[][]" description="Limits for Sync Short Test"
+                   isoptional="false"
+                   islimit = "true"
+                   hint="Go to global settings to import test limit file." />
+       <parameter name="Sync Pin Locations" type="string[]" description="Sync Pin Locations"
+                   hint="Enter locations as comma separated values."
+                   isoptional="false">
+                       <default>0,1</default>
+       </parameter>
+    </metadata>
+  </command>
+  
 </recipe>
