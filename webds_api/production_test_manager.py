@@ -71,7 +71,12 @@ class ProductionTestsManager():
     ##    return finalContent
 
     def convertPyTest(content):
-        assertStr = '\n\ndef test_main():\n    Comm2Functions.Init()\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+        try:
+            regex = re.compile('(?<=metadata name=\")(\w+\s*)+')
+            test = regex.search(content)
+            assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("' + test.group() + '")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+        except:
+            assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         finalContent = content + assertStr
 
         tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
@@ -174,12 +179,12 @@ class ProductionTestsManager():
         return sorted([f[:-3] for f in listdir(path) if isfile(join(path, f))])
 
     def getSupportedList(src):
-        supported_lib = ["AdcRangeTest", "TrxTrxShortTest", "FullRawCapTest", "NoiseTest", "SensorSpeedTest", "DevicePackageTest"]
-        tests = []
-        for test in src:
-            if test in supported_lib:
-                tests.append(test)
-        return tests
+        ##supported_lib = ["AdcRangeTest", "TrxTrxShortTest", "FullRawCapTest", "NoiseTest", "SensorSpeedTest", "DevicePackageTest"]
+        ##tests = []
+        ##for test in src:
+        ##    if test in supported_lib:
+        ##        tests.append(test)
+        return src
 
     def getCommon():
         return ProductionTestsManager.getSupportedList(ProductionTestsManager.getTestList(PT_LIB_COMMON)), PT_LIB_COMMON

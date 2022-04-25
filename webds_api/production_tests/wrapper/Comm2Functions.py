@@ -15,17 +15,28 @@ info = None
 
 import xml.etree.ElementTree as ET
 class XmlParser():
-    def GetTestLimit(name):
+    def GetTestLimit(test, name):
         tree = ET.parse(PT_RUN +'./Recipe.xml')
         root = tree.getroot()
-        for argument in root.iter('arg'):
-            print(argument.attrib)
-            if argument.attrib['name'] == name:
-                if argument.attrib['type'] == 'int':
-                    return [int(argument.text)]
-                elif argument.attrib['type'] == 'bool':
-                    return int(argument.text)
-                return [argument.text]
+
+        command_root = None
+        for command in root.findall('command'):
+            for metadata in command.findall('metadata'):
+                dataname = metadata.get('name')
+                if dataname == test:
+                    command_root = command
+                    break
+
+        if command_root is not None:
+            for argument in command_root.iter('arg'):
+                print(argument.attrib)
+                if argument.attrib['name'] == name:
+                    if argument.attrib['type'] == 'int':
+                        return [int(argument.text)]
+                    elif argument.attrib['type'] == 'bool':
+                        return int(argument.text)
+                    else:
+                        return [argument.text]
         return None
 
 class TestInfo():
@@ -132,7 +143,7 @@ class Comm2DsCore(object):
         pass
 
     def TbcFunction():
-        print("********* [TBC] ********* ")
+        print("[TBC]", sys._getframe().f_back.f_code.co_name)
 
     def SetInterruptCounter(counter):
         info.setValue("counter", counter)
@@ -141,6 +152,20 @@ class Comm2DsCore(object):
     def GetInterruptCounter():
         Comm2DsCore.TbcFunction()
         return info.getValue("counter")
+
+    def SetCollectPacketInfo(param1, param2, param3):
+        Comm2DsCore.TbcFunction()
+
+    def ResetUut(param1, param2, param3):
+        Comm2DsCore.TbcFunction()
+
+    def SetCommAbort(param1):
+        Comm2DsCore.TbcFunction()
+
+    def ReadPacket(param1):
+        Comm2DsCore.TbcFunction()
+        packet = { ReportType: 0 }
+        return packet
 
 def Comm2DsCore_GetHelper(helper):
     if helper == "staticConfiguration":
@@ -172,7 +197,7 @@ def GetInputParam(key):
         return df
 
     ### parse from xml file
-    limit = XmlParser.GetTestLimit(key)
+    limit = XmlParser.GetTestLimit(info.getValue("test_name"), key)
     return limit
 
 def GetInputDimension(key):
@@ -216,7 +241,8 @@ def SetSessionVar(session, var):
 def SetTestName(name):
     info.setValue("test_name", name)
 
-def Init():
+def Init(test):
     global tc, info
     tc = TouchComm.make('report_streamer')
     info = TestInfo()
+    SetTestName(test)
