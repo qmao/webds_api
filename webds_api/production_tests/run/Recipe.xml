@@ -23,8 +23,84 @@
     </metadata>
     <input>
       <arg name="ConnectionString" type="string">"&lt;?xml version="1.0" encoding="utf-8"?&gt;&lt;lastconnection&gt;&lt;converter hash="-2128830753" id="" /&gt;&lt;protocol type="RED"&gt;&lt;Group name="Network"&gt;&lt;Var name="RedAddress" displayname="Network Address" type="string" value="localhost" uivalue="localhost" isHex="False" /&gt;&lt;Var name="RedPort" displayname="Port" type="uint" value="10001" uivalue="10001" isHex="False" /&gt;&lt;Var name="RedResetEnabled" displayname="Reset on Connection" type="customBool" value="False" uivalue="Disabled" isHex="False" /&gt;&lt;Var name="InterruptMode" displayname="Attention Mode" type="intModeList" value="1" uivalue="Interrupt" isHex="False" /&gt;&lt;Var name="PollingDelay" displayname="Polling Span" type="int" value="100" uivalue="100" isHex="False" /&gt;&lt;/Group&gt;&lt;Group name="Advanced Settings"&gt;&lt;Var name="RedBridgeLocation" displayname="ADB Location" type="string" value="Auto" uivalue="Auto" isHex="False" /&gt;&lt;Var name="RedStartBat" displayname="RED Remote Bat" type="string" value="" uivalue="" isHex="False" /&gt;&lt;Var name="RedAPK" displayname="RED Remote Apk" type="string" value="" uivalue="" isHex="False" /&gt;&lt;Var name="InstallRed" displayname="InstallRed" type="button" value="" uivalue="" isHex="False" /&gt;&lt;Var name="UninstallRed" displayname="UninstallRed" type="button" value="" uivalue="" isHex="False" /&gt;&lt;/Group&gt;&lt;Group name="Discovery"&gt;&lt;Var name="DiscoveryPackrat" displayname="Packrat" type="ulong" value="Discover" uivalue="Discover" isHex="False" /&gt;&lt;/Group&gt;&lt;/protocol&gt;&lt;/lastconnection&gt;"</arg>
-      <arg name="Firmware ID" type="int">3555538</arg>
-      <arg name="Device Package" type="string">S3916 A1A0-16.2</arg>
     </input>
   </command>
+
+  <command scriptname="GPIOOpen.py" isconstant="1">
+    <metadata name="GPIO Open Test" description="GPIO Open Test" bin="32" product="S3908">
+       <parameter name="Limits" type="string[][]" description="Limits for GPIO Open Test"
+                   isoptional="false"
+                   islimit = "true"
+                   hint="Go to global settings to import test limit file." />
+   </metadata>
+   <input>
+      <arg name="Limits" type="string[1][7]">"0", "0", "0", "0", "0", "0", "0"</arg>
+    </input>
+  </command>
+
+  <command scriptname="FirmwareID.py" isconstant="1">
+    <metadata name="Firmware ID Test" description="Firmware ID Test verifies firmware number" bin="20">
+      <parameter name="Firmware ID" type="int[]" description="Firmware ID to compare against one found on device."
+               isoptional="false" isConfigBlockPart="true" source="buildID"/>
+    </metadata>
+    <input>
+       <arg name="Firmware ID" type="int[]">3318382</arg>
+    </input>
+  </command>
+
+  <command scriptname="DevicePackage.py" isconstant="1">
+    <metadata name="Device Package Test" description="Device Package Test verifies part number" bin="19" product="S3908">
+      <parameter name="Device Package" type="string" description="Device package to compare against the one found on device."
+               isoptional="false" isSolutionFile="false" sourceFileType=""/>
+    </metadata>
+    <input>
+       <arg name="Device Package" type="string">3318382</arg>
+    </input>
+  </command>
+
+  <command scriptname="Configuration.py" isconstant="1">
+    <metadata name="Configuration Test"
+       description="Configuration test verifies configuration block CRC and customer configuration ID"
+       bin="2">
+       <parameter name="customerConfigId" type="int[]" description="Customer Configuration ID"
+               isoptional="false" isConfigBlockPart = "true" source="customerConfigId" />
+       <parameter name="solutionCRC"  type="int[]" description="Solution Checksum"
+               isoptional="false" isConfigBlockPart = "true" source="checksum" />
+       <parameter name="CRC offset" type="int[]" description="CRC offset"
+               isoptional="false" isConfigBlockPart="true" source="CRCoffset" />
+       <parameter name="CRC length" type="int[]" description="CRC length"
+               isoptional="false" isConfigBlockPart="true" source="CRClength" />
+    </metadata>
+  </command>
+  
+  <command scriptname="HighResistanceTest.py" isconstant="1">
+    <metadata name="High Resistance Test" description="High Resistance" bin="12" product="S3908">
+       <parameter name="Limits" type="string[][]" description="Limits for High Resistance Test"
+                   isoptional="false"
+                   islimit = "true"
+                   hint="Go to global settings to import test limit file." />
+       <parameter name="TxOffsetLimitMin" type="double" description="Min limit for TX offset"
+                   isoptional="false"
+                   hint="Go to global settings to import test limit file." >
+                    <default>-1</default>
+       </parameter>
+       <parameter name="TxOffsetLimitMax" type="double" description="Max limit for TX offset"
+                   isoptional="false"
+                   hint="Go to global settings to import test limit file." >
+                    <default>0.45</default>
+       </parameter>
+       <parameter name="RxOffsetLimitMin" type="double" description="Min limit for RX offset"
+                   isoptional="false"
+                   hint="Go to global settings to import test limit file." >
+                   <default>-1</default>
+       </parameter>
+       <parameter name="RxOffsetLimitMax" type="double" description="Max limit for RX offset"
+                   isoptional="false"
+                   hint="Go to global settings to import test limit file." >
+                   <default>0.45</default>
+       </parameter>
+    </metadata>
+  </command>
+
+
 </recipe>

@@ -20,23 +20,38 @@ class XmlParser():
         root = tree.getroot()
 
         command_root = None
+        value = None
+        datatype = None
         for command in root.findall('command'):
             for metadata in command.findall('metadata'):
                 dataname = metadata.get('name')
+                print(dataname)
                 if dataname == test:
                     command_root = command
+                    for param in command_root.iter('parameter'):
+                        if param.attrib['name'] == name:
+                            datatype = param.attrib['type']
+                            for default in param.iter('default'):
+                                print(default.text)
+                                value = default.text
                     break
 
         if command_root is not None:
             for argument in command_root.iter('arg'):
                 print(argument.attrib)
                 if argument.attrib['name'] == name:
-                    if argument.attrib['type'] == 'int':
-                        return [int(argument.text)]
-                    elif argument.attrib['type'] == 'bool':
-                        return int(argument.text)
-                    else:
-                        return [argument.text]
+                    value = argument.text
+                    break
+
+            if datatype == 'int':
+                return [int(value)]
+            elif datatype == 'bool':
+                return int(value)
+            elif datatype == 'double':
+                return [float(value)]
+            else:
+                return [value]
+
         return None
 
 class TestInfo():
@@ -237,6 +252,9 @@ def SetCustomResult(result):
 
 def SetSessionVar(session, var):
     pass
+
+def SendMessageBox(message):
+    print("[message]", message)
 
 def SetTestName(name):
     info.setValue("test_name", name)
