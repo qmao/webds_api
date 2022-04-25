@@ -19,23 +19,23 @@ class XmlParser():
         tree = ET.parse(PT_RUN +'./Recipe.xml')
         root = tree.getroot()
 
-        command_root = None
+        test_root = None
         value = None
         datatype = None
-        for command in root.findall('command'):
-            for metadata in command.findall('metadata'):
+        for element in root.findall('test'):
+            for metadata in element.findall('metadata'):
                 dataname = metadata.get('name')
                 if dataname == test:
-                    command_root = command
-                    for param in command_root.iter('parameter'):
+                    test_root = element
+                    for param in test_root.iter('parameter'):
                         if param.attrib['name'] == name:
                             datatype = param.attrib['type']
                             for default in param.iter('default'):
                                 value = default.text
                     break
 
-        if command_root is not None:
-            for argument in command_root.iter('arg'):
+        if test_root is not None:
+            for argument in test_root.iter('arg'):
                 if argument.attrib['name'] == name:
                     value = argument.text
                     break
@@ -43,7 +43,7 @@ class XmlParser():
             if datatype == 'int':
                 return [int(value)]
             if datatype == 'int[]':
-                return [int(value)]
+                return list(map(int, value.split(",")))
             elif datatype == 'bool':
                 return int(value)
             elif datatype == 'double':
