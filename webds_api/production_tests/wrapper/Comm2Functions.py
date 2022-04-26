@@ -13,6 +13,60 @@ df = None
 tc = None
 info = None
 
+commands = {
+    "CMD_NONE" : 0x00,
+    "CMD_CONTINUE_WRITE" : 0x01,
+    "CMD_IDENTIFY" : 0x02,			### payload none
+    "CMD_DEBUG" : 0x03,
+    "CMD_RESET" : 0x04,
+    "CMD_ENABLE_REPORT" : 0x05,
+    "CMD_DISABLE_REPORT" : 0x06,
+    "CMD_ACK" : 0x07, ### / v2
+    "CMD_RETRY" : 0x08, ### / v2
+    "CMD_SET_MAX_READ_LENGTH" : 0x09, ### / v2
+    "CMD_GET_REPORT" : 0x0A, ### / v2
+
+    ### bootloader command
+    "CMD_GET_BOOT_INFO" : 0x10,
+    "CMD_FLASH_ERASE" : 0x11,
+    "CMD_FLASH_WRITE" : 0x12,
+    "CMD_FLASH_READ" : 0x13,
+    "CMD_RUN_APPLICATION_FW" : 0x14,
+    "CMD_SPI_MASTER_WRITE_THEN_READ" : 0x15,
+    "CMD_ENTER_MICRO_BOOTLOADER" : 0X16,
+    ### application command
+    "CMD_ENTER_BOOTLOADER" : 0x1F,
+    "CMD_APPLICATION_INFO" : 0x20,
+    "CMD_GET_STATIC_CONFIG" : 0x21,
+    "CMD_SET_STATIC_CONFIG" : 0x22,
+    "CMD_GET_DYNAMIC_CONFIG" : 0x23,
+    "CMD_SET_DYNAMIC_CONFIG" : 0x24,
+    "CMD_GET_REPORT_CONFIG" : 0x25,
+    "CMD_SET_REPORT_CONFIG" : 0x26,
+    "CMD_SEND_EXTENDED_COMMAND" : 0x27,
+    "CMD_COMMIT_CONFIG" : 0x28,
+    "CMD_DESCRIBE_DYNAMIC_CONFIG" : 0x29,
+    "CMD_PRODUCTION_TEST" : 0x2A,
+    "CMD_SET_CONFIG_ID" : 0x2B,
+    "CMD_TOUCH_INFO" : 0x2E,
+    "CMD_GET_DATA_LOCATION" : 0x2F,
+
+    "CMD_HOST_DOWNLOAD" : 0x30,
+    "CMD_ENTER_PRODUCTION_TEST_MODE" : 0x31,
+    "CMD_GET_FEATURES" : 0x32,
+    "CMD_CALIBRATE" : 0x33,
+    "CMD_START_APPLICATION_ACQUISITION" : 0x37,
+    "CMD_STOP_APPLICATION_ACQUISITION" : 0x38,
+    "CMD_SET_GLOBAL_STATIC_CONFIG" : 0x39,
+
+    "CMD_GET_ROMBOOT_INFO" : 0x40,
+    "CMD_WRITE_PROGRAM_RAM" : 0x41,
+    "CMD_RUN_BOOTLOADER_FIRMWARE" : 0x42,
+    "CMD_SPI_MASTER_WRITE_THEN_READ_EXTENDED" : 0x43,
+    "CMD_ENTER_IO_BRIDGE_MODE" : 0x44,
+    "CMD_ROMBOOT_HOSTDOWNLOAD" : 0x45,
+}
+
 import xml.etree.ElementTree as ET
 class XmlParser():
     def GetTestLimit(test, name):
@@ -96,30 +150,46 @@ class Comm2DsCore(object):
 
     @staticmethod
     def ExecuteCommand(cmd, args, packet):
-        tc.sendCommand(cmd, args)
-        packet.payload = tc.getResponse()
-        if cmd == 0x02:
-            packet.parsed["identifyPacket_v0"] = tc._processIdentify(packet.payload)
-            packet.parsed["identifyPacket_v0"]["FirmwareBuildId"] = packet.parsed["identifyPacket_v0"]["buildID"]
-            del packet.parsed["identifyPacket_v0"]["buildID"]
-            packet.parsed["identifyPacket_v0"]["FirmwareMode"] = packet.payload[1]
-            del packet.parsed["identifyPacket_v0"]["mode"]
-            packet.raw["identifyPacket"] = {}
-            packet.raw["identifyPacket"]["PartNumber"] = packet.payload[2:18]
-        elif cmd == 0x21:
-            if not tc.decoder.jsonLoaded():
-                tc._loadJSONFile()
-            packet.parsed["staticConfiguration"] = tc.decoder.parseStaticConfig(packet.payload)
-        elif cmd == 0x23:
-            if not tc.decoder.jsonLoaded():
-                tc._loadJSONFile()
-            packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
+        global tc
+
+        if cmd == commands["CMD_ENTER_BOOTLOADER"]:
+            tc.enterBootloaderMode()
+        elif cmd == commands["CMD_RUN_APPLICATION_FW"]:
+            tc.runApplicationFirmware()
         else:
-            pass
+            tc.sendCommand(cmd, args)
+            packet.payload = tc.getResponse()
+
+            if cmd == commands["CMD_IDENTIFY"]:
+                packet.parsed["identifyPacket_v0"] = tc._processIdentify(packet.payload)
+                packet.parsed["identifyPacket_v0"]["FirmwareBuildId"] = packet.parsed["identifyPacket_v0"]["buildID"]
+                del packet.parsed["identifyPacket_v0"]["buildID"]
+                packet.parsed["identifyPacket_v0"]["FirmwareMode"] = packet.payload[1]
+                del packet.parsed["identifyPacket_v0"]["mode"]
+                packet.raw["identifyPacket"] = {}
+                packet.raw["identifyPacket"]["PartNumber"] = packet.payload[2:18]
+            elif cmd == commands["CMD_GET_BOOT_INFO"]:
+                packet.parsed["bootInfoPacket_v2"] = tc.decoder.parseBootInfo(packet.payload)
+                packet.parsed["bootInfoPacket_v2"]["WriteBlockSize"] = packet.parsed["bootInfoPacket_v2"]["writeBlockWords"]
+            elif cmd == commands["CMD_GET_STATIC_CONFIG"]:
+                if not tc.decoder.jsonLoaded():
+                    tc._loadJSONFile()
+                packet.parsed["staticConfiguration"] = tc.decoder.parseStaticConfig(packet.payload)
+            elif cmd == commands["CMD_APPLICATION_INFO"]:
+                packet.parsed["appInfoPacket_v2"] = tc.decoder.parseAppInfo(packet.payload)
+                packet.raw["appInfoPacket_v2"] = {}
+                packet.raw["appInfoPacket_v2"]["customerConfigId"] = packet.payload[16:32]
+            elif cmd == commands["CMD_GET_DYNAMIC_CONFIG"]:
+                if not tc.decoder.jsonLoaded():
+                    tc._loadJSONFile()
+                packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
+            else:
+                pass
         return 0
 
     @staticmethod
     def GetVarValues(packet, block, key):
+        print(packet, block, key)
         if block not in packet.parsed:
             return None
         if key not in packet.parsed[block]:
@@ -138,14 +208,16 @@ class Comm2DsCore(object):
         if block == "staticConfiguration":
             packet.parsed["staticConfiguration"][key] = value
             tc.setStaticConfig(packet.parsed["staticConfiguration"])
-            Comm2DsCore.ExecuteCommand(0x21, [], packet)
+            Comm2DsCore.ExecuteCommand(commands["CMD_GET_STATIC_CONFIG"], [], packet)
         elif block == "dynamicConfiguration":
             packet.parsed["dynamicConfiguration"][key] = value
             tc.setDynamicConfig(packet.parsed["dynamicConfiguration"])
-            Comm2DsCore.ExecuteCommand(0x23, [0xff], packet)
+            Comm2DsCore.ExecuteCommand(commands["CMD_GET_DYNAMIC_CONFIG"], [0xff], packet)
 
     @staticmethod
     def GetVarRawValues(packet, block, key):
+        print("RAW", packet, block, key)
+        print(packet.raw)
         if block not in packet.raw:
             return None
         if key not in packet.raw[block]:
