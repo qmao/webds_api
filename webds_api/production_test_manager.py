@@ -89,6 +89,8 @@ class ProductionTestsManager():
             assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
             finalContent = finalContent.replace(tarStr, tarStr + assertStr)
 
+        finalContent = finalContent.replace("\\\\TestStudio\\\\", "/run/")
+
         return finalContent
 
     def copyRootFile(src, dst):

@@ -104,6 +104,8 @@ class XmlParser():
                 return [float(value)]
             elif datatype == 'string[]':
                 return list(value.split(","))
+            elif datatype == 'double[]':
+                return list(map(float, value.split(",")))
             else:
                 return [value]
 
@@ -289,8 +291,13 @@ def GetInputParam(key):
     return limit
 
 def GetInputDimension(key):
+    if df is None:
+        GetInputParam(key)
     if key == "Limits" and df is not None:
         return df.shape
+    if key == "References":
+        value = XmlParser.GetTestLimit(info.getValue("test_name"), key)
+        return [len(value)]
 
 def GetInputIndex(key, row_col):
     if key == "Limits" and df is not None:
@@ -299,6 +306,9 @@ def GetInputIndex(key, row_col):
 def GetInputParamEx(key, index):
     if key == "Limits" and df is not None:
         return df.iat[index[0], index[1]]
+    if key == "References":
+        value = XmlParser.GetTestLimit(info.getValue("test_name"), key)
+        return value[index]
 
 def CreateMatrix(num_cols, num_rows):
     return [[0 for x in range(num_cols)] for y in range(num_rows)]
