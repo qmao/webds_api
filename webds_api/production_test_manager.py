@@ -79,15 +79,14 @@ class ProductionTestsManager():
             assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         finalContent = content + assertStr
 
-        tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
-        if tarStr in finalContent and 'test.name' in finalContent:
-            ### check space
-            space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', finalContent)
-            space = space_group[-1]
-            space = space[0: len(space) - len(space.lstrip())]
-
-            assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
-            finalContent = finalContent.replace(tarStr, tarStr + assertStr)
+        #tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
+        #if tarStr in finalContent and 'test.name' in finalContent:
+        #    ### check space
+        #    space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', finalContent)
+        #    space = space_group[-1]
+        #    space = space[0: len(space) - len(space.lstrip())]
+        #    assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
+        #    finalContent = finalContent.replace(tarStr, tarStr + assertStr)
 
         finalContent = finalContent.replace("\\\\TestStudio\\\\", "/run/")
 
