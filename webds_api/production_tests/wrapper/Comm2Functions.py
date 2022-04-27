@@ -152,7 +152,7 @@ class Comm2DsCore(object):
 
     @staticmethod
     def ExecuteCommand(cmd, args, packet):
-        global tc
+        global tc, info
 
         if cmd == commands["CMD_ENTER_BOOTLOADER"]:
             tc.enterBootloaderMode()
@@ -187,6 +187,7 @@ class Comm2DsCore(object):
                 packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
             else:
                 pass
+            info.setValue("counter", info.getValue("counter") + 1)
         return 0
 
     @staticmethod
@@ -236,8 +237,9 @@ class Comm2DsCore(object):
         print("[TBC]", sys._getframe().f_back.f_code.co_name)
 
     def SetInterruptCounter(counter):
+        global tc, info
+        tc = TouchComm.make(protocols='report_streamer', useAttn=True)
         info.setValue("counter", counter)
-        Comm2DsCore.TbcFunction()
 
     def GetInterruptCounter():
         Comm2DsCore.TbcFunction()
