@@ -1,6 +1,7 @@
 import sys
 import json
 import pandas as pd
+import subprocess
 
 
 sys.path.append("/usr/local/syna/lib/python")
@@ -65,6 +66,33 @@ commands = {
     "CMD_SPI_MASTER_WRITE_THEN_READ_EXTENDED" : 0x43,
     "CMD_ENTER_IO_BRIDGE_MODE" : 0x44,
     "CMD_ROMBOOT_HOSTDOWNLOAD" : 0x45,
+}
+
+status = {
+    "TOUCHCOMM_RESPONSE_IDLE" : 0,
+    "TOUCHCOMM_RESPONSE_OK" : 1,
+    "TOUCHCOMM_RESPONSE_CONTINUE_READ" : 3,
+    "TOUCHCOMM_RESPONSE_STATUS_CRC_MISMATCH" : 11,
+    "TOUCHCOMM_RESPONSE_RECEIVE_BUFFER_OVERFLOW" : 12,
+    "TOUCHCOMM_RESPONSE_PREVIOUS_COMMAND_PENDING" : 13,
+    "TOUCHCOMM_RESPONSE_NOT_IMPLEMENTED" : 14,
+    "TOUCHCOMM_RESPONSE_ERROR" : 15,
+    "TOUCHCOMM_RESPONSE_INVALID" : 255,
+    "TOUCHCOMM_REPORT_IDENTIFY" : 16,
+    "TOUCHCOMM_REPORT_TOUCH" : 17,
+    "TOUCHCOMM_REPORT_ACTIVE_DELTA" : 18,
+    "TOUCHCOMM_REPORT_ACTIVE_RAW" : 19,
+    "TOUCHCOMM_REPORT_ACTIVE_BASELINE" : 20,
+    "TOUCHCOMM_REPORT_DOZE_DELTA" : 21,
+    "TOUCHCOMM_REPORT_DOZE_RAW" : 22,
+    "TOUCHCOMM_REPORT_DOZE_BASELINE" : 23,
+    "TOUCHCOMM_REPORT_LOZE_DELTA" : 24,
+    "TOUCHCOMM_REPORT_LOZE_RAW" : 25,
+    "TOUCHCOMM_REPORT_LOZE_BASELINE" : 26,
+    "TOUCHCOMM_REPORT_SLURPER" : 96,
+    "TOUCHCOMM_REPORT_PRINTF" : 130,
+    "TOUCHCOMM_REPORT_PRINT_BUFFER" : 131,
+    "TOUCHCOMM_REPORT_STATUS_LOG" : 134,
 }
 
 import xml.etree.ElementTree as ET
@@ -151,6 +179,37 @@ class Comm2DsCore(object):
         pass
 
     @staticmethod
+    def UpdatePacket(cmd, packet, raw):
+        packet.ReportType = raw['status']
+        packet.payload = raw["payload"]
+
+        if cmd == commands["CMD_IDENTIFY"] or packet.ReportType == status["TOUCHCOMM_REPORT_IDENTIFY"]:
+                packet.parsed["identifyPacket_v0"] = tc._processIdentify(packet.payload)
+                packet.parsed["identifyPacket_v0"]["FirmwareBuildId"] = packet.parsed["identifyPacket_v0"]["buildID"]
+                del packet.parsed["identifyPacket_v0"]["buildID"]
+                packet.parsed["identifyPacket_v0"]["FirmwareMode"] = packet.payload[1]
+                del packet.parsed["identifyPacket_v0"]["mode"]
+                packet.raw["identifyPacket"] = {}
+                packet.raw["identifyPacket"]["PartNumber"] = packet.payload[2:18]
+        elif cmd == commands["CMD_GET_BOOT_INFO"]:
+            packet.parsed["bootInfoPacket_v2"] = tc.decoder.parseBootInfo(packet.payload)
+            packet.parsed["bootInfoPacket_v2"]["WriteBlockSize"] = packet.parsed["bootInfoPacket_v2"]["writeBlockWords"]
+        elif cmd == commands["CMD_GET_STATIC_CONFIG"]:
+            if not tc.decoder.jsonLoaded():
+                tc._loadJSONFile()
+            packet.parsed["staticConfiguration"] = tc.decoder.parseStaticConfig(packet.payload)
+        elif cmd == commands["CMD_APPLICATION_INFO"]:
+            packet.parsed["appInfoPacket_v2"] = tc.decoder.parseAppInfo(packet.payload)
+            packet.raw["appInfoPacket_v2"] = {}
+            packet.raw["appInfoPacket_v2"]["customerConfigId"] = packet.payload[16:32]
+        elif cmd == commands["CMD_GET_DYNAMIC_CONFIG"]:
+            if not tc.decoder.jsonLoaded():
+                tc._loadJSONFile()
+            packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
+        else:
+            pass
+
+    @staticmethod
     def ExecuteCommand(cmd, args, packet):
         global tc, info
 
@@ -160,33 +219,9 @@ class Comm2DsCore(object):
             tc.runApplicationFirmware()
         else:
             tc.sendCommand(cmd, args)
-            packet.payload = tc.getResponse()
+            raw = tc.getPacket()
+            Comm2DsCore.UpdatePacket(cmd, packet, raw)
 
-            if cmd == commands["CMD_IDENTIFY"]:
-                packet.parsed["identifyPacket_v0"] = tc._processIdentify(packet.payload)
-                packet.parsed["identifyPacket_v0"]["FirmwareBuildId"] = packet.parsed["identifyPacket_v0"]["buildID"]
-                del packet.parsed["identifyPacket_v0"]["buildID"]
-                packet.parsed["identifyPacket_v0"]["FirmwareMode"] = packet.payload[1]
-                del packet.parsed["identifyPacket_v0"]["mode"]
-                packet.raw["identifyPacket"] = {}
-                packet.raw["identifyPacket"]["PartNumber"] = packet.payload[2:18]
-            elif cmd == commands["CMD_GET_BOOT_INFO"]:
-                packet.parsed["bootInfoPacket_v2"] = tc.decoder.parseBootInfo(packet.payload)
-                packet.parsed["bootInfoPacket_v2"]["WriteBlockSize"] = packet.parsed["bootInfoPacket_v2"]["writeBlockWords"]
-            elif cmd == commands["CMD_GET_STATIC_CONFIG"]:
-                if not tc.decoder.jsonLoaded():
-                    tc._loadJSONFile()
-                packet.parsed["staticConfiguration"] = tc.decoder.parseStaticConfig(packet.payload)
-            elif cmd == commands["CMD_APPLICATION_INFO"]:
-                packet.parsed["appInfoPacket_v2"] = tc.decoder.parseAppInfo(packet.payload)
-                packet.raw["appInfoPacket_v2"] = {}
-                packet.raw["appInfoPacket_v2"]["customerConfigId"] = packet.payload[16:32]
-            elif cmd == commands["CMD_GET_DYNAMIC_CONFIG"]:
-                if not tc.decoder.jsonLoaded():
-                    tc._loadJSONFile()
-                packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
-            else:
-                pass
             info.setValue("counter", info.getValue("counter") + 1)
         return 0
 
@@ -242,22 +277,45 @@ class Comm2DsCore(object):
         info.setValue("counter", counter)
 
     def GetInterruptCounter():
-        Comm2DsCore.TbcFunction()
         return info.getValue("counter")
 
     def SetCollectPacketInfo(param1, param2, param3):
         Comm2DsCore.TbcFunction()
 
     def ResetUut(param1, param2, param3):
-        Comm2DsCore.TbcFunction()
+        packet = Packet()
+        Comm2DsCore.ExecuteCommand(commands["CMD_SET_CONFIG_ID"], ["01", "02", "03", "04", "01", "02", "03", "04", "01", "02", "03", "04", "01", "02", "03", "04"], packet)
+        print(packet.parsed)
+
+        Comm2DsCore.ExecuteCommand(commands["CMD_APPLICATION_INFO"], [], packet)
+        print(packet.parsed)
+        raw = tc.getPacket()
+
+        ##Comm2DsCore.ExecuteCommand(commands["CMD_RESET"], [], packet)
+        ##raw = tc.getPacket()
+
+        protocol = tc.comm.get_interface()
+        if protocol == "i2c":
+            result = subprocess.run(["sudo", "echo", "2",  ">", "/sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset"], capture_output=True, text=True)
+        elif protocol == "spi":
+            result = subprocess.run(["sudo", "echo", "2",  ">", "/sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset"], capture_output=True, text=True)
+        if result is not None:
+            print("result:", result)
+
+        packet = Packet()
+        Comm2DsCore.ExecuteCommand(commands["CMD_APPLICATION_INFO"], [], packet)
+        print(packet.parsed)
+
+        Comm2DsCore.ExecuteCommand(commands["CMD_RESET"], [], packet)
 
     def SetCommAbort(param1):
         Comm2DsCore.TbcFunction()
 
-    def ReadPacket(param1):
-        Comm2DsCore.TbcFunction()
-        packet = { ReportType: 0 }
-        return packet
+    def ReadPacket(packet):
+        raw = tc.getPacket()
+        print(raw)
+        Comm2DsCore.UpdatePacket([], packet, raw)
+        return 0
 
 def Comm2DsCore_GetHelper(helper):
     if helper == "staticConfiguration":
