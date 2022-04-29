@@ -2,6 +2,8 @@ import sys
 import json
 import pandas as pd
 import subprocess
+import numpy as np
+from time import sleep
 
 
 sys.path.append("/usr/local/syna/lib/python")
@@ -283,30 +285,30 @@ class Comm2DsCore(object):
         Comm2DsCore.TbcFunction()
 
     def ResetUut(param1, param2, param3):
+        # write temp config id
+        # hw reset
+        # check config id has been restored
+        # do sw rest for sending identify packet if hw reset success
+        config = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
         packet = Packet()
-        Comm2DsCore.ExecuteCommand(commands["CMD_SET_CONFIG_ID"], ["01", "02", "03", "04", "01", "02", "03", "04", "01", "02", "03", "04", "01", "02", "03", "04"], packet)
-        print(packet.parsed)
-
-        Comm2DsCore.ExecuteCommand(commands["CMD_APPLICATION_INFO"], [], packet)
-        print(packet.parsed)
-        raw = tc.getPacket()
-
-        ##Comm2DsCore.ExecuteCommand(commands["CMD_RESET"], [], packet)
-        ##raw = tc.getPacket()
+        Comm2DsCore.ExecuteCommand(commands["CMD_SET_CONFIG_ID"], map(str, config), packet)
 
         protocol = tc.comm.get_interface()
         if protocol == "i2c":
-            result = subprocess.run(["sudo", "echo", "2",  ">", "/sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset"], capture_output=True, text=True)
+            subprocess.check_output("sudo echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset", shell=True)
         elif protocol == "spi":
-            result = subprocess.run(["sudo", "echo", "2",  ">", "/sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset"], capture_output=True, text=True)
-        if result is not None:
-            print("result:", result)
+            subprocess.check_output("sudo echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset", shell=True)
+
+        sleep(1)
 
         packet = Packet()
         Comm2DsCore.ExecuteCommand(commands["CMD_APPLICATION_INFO"], [], packet)
-        print(packet.parsed)
 
-        Comm2DsCore.ExecuteCommand(commands["CMD_RESET"], [], packet)
+        if np.array_equal(config, packet.raw["appInfoPacket_v2"]["customerConfigId"]):
+            print("RESET FAILED")
+        else:
+            print("RESET SUCCESS!!!")
+            tc.sendCommand(commands["CMD_RESET"], [])
 
     def SetCommAbort(param1):
         Comm2DsCore.TbcFunction()
