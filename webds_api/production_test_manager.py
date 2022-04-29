@@ -168,12 +168,19 @@ class ProductionTestsManager():
     def stopTests(self):
         TestBridge().setState('stop')
 
+    def getJsonContent(partNumber):
+        content = {}
+        testJson = os.path.join(PT_SETS, partNumber + ".json")
+        if exists(testJson):
+            with open(testJson) as json_file:
+                content = json.load(json_file)
+        return content
+
     def getSets(partNumber):
         sets = []
-        sets_file = os.path.join(PT_SETS, partNumber + ".json")
-        if exists(sets_file):
-            with open(sets_file) as json_file:
-                sets = json.load(json_file)
+        content = ProductionTestsManager.getJsonContent(partNumber)
+        if len(content["sets"]) != 0:
+            return content["sets"]
         return sets
 
     def getTestList(path):
@@ -217,11 +224,14 @@ class ProductionTestsManager():
         return data
 
     def setTests(partNumber, data):
+        content = ProductionTestsManager.getJsonContent(partNumber)
+        content["sets"] = data
+
         sets_file = os.path.join(PT_SETS, partNumber + ".json")
         print(sets_file)
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
-            json.dump(data, f)
+            json.dump(content, f)
             ProductionTestsManager.copyRootFile(temp_file, sets_file)
         return sets_file
 

@@ -281,7 +281,7 @@ class Comm2DsCore(object):
     def GetInterruptCounter():
         return info.getValue("counter")
 
-    def SetCollectPacketInfo(param1, param2, param3):
+    def SetCollectPacketInfo(name, commandId, count):
         Comm2DsCore.TbcFunction()
 
     def ResetUut(param1, param2, param3):
