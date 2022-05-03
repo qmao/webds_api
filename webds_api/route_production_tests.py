@@ -125,7 +125,12 @@ class ProductionTestsHandler(APIHandler):
             input_data = self.get_json_body()
             print(input_data)
 
-            sets_file = ProductionTestsManager.setTests(partNumber, input_data)
+            if type(input_data) == dict:
+                sets = input_data["sets"]
+                if sets is not None:
+                    sets_file = ProductionTestsManager.updateTestJson(partNumber, input_data)
+            elif type(input_data) == list:
+                sets_file = ProductionTestsManager.setTests(partNumber, input_data)
 
             data = { "message": str(sets_file) }
         else:

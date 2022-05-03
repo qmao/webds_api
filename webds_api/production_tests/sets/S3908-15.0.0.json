@@ -1,1 +1,1 @@
-{"settings": {"i2cAddr": 32, "speed": 500, "spiMode": 0, "vdd": 1234, "vddtx": 2234, "vled": 3234, "vpu": 4234}, "sets": [{"name": "Test Set 1", "id": "b7f7ec88-f551-4593-9087-7a230be5a483", "tests": []}]}
+{"settings": {"vdd": "1200", "vddtx": "3300", "vled": "1200", "vpu": "1200"}, "sets": [{"name": "Test Set 1", "id": "b7f7ec88-f551-4593-9087-7a230be5a483", "tests": []}]}

@@ -82,8 +82,8 @@ class ProductionTestsManager():
 
         return finalContent
 
-    def copyRootFile(src, dst):
-        SystemHandler.CallSysCommand(['mv', src, dst])
+    def copyRootFile(src, dst, action = 'mv'):
+        SystemHandler.CallSysCommand([ action, src, dst])
         SystemHandler.CallSysCommand(['chown', 'root:root', dst])
 
     def updatePyTest(src, dst):
@@ -123,6 +123,8 @@ class ProductionTestsManager():
 
             dst = join(PT_RUN, pyName)
             ProductionTestsManager.updatePyTest(src, dst)
+
+        ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + ".json"), join(PT_RUN, "Recipe.json"), 'cp')
 
     def getScriptList(partNumber, id = None):
         tests = []
@@ -172,6 +174,13 @@ class ProductionTestsManager():
         if len(content["sets"]) != 0:
             return content["sets"]
         return sets
+
+    def getSettings(partNumber):
+        settings = []
+        content = ProductionTestsManager.getJsonContent(partNumber)
+        if len(content["settings"]) != 0:
+            return content["settings"]
+        return settings
 
     def getTestList(path):
         return sorted([f[:-3] for f in listdir(path) if isfile(join(path, f))])
@@ -227,15 +236,26 @@ class ProductionTestsManager():
         common_scripts, path = ProductionTestsManager.getCommon()
 
         sets = ProductionTestsManager.getSets(partNumber)
+        settings = ProductionTestsManager.getSettings(partNumber)
 
         data = {
           "common": common_scripts,
           "lib": chip_scripts,
-          "sets": sets
+          "sets": sets,
+          "settings": settings
           }
 
         print(data)
         return data
+
+    def updateTestJson(partNumber, data):
+        sets_file = os.path.join(PT_SETS, partNumber + ".json")
+        print(sets_file)
+        temp_file = webds.PRODUCTION_TEST_JSON_TEMP
+        with open(temp_file, 'w') as f:
+            json.dump(data, f)
+            ProductionTestsManager.copyRootFile(temp_file, sets_file)
+        return sets_file
 
     def setTests(partNumber, data):
         content = ProductionTestsManager.getJsonContent(partNumber)

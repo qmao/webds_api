@@ -1,5 +1,7 @@
 import sys
 import json
+import os
+from os.path import isfile, join, exists
 import pandas as pd
 import subprocess
 import numpy as np
@@ -146,6 +148,7 @@ class TestInfo():
     _counter = 0
     _test_name = ""
     _test_result = ""
+    _json = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -154,6 +157,7 @@ class TestInfo():
 
     def __init__(self):
         print("TestsInfo init")
+        self.getJson()
 
     def setValue(self, varname, new_value):
         value = setattr(self, "_" + varname, new_value)
@@ -161,6 +165,17 @@ class TestInfo():
     def getValue(self, varname):
         value = getattr(self, "_" + varname)
         return value
+
+    def getJson(self):
+        testJson = os.path.join(PT_RUN, "Recipe.json")
+        if exists(testJson):
+            with open(testJson) as json_file:
+                self._json = json.load(json_file)
+
+    def getSettings(self):
+        if self._json is not None:
+            print(self._json["settings"])
+            return self._json["settings"]
 
 class Packet(object):
     def __init__(self):
@@ -210,6 +225,11 @@ class Comm2DsCore(object):
             packet.parsed["dynamicConfiguration"] = tc.decoder.parseDynamicConfig(packet.payload)
         else:
             pass
+
+    @staticmethod
+    def CreateTouchcommObject(settings):
+        global tc
+        tc = TouchComm.make(protocols='report_streamer', **settings)
 
     @staticmethod
     def ExecuteCommand(cmd, args, packet):
@@ -274,8 +294,10 @@ class Comm2DsCore(object):
         print("[TBC]", sys._getframe().f_back.f_code.co_name)
 
     def SetInterruptCounter(counter):
-        global tc, info
-        tc = TouchComm.make(protocols='report_streamer', useAttn=True)
+        global info
+        settings = info.getSettings()
+        settings["useAttn"] = True
+        Comm2DsCore.CreateTouchcommObject(settings)
         info.setValue("counter", counter)
 
     def GetInterruptCounter():
@@ -406,6 +428,7 @@ def SetTestName(name):
 
 def Init(test):
     global tc, info
-    tc = TouchComm.make('report_streamer')
     info = TestInfo()
+    settings = info.getSettings()
+    Comm2DsCore.CreateTouchcommObject(settings)
     SetTestName(test)
