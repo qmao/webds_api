@@ -1,6 +1,6 @@
 {
   "name": "@webds/webds-api",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "A JupyterLab extension.",
   "keywords": [
     "jupyter",
