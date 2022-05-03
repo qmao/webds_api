@@ -78,16 +78,6 @@ class ProductionTestsManager():
         except:
             assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         finalContent = content + assertStr
-
-        #tarStr = 'XMLTestResultGenerator.XMLTestResultGenerator()'
-        #if tarStr in finalContent and 'test.name' in finalContent:
-        #    ### check space
-        #    space_group = re.findall(r'\n(\s* |\s*\w+\s*=\s*)(?=XMLTestResultGenerator.XMLTestResultGenerator\(\))', finalContent)
-        #    space = space_group[-1]
-        #    space = space[0: len(space) - len(space.lstrip())]
-        #    assertStr = '\n' + space +  'Comm2Functions.SetTestName(test.name)\n'
-        #    finalContent = finalContent.replace(tarStr, tarStr + assertStr)
-
         finalContent = finalContent.replace("\\\\TestStudio\\\\", "/run/")
 
         return finalContent
@@ -187,11 +177,35 @@ class ProductionTestsManager():
         return sorted([f[:-3] for f in listdir(path) if isfile(join(path, f))])
 
     def getSupportedList(src):
-        ##supported_lib = ["AdcRangeTest", "TrxTrxShortTest", "FullRawCapTest", "NoiseTest", "SensorSpeedTest", "DevicePackageTest"]
-        ##tests = []
-        ##for test in src:
-        ##    if test in supported_lib:
-        ##        tests.append(test)
+        supported_lib = [
+            "Configuration",
+            "FirmwareID",
+            "AbsRawCapTest",
+            "AdcRangeTest",
+            "DevicePackageTest",
+            "ExtendedHighResistance",
+            "FullRawCapTest",
+            "GPIOOpen",
+            "GPIOShort",
+            "HighResistanceTest",
+            "NoiseTest",
+            "SensorSpeedTest",
+            "TRxGround",
+            "TRxSensorOpen",
+            "TransRawCap",
+            "TrxTrxShortTest",
+            "BSCCalibration",
+            "ForceButtonOpenGuardPlane",
+            "ForceButtonOpenGuardTrace",
+            "SyncConnectionTest",
+            "SyncShortTest",
+            "Attention",
+            "ResetPinTest"
+        ]
+        tests = []
+        for test in src:
+            if test in supported_lib:
+                tests.append(test)
         return src
 
     def getCommon():
