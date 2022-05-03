@@ -206,7 +206,7 @@ class ProductionTestsManager():
         for test in src:
             if test in supported_lib:
                 tests.append(test)
-        return src
+        return tests
 
     def getCommon():
         return ProductionTestsManager.getSupportedList(ProductionTestsManager.getTestList(PT_LIB_COMMON)), PT_LIB_COMMON
