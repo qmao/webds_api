@@ -174,8 +174,8 @@ class TestInfo():
 
     def getSettings(self):
         if self._json is not None:
-            print(self._json["settings"])
-            return self._json["settings"]
+            print(self._json["settings"]["voltages"])
+            return self._json["settings"]["voltages"]
 
 class Packet(object):
     def __init__(self):
