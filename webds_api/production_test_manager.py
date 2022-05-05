@@ -253,7 +253,7 @@ class ProductionTestsManager():
         print(sets_file)
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
             ProductionTestsManager.copyRootFile(temp_file, sets_file)
         return sets_file
 
@@ -265,7 +265,7 @@ class ProductionTestsManager():
         print(sets_file)
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
-            json.dump(content, f)
+            json.dump(content, f, indent=4)
             ProductionTestsManager.copyRootFile(temp_file, sets_file)
         return sets_file
 

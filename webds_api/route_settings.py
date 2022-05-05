@@ -47,7 +47,7 @@ class ConnectionSettings:
     @staticmethod
     def updateConnectionJsonFile(data):
         with open(webds.CONNECTION_SETTINGS_FILE_TEMP, 'w') as json_file:
-            json.dump(data, json_file)
+            json.dump(data, json_file, indent=4)
         SystemHandler.CallSysCommand(['chmod', '644', webds.CONNECTION_SETTINGS_FILE_TEMP])
         SystemHandler.CallSysCommand(['chown', 'root:root', webds.CONNECTION_SETTINGS_FILE_TEMP])
         SystemHandler.CallSysCommand(['mv', webds.CONNECTION_SETTINGS_FILE_TEMP, webds.CONNECTION_SETTINGS_FILE])
