@@ -13,6 +13,7 @@ from touchcomm import TouchComm
 
 PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
 PT_RUN = PT_ROOT + "run/"
+PT_RECIPE = os.path.join(PT_RUN, "Recipe.json")
 
 df = None
 tc = None
@@ -138,10 +139,40 @@ class XmlParser():
                 return list(value.split(","))
             elif datatype == 'double[]':
                 return list(map(float, value.split(",")))
+            elif datatype == 'string[][]':
+                return value
             else:
                 return [value]
 
         return None
+
+class RecipeParser():
+    def GetTestLimit(test, name):
+        print(test, name)
+        if exists(PT_RECIPE):
+            with open(PT_RECIPE) as json_file:
+                recipe = json.load(json_file)
+                param = recipe['limits'][test]["parameters"][name]
+                value = param["value"]
+                datatype = param["type"]
+                if datatype == 'int':
+                    return [int(value)]
+                if datatype == 'int[]':
+                    return value
+                elif datatype == 'bool':
+                    return int(value)
+                elif datatype == 'double':
+                    return [float(value)]
+                elif datatype == 'string[]':
+                    return value
+                elif datatype == 'double[]':
+                    return value
+                elif datatype == 'string[][]':
+                    return value
+                else:
+                    return [value]
+        return None
+
 
 class TestInfo():
     _instance = None
@@ -366,21 +397,22 @@ def GetInputParam(key):
 
     ### parse from xls file
     if key == "Limits":
-        test_name = info.getValue("test_name")
-        df = pd.read_excel(PT_RUN + "./limits.xls", sheet_name=test_name, header=None)
-        return df
+        value = RecipeParser.GetTestLimit(info.getValue("test_name"), key)
+        df = np.array(value)
+        return pd.DataFrame(value)
 
     ### parse from xml file
-    limit = XmlParser.GetTestLimit(info.getValue("test_name"), key)
+    limit = RecipeParser.GetTestLimit(info.getValue("test_name"), key)
     return limit
 
 def GetInputDimension(key):
     if df is None:
         GetInputParam(key)
     if key == "Limits" and df is not None:
-        return df.shape
+        value = df.shape
+        return value[0], value[1]
     if key == "References":
-        value = XmlParser.GetTestLimit(info.getValue("test_name"), key)
+        value = RecipeParser.GetTestLimit(info.getValue("test_name"), key)
         return [len(value)]
 
 def GetInputIndex(key, row_col):
@@ -389,9 +421,9 @@ def GetInputIndex(key, row_col):
 
 def GetInputParamEx(key, index):
     if key == "Limits" and df is not None:
-        return df.iat[index[0], index[1]]
+        return df[index[0]][index[1]]
     if key == "References":
-        value = XmlParser.GetTestLimit(info.getValue("test_name"), key)
+        value = RecipeParser.GetTestLimit(info.getValue("test_name"), key)
         return value[index]
 
 def CreateMatrix(num_cols, num_rows):
