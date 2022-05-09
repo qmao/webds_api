@@ -1,8 +1,8 @@
 import sys
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
-
 from threading import Lock
+from . import webds
 
 class TouchcommManager(object):
     _instance = None
@@ -27,7 +27,7 @@ class TouchcommManager(object):
             if self._tc is not None:
                 version = self._tc.comm.send_and_check("version")
             if self._tc is None or version['content'] == 'disconnect':
-                self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', packratCachePath='/home/pi/jupyter/workspace/Packrat', streaming=False)
+                self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', packratCachePath=webds.WORKSPACE_PACKRAT_DIR, streaming=False)
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))

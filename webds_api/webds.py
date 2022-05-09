@@ -1,14 +1,20 @@
+import getpass
+import os
+
 # packrat
 PACKRAT_CACHE = '/var/cache/syna/packrat'
-WORKSPACE = '/home/pi/jupyter/workspace'
-WORKSPACE_PACKRAT_DIR = WORKSPACE + '/Packrat/Cache'
-WORKSPACE_CACHE_DIR = WORKSPACE + '/.cache'
-WORKSPACE_TEMP_FILE = WORKSPACE_CACHE_DIR + '/temp.cache'
+WORKSPACE = os.path.join('/home', getpass.getuser(), 'jupyter/workspace')
+WORKSPACE_PACKRAT_DIR = os.path.join(WORKSPACE, 'Packrat')
+WORKSPACE_PACKRAT_CACHE_DIR = os.path.join(WORKSPACE_PACKRAT_DIR, 'Cache')
+
+# cache
+WORKSPACE_CACHE_DIR = os.path.join(WORKSPACE, '.cache')
+WORKSPACE_TEMP_FILE = os.path.join(WORKSPACE_CACHE_DIR, 'temp.cache')
 
 # connection settings
 CONNECTION_SETTINGS_FILE = '/usr/local/syna/lib/python/touchcomm/connection_params.json'
-CONNECTION_SETTINGS_FILE_TEMP = WORKSPACE_CACHE_DIR + 'connection_params.json'
+CONNECTION_SETTINGS_FILE_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'connection_params.json')
 
 # production tests
-PRODUCTION_TEST_JSON_TEMP = WORKSPACE_CACHE_DIR + '/ptset.json.cache'
-PRODUCTION_TEST_PY_TEMP = WORKSPACE_CACHE_DIR + '/ptset.py.cache'
+PRODUCTION_TEST_JSON_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.json.cache')
+PRODUCTION_TEST_PY_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.py.cache')

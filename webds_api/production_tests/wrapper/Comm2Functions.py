@@ -348,9 +348,9 @@ class Comm2DsCore(object):
 
         protocol = tc.comm.get_interface()
         if protocol == "i2c":
-            subprocess.check_output("sudo echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset", shell=True)
+            subprocess.check_output("echo 'syna' | su -c 'echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset'", shell=True)
         elif protocol == "spi":
-            subprocess.check_output("sudo echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset", shell=True)
+            subprocess.check_output("echo 'syna' | su -c 'echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset'", shell=True)
 
         sleep(1)
 

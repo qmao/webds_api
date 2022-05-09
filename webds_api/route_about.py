@@ -15,9 +15,9 @@ def ReadOsInfo():
 
     try:
       for element in os_list:
-          name, version = element.split('=')
-          os_info[name] = version
-
+          if element != "":
+              name, version = element.split('=')
+              os_info[name] = version
     except:
       print("something wrong")
 
