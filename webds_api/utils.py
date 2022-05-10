@@ -31,6 +31,11 @@ class SystemHandler():
         print("stdout:", result.stdout, "stderr:", result.stderr)
         return result.stdout
 
+    def SendSysCommand(command, user = False):
+        if not user:
+            command =  "echo 'syna' | su -c " + "'" + command + "'"
+        print(command)
+        subprocess.check_output(command, shell=True)
 
     def UpdateWorkSpaceCache():
         os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)

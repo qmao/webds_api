@@ -6,6 +6,9 @@ import numpy as np
 from os.path import isfile, join, exists
 import xml.etree.ElementTree as ET
 
+LIMIT_INPUT = "Recipe_input.json"
+RECIPE_OUTPUT = "Recipe.json"
+INDENT = None
 
 def ConvertData(t, data, dimesion=None):
     if t == "int[]":
@@ -96,13 +99,25 @@ def ConvertLimit():
                         value = ConvertData(recipe["limits"][dataname]["parameters"][name]["type"], value, atype)
                         recipe["limits"][dataname]["parameters"][name]["value"] = value
 
-    temp_file = "Recipe.json"
-    with open(temp_file, 'w') as f:
-        json.dump(recipe, f, indent=4)
+    with open(RECIPE_OUTPUT, 'w') as f:
+        json.dump(recipe, f, indent=INDENT)
 
     print("\n -- Success convert limits to Recipe.json --")
                             
 
-    
-###GetTestLimit("Firmware ID Test", "Firmware ID")
+def WriteToRecipe(data, file):
+    with open(file, 'w') as f:
+        json.dump(data, f, indent=INDENT)
+
+def MergeRecipe(irecipe, limit):
+    if exists(irecipe):
+        with open(irecipe) as recipe_file:
+            i = json.load(recipe_file)
+            with open(limit) as limit_file:
+                l = json.load(limit_file)  
+                i.update(l)
+                WriteToRecipe(i, RECIPE_OUTPUT)
+
+
 ConvertLimit()
+MergeRecipe(LIMIT_INPUT, RECIPE_OUTPUT)
