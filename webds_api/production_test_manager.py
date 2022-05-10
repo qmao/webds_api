@@ -3,6 +3,8 @@ import tornado
 import json
 import re
 import os
+import py
+from pathlib import Path
 from os import listdir
 from os.path import isfile, join, exists
 from . import webds
@@ -15,12 +17,13 @@ import sys
 import pytest
 
 PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
-PT_LIB_ROOT = PT_ROOT + "lib/"
-PT_LIB_COMMON = PT_LIB_ROOT + "common/"
-PT_WRAPPER = PT_ROOT + "wrapper/"
-PT_RUN = PT_ROOT + "run/"
-PT_SETS = PT_ROOT + "sets/"
+PT_LIB_ROOT = os.path.join(PT_ROOT, "lib")
+PT_LIB_COMMON = os.path.join(PT_LIB_ROOT, "common")
+PT_WRAPPER = os.path.join(PT_ROOT, "wrapper")
+PT_RUN = os.path.join(PT_ROOT, "run")
+PT_SETS = os.path.join(PT_ROOT, "sets")
 PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
+PT_LOG_DIR = os.path.join(PT_RUN, "log")
 
 sys.path.append(PT_WRAPPER)
 
@@ -124,8 +127,11 @@ class ProductionTestsManager():
             dst = join(PT_RUN, pyName)
             ProductionTestsManager.updatePyTest(src, dst)
 
-        ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + ".json"), join(PT_RUN, "Recipe.json"), 'cp')
-        ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + ".limits.json"), join(PT_RUN, "Recipe.limits.json"), 'cp')
+        recipes = [".json", ".limits.json"]
+        for val in recipes:
+            fname = "Recipe" + val
+            SystemHandler.CallSysCommand(['rm', join(PT_RUN, fname)])
+            ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + val), join(PT_RUN, fname), 'cp')
 
     def getScriptList(partNumber, id = None):
         tests = []
@@ -155,8 +161,16 @@ class ProductionTestsManager():
     def run(self):
         TestBridge().reset()
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
-        cmd = ['--tb=no', '--disable-pytest-warnings', PT_RUN]
+        cmd = ['--tb=no', '--disable-pytest-warnings', '-s', '--disable-warnings', PT_RUN]
+        capture = py.io.StdCapture()
         pytest.main(cmd)
+        std, err = capture.reset()
+
+        Path(PT_LOG_DIR).mkdir(parents=True, exist_ok=True)
+        log = open(os.path.join(PT_LOG_DIR, "log.txt"), "wt")
+        log.write(std)
+        log.write(err)
+        log.close()
 
     def stopTests(self):
         TestBridge().setState('stop')
@@ -204,7 +218,7 @@ class ProductionTestsManager():
             "TRxSensorOpen",
             "TransRawCap",
             "TrxTrxShortTest",
-            "BSCCalibration",
+            ###"BSCCalibration",
             "ForceButtonOpenGuardPlane",
             "ForceButtonOpenGuardTrace",
             "SyncConnectionTest",
