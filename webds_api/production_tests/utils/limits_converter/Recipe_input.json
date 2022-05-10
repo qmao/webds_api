@@ -1,0 +1,29 @@
+{	
+"sets": [
+        {
+            "id": "b7f7ec88-f551-4593-9087-7a230be5a483",
+            "name": "Test Set 1",
+            "tests": [
+                "Configuration",
+                "HighResistanceTest"
+            ]
+        },
+        {
+            "name": "Test Set 2",
+            "id": "84543489-708d-4658-ab34-f4053b26f713",
+            "tests": [
+                "ResetPinTest",
+                "FirmwareID",
+                "Configuration"
+            ]
+        }
+    ],
+    "settings": {
+        "voltages": {
+            "vdd": "1200",
+            "vddtx": "3300",
+            "vled": "1200",
+            "vpu": "1200"
+        }
+    }
+}

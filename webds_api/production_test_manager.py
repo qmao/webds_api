@@ -125,6 +125,7 @@ class ProductionTestsManager():
             ProductionTestsManager.updatePyTest(src, dst)
 
         ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + ".json"), join(PT_RUN, "Recipe.json"), 'cp')
+        ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + ".limits.json"), join(PT_RUN, "Recipe.limits.json"), 'cp')
 
     def getScriptList(partNumber, id = None):
         tests = []

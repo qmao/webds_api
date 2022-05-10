@@ -14,6 +14,7 @@ from touchcomm import TouchComm
 PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
 PT_RUN = PT_ROOT + "run/"
 PT_RECIPE = os.path.join(PT_RUN, "Recipe.json")
+PT_LIMITS = os.path.join(PT_RUN, "Recipe.limits.json")
 
 df = None
 tc = None
@@ -149,8 +150,8 @@ class XmlParser():
 class RecipeParser():
     def GetTestLimit(test, name):
         print(test, name)
-        if exists(PT_RECIPE):
-            with open(PT_RECIPE) as json_file:
+        if exists(PT_LIMITS):
+            with open(PT_LIMITS) as json_file:
                 recipe = json.load(json_file)
                 param = recipe['limits'][test]["parameters"][name]
                 value = param["value"]
