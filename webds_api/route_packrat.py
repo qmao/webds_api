@@ -4,7 +4,8 @@ import os
 import json
 
 from . import webds
-from .utils import FileHandler, HexFile, SystemHandler
+from .utils import HexFile, SystemHandler
+from .file_manager import FileManager
 
 class PackratHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -21,7 +22,7 @@ class PackratHandler(APIHandler):
         data = json.loads("{}")
 
         if extension:
-            filelist = FileHandler.GetFileList(extension)
+            filelist = FileManager.GetFileList(extension)
             data = filelist
 
         elif packrat_id and filename:
@@ -30,7 +31,7 @@ class PackratHandler(APIHandler):
 
             filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
             print(filename)
-            await FileHandler.download(self, filename)
+            await FileManager.download(self, filename)
 
         self.finish(data)
 

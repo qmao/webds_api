@@ -3,7 +3,8 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 from . import webds
-from .utils import SystemHandler, FileHandler
+from .utils import SystemHandler
+from .file_manager import FileManager
 
 
 def save(files, location):
@@ -61,7 +62,7 @@ class FilesystemHandler(APIHandler):
         print(folder)
         if folder is not None:
             try:
-                data = FileHandler.GetTree(folder)
+                data = FileManager.GetTree(folder)
             except Exception as e:
                 raise tornado.web.HTTPError(status_code=400, log_message=str(e))
         else:

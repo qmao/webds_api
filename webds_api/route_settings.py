@@ -4,7 +4,7 @@ import os
 import json
 
 from . import webds
-from .utils import FileHandler, SystemHandler
+from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
 from os.path import exists
 
