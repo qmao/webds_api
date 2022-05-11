@@ -6,6 +6,7 @@ import pandas as pd
 import subprocess
 import numpy as np
 from time import sleep
+from goalkeeper import Goalkeeper
 
 
 sys.path.append("/usr/local/syna/lib/python")
@@ -16,6 +17,8 @@ PT_RUN = PT_ROOT + "run/"
 PT_RECIPE = os.path.join(PT_RUN, "Recipe.json")
 PT_LIMITS = os.path.join(PT_RUN, "Recipe.limits.json")
 PT_LOG_DIR = os.path.join(PT_RUN, "log")
+
+sys.path.append(os.path.join(PT_ROOT, "wrapper", "obfucate"))
 
 df = None
 tc = None
@@ -350,9 +353,9 @@ class Comm2DsCore(object):
 
         protocol = tc.comm.get_interface()
         if protocol == "i2c":
-            subprocess.check_output("echo 'syna' | su -c 'echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset'", shell=True)
+            Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset')
         elif protocol == "spi":
-            subprocess.check_output("echo 'syna' | su -c 'echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset'", shell=True)
+            Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset')
 
         sleep(1)
 

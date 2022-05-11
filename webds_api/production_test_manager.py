@@ -87,7 +87,7 @@ class ProductionTestsManager():
 
     def copyRootFile(src, dst, action = 'mv'):
         SystemHandler.CallSysCommand([ action, src, dst])
-        SystemHandler.SendSysCommand('chown root:root ' + dst)
+        SystemHandler.CallSysCommandFulfil('chown root:root ' + dst)
 
     def updatePyTest(src, dst):
         temp_file = webds.PRODUCTION_TEST_PY_TEMP

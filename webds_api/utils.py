@@ -1,37 +1,19 @@
 import os
-import subprocess
 import re
 import json
 from . import webds
+from .obfucate.goalkeeper import Goalkeeper
 
 class SystemHandler():
-    def CheckPrivileges(command, user = False, text=False):
-        if os.geteuid() == 0 or user:
-            print("No need to call with sudo")
-        else:
-            print("We're not root.")
-            command = ' '.join(command)
-            command = ['su', '-c', command]
-
-        print(command)
-        password = subprocess.run(['echo', 'syna'], check=True, capture_output=True, text=text)
-        return password
 
     def CallSysCommand(command, user = False):
-        password = SystemHandler.CheckPrivileges(command, user)
-        subprocess.run(command, input=password.stdout)
+        Goalkeeper.CallSysCommand(command, user)
 
-    def RunSysCommand(command, user = False):
-        password = SystemHandler.CheckPrivileges(command, user, True)
-        result = subprocess.run(command, input=password.stdout, capture_output=True, text=True)
-        print("stdout:", result.stdout, "stderr:", result.stderr)
-        return result.stdout
+    def CallSysCommandCapture(command, user = False):
+        return Goalkeeper.CallSysCommandCapture(command, user)
 
-    def SendSysCommand(command, user = False):
-        if not user:
-            command =  "echo 'syna' | su -c " + "'" + command + "'"
-        print(command)
-        subprocess.check_output(command, shell=True)
+    def CallSysCommandFulfil(command, user = False):
+        Goalkeeper.CallSysCommandFulfil(command, user)
 
     def UpdateWorkSpaceCache():
         os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)

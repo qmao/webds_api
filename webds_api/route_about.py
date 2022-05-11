@@ -10,7 +10,7 @@ def ReadPhoneInfo():
 
 def ReadOsInfo():
     os_info = {}
-    result = SystemHandler.RunSysCommand(['cat', '/usr/lib/os-release'])
+    result = SystemHandler.CallSysCommandCapture(['cat', '/usr/lib/os-release'])
     os_list = result.split('\n')
 
     try:
@@ -34,7 +34,7 @@ def ReadSystemInfo():
     package_info = {}
 
     for i in packages:
-        result = SystemHandler.RunSysCommand(['dpkg-query', '-W', i])
+        result = SystemHandler.CallSysCommandCapture(['dpkg-query', '-W', i])
         name, version = result.split('\t')
         package_info[name] = version.strip()
 
