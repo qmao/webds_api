@@ -2,7 +2,10 @@ import os
 import re
 import json
 from . import webds
-from .obfucate.goalkeeper import Goalkeeper
+import sys
+
+sys.path.append("/usr/local/syna/lib/python/production_tests/wrapper/obfuscate")
+from goalkeeper import Goalkeeper
 
 class SystemHandler():
 

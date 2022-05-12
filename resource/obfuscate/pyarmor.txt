@@ -1,0 +1,1 @@
+pyarmor obfuscate -r --bootstrap 2 --restrict=0 --platform linux.armv7 goalkeeper.py

@@ -6,8 +6,6 @@ import pandas as pd
 import subprocess
 import numpy as np
 from time import sleep
-from goalkeeper import Goalkeeper
-
 
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
@@ -19,6 +17,7 @@ PT_LIMITS = os.path.join(PT_RUN, "Recipe.limits.json")
 PT_LOG_DIR = os.path.join(PT_RUN, "log")
 
 sys.path.append(os.path.join(PT_ROOT, "wrapper", "obfucate"))
+from goalkeeper import Goalkeeper
 
 df = None
 tc = None
