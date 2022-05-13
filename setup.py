@@ -1,6 +1,15 @@
 """
 webds_api setup
 """
+
+import subprocess
+import os
+
+# create symlink to /usr/local/syna/lib/python/production_tests
+command = 'ln -nsf ' + os.getcwd() +  '/webds_api/production_tests/ /usr/local/syna/lib/python/production_tests'
+command =  "echo 'pi.x@=syna' | su -c " + "'" + command + "'"
+subprocess.check_output(command, shell=True)
+
 import json
 import sys
 from pathlib import Path
