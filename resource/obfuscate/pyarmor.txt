@@ -1,1 +1,4 @@
-pyarmor obfuscate -r --bootstrap 2 --restrict=0 --platform linux.armv7 goalkeeper.py
+/usr/local/bin/pyarmor obfuscate -r --bootstrap 2 --restrict=0 --platform linux.armv7 goalkeeper.py
+cp dist/goalkeeper.py ../../webds_api/production_tests/wrapper/obfuscate/goalkeeper.py
+cp dist/pytransform/__init__.py ../../webds_api/production_tests/wrapper/obfuscate/pytransform/pytransform.py
+cp dist/pytransform/_pytransform.so ../../webds_api/production_tests/wrapper/obfuscate/pytransform/_pytransform.so

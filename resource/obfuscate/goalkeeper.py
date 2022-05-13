@@ -2,25 +2,28 @@ import os
 import subprocess
 
 class Goalkeeper():
-    def CheckPrivileges(command, user = False, text=False):
+    def CallSysCommand(command, user = False):
         if os.geteuid() != 0 and user != True:
             command = ' '.join(command)
             command = ['su', '-c', command]
 
-        password = subprocess.run(['echo', 'syna'], check=True, capture_output=True, text=text)
-        return password
-
-    def CallSysCommand(command, user = False):
-        password = Goalkeeper.CheckPrivileges(command, user)
+        print("QMAO CallSysCommand: ", command)
+        password = subprocess.run(['echo', 'pi.x@=syna'], check=True, capture_output=True)
         subprocess.run(command, input=password.stdout)
 
     def CallSysCommandCapture(command, user = False):
-        password = Goalkeeper.CheckPrivileges(command, user, True)
+        if os.geteuid() != 0 and user != True:
+            command = ' '.join(command)
+            command = ['su', '-c', command]
+
+        print("QMAO CallSysCommandCapture: ", command)
+        password = subprocess.run(['echo', 'pi.x@=syna'], check=True, capture_output=True, text=True)
         result = subprocess.run(command, input=password.stdout, capture_output=True, text=True)
-        ###print("stdout:", result.stdout, "stderr:", result.stderr)
         return result.stdout
 
     def CallSysCommandFulfil(command, user = False):
         if os.geteuid() != 0 and user != True:
-            command =  "echo 'syna' | su -c " + "'" + command + "'"
+            command =  "echo 'pi.x@=syna' | su -c " + "'" + command + "'"
+
+        print("QMAO CallSysCommandFulfil: ", command)
         subprocess.check_output(command, shell=True)
