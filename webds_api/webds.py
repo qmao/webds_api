@@ -18,3 +18,5 @@ CONNECTION_SETTINGS_FILE_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'connection_pa
 # production tests
 PRODUCTION_TEST_JSON_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.json.cache')
 PRODUCTION_TEST_PY_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.py.cache')
+PRODUCTION_TEST_LOG_FILE = '/var/log/syna/production_tests.log'
+PRODUCTION_TEST_LOG_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.log.cache')

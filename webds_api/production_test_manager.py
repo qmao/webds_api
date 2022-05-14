@@ -166,11 +166,14 @@ class ProductionTestsManager():
         pytest.main(cmd)
         std, err = capture.reset()
 
-        Path(PT_LOG_DIR).mkdir(parents=True, exist_ok=True)
-        log = open(os.path.join(PT_LOG_DIR, "log.txt"), "wt")
+        log_temp = webds.PRODUCTION_TEST_LOG_TEMP
+        log = open(log_temp, "wt")
         log.write(std)
         log.write(err)
         log.close()
+
+        SystemHandler.CallSysCommand(['mkdir','-p', PT_LOG_DIR])
+        SystemHandler.CallSysCommand(['mv', log_temp, webds.PRODUCTION_TEST_LOG_FILE])
 
     def stopTests(self):
         TestBridge().setState('stop')
