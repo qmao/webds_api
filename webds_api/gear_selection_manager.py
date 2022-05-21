@@ -27,6 +27,7 @@ class GearSelectionManager(object):
     _instance = None
     _lock = threading.Lock()
     _thread = None
+    _stop_event = False
     _tc = None
     _total = 0
     _progress = 0
@@ -44,8 +45,9 @@ class GearSelectionManager(object):
 
     def __init__(self):
         log("GearSelectionManager")
-        tc = TouchcommManager()
-        self._tc = tc.getInstance()
+        if self._thread is None:
+            tc = TouchcommManager()
+            self._tc = tc.getInstance()
 
     def _set_static_config(self, static):
         self._tc.sendCommand(56)
@@ -55,7 +57,7 @@ class GearSelectionManager(object):
         self._tc.getResponse()
         self._tc.sendCommand(55)
         self._tc.getResponse()
-        static = self._tc.getStaticConfig()
+        time.sleep(0.1)
 
     def _set_dynamic_config(self, dynamic):
         self._tc.setDynamicConfig(dynamic)
@@ -126,6 +128,7 @@ class GearSelectionManager(object):
 
     def pre_pdnr_sweep(self, int_durs, num_gears, baseline_frames, gram_data_frames):
         log("int_durs = {}, num_gears = {}, baseline_frames = {}, gram_data_frames = {}".format(int_durs, num_gears, baseline_frames, gram_data_frames))
+        time.sleep(0.1)
         self._total = len(int_durs) * 3
         self._progress = 0
         self._sweep = "started"
@@ -146,6 +149,10 @@ class GearSelectionManager(object):
         self._pdnr_tuning.append([])
         covmat_cmd_arg = [baseline_frames & 0xff, (baseline_frames >> 8) & 0xff, gram_data_frames & 0xff, (gram_data_frames >> 8) & 0xff]
         for int_dur in int_durs:
+            if self._stop_event:
+                self._tc.reset()
+                self._sweep = "stopped"
+                return
             raw_reports = []
             float_reports = []
             self._set_trans_sensing_freqs(static, int_dur, [0]*num_gears)
@@ -156,6 +163,10 @@ class GearSelectionManager(object):
             self._tc.getResponse()
             log('Received response to COMM_CMD_GET_PDNR_COVMAT')
             while True:
+                if self._stop_event:
+                    self._tc.reset()
+                    self._sweep = "stopped"
+                    return
                 report = self._tc.getReport(10)
                 log(report)
                 raw_reports.append(report)
@@ -193,6 +204,7 @@ class GearSelectionManager(object):
 
     def pdnr_sweep(self, int_durs, num_gears, baseline_frames, gram_data_frames):
         log("int_durs = {}, num_gears = {}, baseline_frames = {}, gram_data_frames = {}".format(int_durs, num_gears, baseline_frames, gram_data_frames))
+        time.sleep(0.1)
         self._noise_output = [[], [], []]
         self._total = len(int_durs) * 3
         self._progress = 0
@@ -208,6 +220,10 @@ class GearSelectionManager(object):
         self._set_dynamic_config(dynamic)
         covmat_cmd_arg = [baseline_frames & 0xff, (baseline_frames >> 8) & 0xff, gram_data_frames & 0xff, (gram_data_frames >> 8) & 0xff]
         for idx, int_dur in enumerate(int_durs):
+            if self._stop_event:
+                self._tc.reset()
+                self._sweep = "stopped"
+                return
             raw_reports = []
             self._set_pdnr(static,
                 self._pdnr_tuning[self._pdnr_index][idx]['basisAmpStdevTransRx'],
@@ -225,6 +241,10 @@ class GearSelectionManager(object):
             self._tc.getResponse()
             log('Received response to COMM_CMD_GET_PDNR_COVMAT')
             while True:
+                if self._stop_event:
+                    self._tc.reset()
+                    self._sweep = "stopped"
+                    return
                 report = self._tc.getReport(10)
                 raw_reports.append(report)
                 self._progress += 1
@@ -256,6 +276,9 @@ class GearSelectionManager(object):
             self._thread.join()
             self._thread = None
 
+    def stop(self):
+        self._stop_event = True
+
     def function(self, fn, args=None):
         log(fn)
         data = {}
@@ -265,6 +288,7 @@ class GearSelectionManager(object):
             else:
                 if "sweep" in fn:
                     self._thread = threading.Thread(target=getattr(self, fn), args=args)
+                    self._stop_event = False
                     self._thread.start()
                 else:
                     data = getattr(self, fn)(*args)

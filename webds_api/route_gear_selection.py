@@ -49,10 +49,10 @@ class GearSelectionHandler(APIHandler):
             gsm = GearSelectionManager()
             while True:
                 total, progress, sweep = gsm.get_progress()
-                if sweep == "completed":
+                if sweep == "completed" or sweep == "stopped":
                     gsm.join()
                     self.set_header("content-type", "text/event-stream")
-                    self.write("id: completed\n")
+                    self.write("id: {}\n".format(sweep))
                     self.write("data: {}\n".format(gsm.get_noise_output()))
                     self.write('\n')
                     yield self.flush()
