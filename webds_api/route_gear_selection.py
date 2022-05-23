@@ -13,8 +13,9 @@ class GearSelectionHandler(APIHandler):
         input_data = self.get_json_body()
         print(input_data)
 
+        gsm = GearSelectionManager()
+
         try:
-            gsm = GearSelectionManager()
             fn = input_data["function"]
             args = None
             if "arguments" in input_data:
@@ -45,8 +46,9 @@ class GearSelectionHandler(APIHandler):
 
         cur_progress = 0
 
+        gsm = GearSelectionManager()
+
         try:
-            gsm = GearSelectionManager()
             while True:
                 total, progress, sweep = gsm.get_progress()
                 if sweep == "completed" or sweep == "stopped":
@@ -56,7 +58,6 @@ class GearSelectionHandler(APIHandler):
                     self.write("data: {}\n".format(gsm.get_noise_output()))
                     self.write('\n')
                     yield self.flush()
-                    gsm.reset_progress()
                     break
                 elif cur_progress != progress:
                         send = {
@@ -68,7 +69,10 @@ class GearSelectionHandler(APIHandler):
                 yield tornado.gen.sleep(0.0005)
         except tornado.iostream.StreamClosedError:
             print("GearSelectionHandler SSE Stream Closed")
+            gsm.stop(True)
             pass
         except Exception as e:
             print("GearSelectionHandler GET Exception")
             raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+        finally:
+            gsm.reset_progress()
