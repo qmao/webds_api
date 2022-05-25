@@ -15,8 +15,13 @@ import threading
 import time
 import sys
 import pytest
+import logging
+from queue import Queue
 
-PT_ROOT = "/usr/local/syna/lib/python/production_tests/"
+sys.path.append("/usr/local/syna/lib/python")
+from .touchcomm_manager import TouchcommManager
+
+PT_ROOT = '/usr/local/syna/lib/python/production_tests/'
 PT_LIB_ROOT = os.path.join(PT_ROOT, "lib")
 PT_LIB_COMMON = os.path.join(PT_LIB_ROOT, "common")
 PT_WRAPPER = os.path.join(PT_ROOT, "wrapper")
@@ -24,13 +29,33 @@ PT_RUN = os.path.join(PT_ROOT, "run")
 PT_SETS = os.path.join(PT_ROOT, "sets")
 PT_LIB_SCRIPT_SUBDIR = 'TestStudio/Scripts/'
 PT_LOG_DIR = os.path.join(PT_RUN, "log")
+PT_RESOURCE = os.path.join(PT_RUN, "resource")
+PT_IMAGE_TEMP = '/tmp'
 
 sys.path.append(PT_WRAPPER)
 
 from TestBridge import TestBridge
 
+
+class StdoutHandler(Queue):
+    _logger = None
+    def __init__(self, logger):
+        super().__init__()
+        self._logger = logger
+
+    def write(self, msg):
+        if msg != "\n":
+            self._logger.info(msg)
+
+    def flush(self):
+        sys.__stdout__.flush()
+
+
 class ProductionTestsManager():
     _instance = None
+    _logger = None
+    _stdout = None
+    _test_stdout = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -133,6 +158,57 @@ class ProductionTestsManager():
             SystemHandler.CallSysCommand(['rm', join(PT_RUN, fname)])
             ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + val), join(PT_RUN, fname), 'cp')
 
+        if not exists(PT_RESOURCE):
+            SystemHandler.CallSysCommandFulfil('mkdir ' + PT_RESOURCE)
+
+        ProductionTestsManager().resetLog()
+        ProductionTestsManager.reflash(partNumber)
+
+    def resetLog(self):
+        name='ProductionTests'
+        log_temp = webds.PRODUCTION_TEST_LOG_TEMP
+
+        logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+        rootLogger = logging.getLogger()
+
+        fileHandler = logging.FileHandler(log_temp)
+        fileHandler.setFormatter(logFormatter)
+        rootLogger.addHandler(fileHandler)
+
+        self._logger = rootLogger
+
+        self._test_stdout = StdoutHandler(self._logger)
+        self._stdout = sys.stdout
+        sys.stdout = self._test_stdout
+        sys.stdout.isatty = lambda: False
+
+    def updateLog(self):
+        sys.stdout = self._stdout
+        log_temp = webds.PRODUCTION_TEST_LOG_TEMP
+        SystemHandler.CallSysCommand(['mkdir','-p', PT_LOG_DIR])
+        SystemHandler.CallSysCommand(['mv', log_temp, webds.PRODUCTION_TEST_LOG_FILE])
+
+    def reflash(partNumber):
+        settings = ProductionTestsManager.getSettings(partNumber)
+        if settings["reflash"]["enable"]:
+            image = settings["reflash"]["file"]
+            src_img = os.path.join(PT_IMAGE_TEMP, image)
+            dst_img = os.path.join(PT_RESOURCE, image)
+
+            if exists(src_img):
+                ProductionTestsManager.copyRootFile(src_img, dst_img)
+
+            try:
+                print(settings["reflash"]["file"])
+                tc = TouchcommManager()
+                tc.function("reflashImageFile", [dst_img])
+            except Exception as e:
+                print('Reflash exception:{}'.format(e))
+                raise tornado.web.HTTPError(status_code=400, log_message='Reflash exception:{}'.format(e))
+
+        else:
+            print("skip reflash")
+
     def getScriptList(partNumber, id = None):
         tests = []
         if id is None:
@@ -162,18 +238,10 @@ class ProductionTestsManager():
         TestBridge().reset()
         export_wrapper = 'PYTHONPATH=' + PT_WRAPPER
         cmd = ['--tb=no', '--disable-pytest-warnings', '-s', '--disable-warnings', PT_RUN]
-        capture = py.io.StdCapture()
+
         pytest.main(cmd)
-        std, err = capture.reset()
 
-        log_temp = webds.PRODUCTION_TEST_LOG_TEMP
-        log = open(log_temp, "wt")
-        log.write(std)
-        log.write(err)
-        log.close()
-
-        SystemHandler.CallSysCommand(['mkdir','-p', PT_LOG_DIR])
-        SystemHandler.CallSysCommand(['mv', log_temp, webds.PRODUCTION_TEST_LOG_FILE])
+        ProductionTestsManager().updateLog()
 
     def stopTests(self):
         TestBridge().setState('stop')
