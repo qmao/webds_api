@@ -13,6 +13,7 @@ from .route_report           import ReportHandler
 from .route_settings         import SettingsHandler
 from .route_production_tests import ProductionTestsHandler
 from .route_gear_selection   import GearSelectionHandler
+from .route_config           import ConfigHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -39,6 +40,8 @@ def setup_handlers(web_app):
 
     gear_selection_pattern = url_path_join(base_url, "webds", "gear-selection")
 
+    config_pattern = url_path_join(base_url, "webds", "config")
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -50,6 +53,7 @@ def setup_handlers(web_app):
                 (settings_pattern, SettingsHandler),
                 (production_tests_pattern, ProductionTestsHandler),
                 (gear_selection_pattern, GearSelectionHandler),
+                (config_pattern, ConfigHandler),
                ]
 
     web_app.add_handlers(host_pattern, handlers)
