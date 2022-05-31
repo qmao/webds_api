@@ -32,6 +32,7 @@ class PackratHandler(APIHandler):
             filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
             print(filename)
             await FileManager.download(self, filename)
+            data = None
 
         self.finish(data)
 

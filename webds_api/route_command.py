@@ -19,7 +19,7 @@ class CommandHandler(APIHandler):
         command = input_data["command"]
         payload = input_data["payload"]
 
-        data = {'data': 'done'}
+        data = tc.function(command, payload)
 
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
