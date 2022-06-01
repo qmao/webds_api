@@ -17,10 +17,23 @@ class CommandHandler(APIHandler):
         print(input_data)
 
         command = input_data["command"]
-        payload = input_data["payload"]
+        if "payload" in input_data:
+            payload = input_data["payload"]
+        else:
+            payload = None
 
-        data = tc.function(command, payload)
+        print(command)
+        print(payload)
 
+        try:
+            tc = TouchcommManager()
+            tc.function(command, payload)
+        except Exception as e:
+            print(e)
+            message=str(e)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+
+        data = {'data': 'done'}
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
 
@@ -43,8 +56,10 @@ class CommandHandler(APIHandler):
                 self.finish(json.dumps(info))
                 return
 
-        except:
-            print("Exception...")
+        except Exception as e:
+            print(e)
+            message=str(e)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
 
         data = json.loads("{}")
         self.finish(data)
