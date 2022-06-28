@@ -1,0 +1,751 @@
+swagger: "2.0"
+info:
+  description: "Welcome to WebDS API documentation!"
+  version: "1.0.0"
+  title: "WebDS REST API"
+  termsOfService: "https://confluence.synaptics.com/display/PRJRN/%5BWebDS%5D+WebDS+API+Definition"
+  ###contact:
+    ###email: "achin@synaptics.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8889"
+basePath: "/webds"
+tags:
+- name: "About"
+  description: "about endpoints"
+
+- name: "Command"
+  description: "send touchcomm commands"
+  ##externalDocs:
+    ##description: "Find out more"
+    ##url: "http://localhost:8889"
+    
+- name: "Config"
+  description: "config endpoints"
+
+- name: "Filesystem"
+  description: "PinormOS Filesystem"
+
+- name: "Gear Selection"
+  description: "gear selection endpoints"
+
+- name: "General"
+  description: "general endpoints"
+
+- name: "Image"
+  description: "image endpoints"
+
+- name: "Packrat"
+  description: "packrat endpoints"
+
+- name: "Production Tests"
+  description: "production tests endpoints"
+
+- name: "Report"
+  description: "report endpoints"
+
+- name: "Reprogram"
+  description: "reporgram endpoints"
+
+- name: "Settings"
+  description: "settings endpoints"
+
+  
+
+schemes:
+- "http"
+- "https"
+
+paths:
+  /packrat:
+    get:
+      tags:
+      - "Packrat"
+      summary: "Get file list by given extension"
+      description: "Client requests list of packrat files in packrat cache on server with specified file extension."
+      operationId: "get-packrat"
+      produces:
+      - "application/json"
+      - "text/plain"
+      - "application/octet-stream"
+      parameters:
+      - name: "extension"
+        in: "query"
+        description: "Extension values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "json"
+          - "hex"
+          - "img"
+          default: "hex"
+          
+      - in: "query"
+        name: "packrat-id"
+        type: "integer"
+        collectionFormat: "multi"
+        
+      - in: "query"
+        name: "filename"
+        type: "string"
+        collectionFormat: "multi"
+      
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+          
+    post:
+      tags:
+      - "Packrat"
+      summary: "Upload a packrat file to server"
+      description: "Client uploads packrat file to packrat cache on server.\n
+                    Server parses packrat ID from contents of packrat file and places packrat file in appropriate location in packrat cache."
+      operationId: "post-packrat"
+      consumes:
+      - "multipart/form-data"
+      parameters:
+      - in: "formData"
+        name: "upfile"
+        type: "file"
+        description: "The packrat file to upload."
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+   
+          
+  /packrat/{id}:
+    get:
+      tags:
+      - "Packrat"
+      summary: "JSON containing list of packrat files"
+      description: "Client requests list of packrat files in packrat cache on server for specified packrat ID."
+      operationId: "packrat-id-get"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"   # Note the name is the same as in the path
+        required: true
+        type: "integer"
+        description: "The Packrat ID"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+      deprecated: true
+          
+    delete:
+      tags:
+      - "Packrat"
+      summary: "JSON containing name of packrat file to delete"
+      description: "Client requests for deletion of specific packrat file in packrat cache on server"
+      operationId: "delete-packrat-id"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"
+        required: true
+        type: "integer"
+        description: "The Packrat ID"
+        default: 3318382
+      - in: "body"
+        name: "body"
+        description: "File name"
+        required: true
+        schema:
+          $ref: "#/definitions/Packrat"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+  /packrat/{id}/{filename}:
+    get:
+      tags:
+      - "Packrat"
+      summary: "Blob containing requested packrat file"
+      description: "Client requests specific packrat file from packrat cache on server"
+      operationId: "get-packrat-id-filename"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"   # Note the name is the same as in the path
+        required: true
+        type: "integer"
+        description: "The Packrat ID"
+      - in: "path"
+        name: "filename"   # Note the name is the same as in the path
+        required: true
+        type: "string"
+        description: "The Packrat file"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+      deprecated: true
+      
+  /command:
+    get:
+      tags:
+      - "Command"
+      summary: "query command"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "get-command"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "query"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "identify"
+          - "getAppInfo"
+          default: "identify"
+        collectionFormat: "multi"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    post:
+      tags:
+      - "Command"
+      summary: "JSON containing command and payload data  "
+      description: "Client issues TouchComm command with necessary payload data to server.\n
+                    Server replies client with response data from execution of command."
+      operationId: "post-command"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Pet object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/Command"
+      responses:
+        '201':
+          description: Created
+
+  /report:
+    post:
+      tags:
+      - "Report"
+      summary: "JSON containing report ID to enable/disable"
+      description: "Client requests for server to enable/disable specific report type."
+      operationId: "post-report"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "report ID to enable/disable"
+        required: true
+        schema:
+          $ref: "#/definitions/Report"
+      responses:
+        '201':
+          description: Created
+    get:
+      tags:
+      - "Report"
+      summary: "SSE"
+      description: "Client sets up event-stream listener for specific report type Server pushes report data to client upon availability."
+      responses:
+        '200':
+          description: "SSE"
+          ##content:
+          ##  text/event-stream:
+          ##    schema:
+          ##      type: "array" 
+          ##      format: "event-stream"
+          ##      items:
+          ##        oneOf:
+          ##        - type: "object"
+          ##          properties:
+          ##             id:
+          ##               type: "string"
+          ##             event: 
+          ##               const: "cat"
+          ##             data: 
+          ##               type: "object"
+          ##               properties: 
+          ##                   name:
+          ##                   type: "string"
+
+  
+  /filesystem:
+    get:
+      tags:
+      - "Filesystem"
+      summary: "JSON containing directory tree content"
+      description: "Client requests directory tree content of specified location in file system on server."
+      operationId: "get-filesystem"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dir"
+        in: "query"
+        description: "show directory fs tree"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "/home/dsdkuser/jupyter/workspace"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    
+    post:
+      tags:
+      - "Filesystem"
+      summary: "FormData containing file(s) to upload and location in file system on server to upload file(s) to"
+      description: "Client uploads file(s) to specified location in file system on server."
+      operationId: "post-filesystem"
+      consumes:
+      - "multipart/form-data"
+      parameters:
+      - in: formData
+        name: location
+        type: string
+        default: "/home/dsdkuser/"
+        required: true
+        description: Specified location in file system.
+      - in: formData
+        name: upfile
+        type: file
+        required: true
+      - in: formData
+        name: upfile2
+        type: file
+        required: false
+      - in: formData
+        name: upfile3
+        type: file
+        required: false
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+  
+  /reprogram:
+    get:
+      tags:
+      - "Reprogram"
+      summary: "SSE"
+      description: "Client sets up event-stream listener for reprogram progress data\n
+                    Server pushes progress data to client during reprogram process\n
+                    Final progress data from server also contains additional status and message entries"
+      operationId: "get-reprogram"
+      responses:
+        '200':
+          description: "JSON containing progress data of reprogram process"
+    
+    post:
+      tags:
+      - "Reprogram"
+      summary: "JSON containing path to .hex file in packrat cache to use for reprogram process"
+      description: "Client requests for server to initiate reprogram process with specified .hex file in packrat cache"
+      operationId: "post-reprogram"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "report ID to enable/disable"
+        required: true
+        schema:
+          $ref: "#/definitions/Reprogram"
+      responses:
+        '201':
+          description: Created
+       
+  /about:
+    get:
+      tags:
+      - "About"
+      summary: "Client requests information"
+      description: "Client requests information\n
+                    - PinormOS release\n
+                    - versions of sub-modules\n
+                    - versions of sub-modules\n"
+      operationId: "get-about"
+      parameters:
+      - name: "query"
+        in: "query"
+        required: true
+        type: "string"
+        enum:
+        - "os-info"
+        - "system-info"
+        - "android-connection"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+          
+  /settings/connection:
+    get:
+      tags:
+      - "Settings"
+      summary: "Client requests connection settings"
+      operationId: "get-settings"
+      parameters:
+      - name: "query"
+        in: "query"
+        required: true
+        type: "string"
+        enum:
+        - "default"
+        - "custom"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    post:
+      tags:
+      - "Settings"
+      summary: "JSON containing connection settings action"
+      operationId: "post-settings"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "reset/update connection settings"
+        required: true
+        schema:
+          $ref: "#/definitions/SettingsConnection"
+      responses:
+        '200':
+          description: Connection result
+
+  /config:
+    get:
+      tags:
+      - "Config"
+      summary: "Client requests firmware configuration"
+      operationId: "get-config"
+      parameters:
+      - name: "query"
+        in: "query"
+        required: true
+        type: "string"
+        enum:
+        - "static"
+        - "dynamic"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    options:
+      tags:
+      - "Config"
+      summary: "JSON containing configuration to set (POST TBC)"
+      operationId: "post-config"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "reset/update connection settings"
+        required: true
+        schema:
+          type: object
+      responses:
+        '200':
+          description: Connection result
+
+  /gear-selection:
+    get:
+      tags:
+      - "Gear Selection"
+      summary: "SSE"
+      description: "JSON containing execution progress of PDNR sweep"
+      operationId: "get-gear-selection"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    post:
+      tags:
+      - "Gear Selection"
+      summary: "JSON containing function and arguments for execution in GearSelectionManager"
+      operationId: "post-gear-selection"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "reset/update connection settings"
+        required: true
+        schema:
+          $ref: "#/definitions/GearSelection"
+      responses:
+        '200':
+          description: Connection result
+          
+  /production-tests:
+    get:
+      tags:
+      - "Production Tests"
+      summary: "SSE"
+      description: "JSON containing test progress and result"
+      operationId: "get-production-tests"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+  /production-tests/{part-number}:
+    get:
+      tags:
+      - "Production Tests"
+      summary: "JSON containing available test sets for specified part number"
+      description: "Client requests available test sets for specified part number"
+      operationId: "get-production-tests-partnumber"
+      parameters:
+      - in: "path"
+        name: "part-number"   # Note the name is the same as in the path
+        required: true
+        type: "string"
+        default: "S3908-15.0.0"
+        description: "The Part Number"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    
+    post:
+      tags:
+      - "Production Tests"
+      summary: "JSON containing parameters for specifying test set to run  "
+      operationId: "post-production-tests-partnumber"
+      parameters:
+      - in: "path"
+        name: "part-number"   # Note the name is the same as in the path
+        required: true
+        type: "string"
+        default: "S3908-15.0.0"
+        description: "The Part Number"
+      - in: "body"
+        name: "body"
+        description: "run test"
+        required: true
+        schema:
+          $ref: "#/definitions/ProductionTestsPartnumber"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    
+    put:
+      tags:
+      - "Production Tests"
+      summary: "JSON containing data for updating custom test sets for specified part number  "
+      operationId: "put-production-tests-partnumber"
+      parameters:
+      - in: "path"
+        name: "part-number"   # Note the name is the same as in the path
+        required: true
+        type: "string"
+        default: "S3908-15.0.0"
+        description: "The Part Number"
+      - in: "body"
+        name: "body"
+        description: "run test"
+        required: true
+        schema:
+          $ref: "#/definitions/ProductionTestsList"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+          
+  /general:
+    get:
+      tags:
+      - "General"
+      summary: "JSON containing initialization message"
+      operationId: "get-general"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"      
+  
+  /image:
+    post:
+      tags:
+      - "Image"
+      summary: "JSON containing packrate ID of base image"
+      operationId: "post-image"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "run test"
+        required: true
+        schema:
+          $ref: "#/definitions/Image"
+      responses:
+        "200":
+          description: "JSON containing image file content including updated configuration"
+        "400":
+          description: "Invalid status value"
+definitions:
+  Command:
+    type: "object"
+    properties:
+      command:
+        type: "string"
+        default: "identify"
+      payload:
+        type: "array"
+        items:
+          type: "integer"
+          format: "int8"
+        default: []
+
+  Packrat:
+    type: object
+    properties:
+      file:
+        type: "string"
+        default: "config_private.json"
+    required:
+      - file
+  
+  Report:
+    type: "object"
+    properties:
+      enable:
+        type: "array"
+        items:
+          type: "integer"
+          format: "int8"
+        default: [17,18]
+      disable:
+        type: "array"
+        items:
+          type: "integer"
+          format: "int8"
+        default: [19]
+      fps:
+        type: "integer"
+        default: "300"  
+        
+    
+  Reprogram:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        enum:
+        - "start"
+        - "cancel"
+        default: "start"
+      filename:
+        type: "string"
+        default: "3318382/PR3318382.hex"
+
+  ConnectionParam:
+    type: "object"
+    properties:
+      interfaces:
+        type: "array"
+        items:
+          type: "string"
+        default: ["i2c","spi"]
+      port:
+        type: "integer"
+        default: 1729
+      speed:
+        type: "integer"
+        default: null
+        
+  SettingsConnection:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        enum:
+        - "reset"
+        - "update"
+        default: "update"
+      value:
+        $ref: "#/definitions/ConnectionParam"
+        
+  GearSelection:
+    type: "object"
+    properties:
+      function:
+        type: "string"
+      arguments:
+        type: "string"
+        
+  ProductionTestsPartnumber:
+    type: "object"
+    properties:
+      test:
+        type: "string"
+        default: "all"
+    
+  ProductionTestsList:
+    type: "array"
+    items:
+      $ref: "#/definitions/ProductionTestsItem"
+
+  ProductionTestsItem:
+    type: "object"
+    properties:
+      id:
+        type: string
+        default: "b7f7ec88-f551-4593-9087-7a230be5a483"
+      name:
+        type: string
+        default: "Test Set N"
+      tests:
+        type: "array"
+        items:
+          type: string
+          default: 'ResetPinTest'
+       
+  Image:
+    type: "object"
+    properties:
+      packrat_id:
+        type: integer
+        default: 3318382
+
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
