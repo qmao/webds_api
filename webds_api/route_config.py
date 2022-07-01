@@ -34,14 +34,7 @@ class ConfigHandler(APIHandler):
                 print("Set static config failed")
                 #### error handling
 
-    # The following decorator should be present on all verb methods (head, get, post,
-    # patch, put, delete, options) to ensure only authorized user can request the
-    # Jupyter server
-    @tornado.web.authenticated
-    def post(self):
-        configToSet = self.get_json_body()
-        print(configToSet)
-
+    def _update_static_config(configToSet):
         try:
             tc = TouchcommManager()
             config = tc.function("getStaticConfig")
@@ -54,23 +47,36 @@ class ConfigHandler(APIHandler):
                         config[key][idx] = int(x)
                 else:
                     config[key] = int(config_value)
-
             ConfigHandler._set_static_config(config)
-
-            self.set_header('content-type', 'application/json')
-            self.finish(json.dumps(config))
-
         except Exception as e:
             print(e)
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
+        return config
+
+    # The following decorator should be present on all verb methods (head, get, post,
+    # patch, put, delete, options) to ensure only authorized user can request the
+    # Jupyter server
+    @tornado.web.authenticated
+    def post(self, config_type):
+        configToSet = self.get_json_body()
+        print(configToSet)
+
+        if config_type == 'static':
+            config = ConfigHandler._update_static_config(configToSet)
+        elif config_type == 'dynamic':
+            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+        else:
+            raise tornado.web.HTTPError(status_code=405, log_message="Not support")
+
+        self.set_header('content-type', 'application/json')
+        self.finish(json.dumps(config))
 
     @tornado.web.authenticated
-    def get(self):
+    def get(self, config_type):
 
         print(self.request.arguments)
-
-        config_type = self.get_argument('type', None)
+        print(config_type)
 
         tc = TouchcommManager()
         try:
@@ -84,6 +90,8 @@ class ConfigHandler(APIHandler):
                 print(config)
                 self.finish(json.dumps(config))
                 return
+            else:
+                raise tornado.web.HTTPError(status_code=405, log_message="Not support")
 
         except Exception as e:
             print("Exception...", e)

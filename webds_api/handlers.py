@@ -42,7 +42,7 @@ def setup_handlers(web_app):
 
     gear_selection_pattern = url_path_join(base_url, "webds", "gear-selection")
 
-    config_pattern = url_path_join(base_url, "webds", "config")
+    config_pattern = url_path_join(base_url, "webds", "config/" + '(.*)')
 
     image_pattern = url_path_join(base_url, "webds", "image")
 

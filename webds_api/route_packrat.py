@@ -31,7 +31,7 @@ class PackratHandler(APIHandler):
             ###/packrat/{packrat_id}/{filename}
             try:
                 file_type = self.get_argument('type', None)
-                if file_type:
+                if file_type and file_type != 'base':
                     print("implement image function here", filename)
                 else:
                     filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
