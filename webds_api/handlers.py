@@ -1,5 +1,6 @@
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
+from swagger_ui import api_doc
 
 import tornado
 
@@ -61,3 +62,5 @@ def setup_handlers(web_app):
                ]
 
     web_app.add_handlers(host_pattern, handlers)
+
+    api_doc(web_app, config_path='/home/dsdkuser/jupyter/workspace/test.yaml', url_prefix='/api/doc', title='API doc')
