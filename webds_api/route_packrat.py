@@ -15,25 +15,45 @@ class PackratHandler(APIHandler):
     async def get(self, cluster_id: str = ""):
         print(self.request)
 
-        packrat_id = self.get_argument('packrat-id', None)
-        filename = self.get_argument('filename', None)
-        extension = self.get_argument('extension', None)
+        param = cluster_id.split("/")
+        packrat_id = None
+        filename = None
+        data = {}
 
-        data = json.loads("{}")
+        if len(param) > 3:
+            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+        if len(param) > 1:
+            packrat_id = param[1]
+        if len(param) > 2:
+            filename = param[2]
 
-        if extension:
-            filelist = FileManager.GetFileList(extension)
-            data = filelist
+        if packrat_id and filename:
+            ###/packrat/{packrat_id}/{filename}
+            try:
+                file_type = self.get_argument('type', None)
+                if file_type:
+                    print("implement image function here", filename)
+                else:
+                    filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
+                    print(filename)
+                    await FileManager.download(self, filename)
+                    data = None
+            except Exception as e:
+                print(e)
+                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+        elif packrat_id is not None:
+            ###/packrat/{packrat_id}
+            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+        else:
+            ###/packrat?extension=json
+            extension = self.get_argument('extension', None)
+            data = json.loads("{}")
 
-        elif packrat_id and filename:
-            print(packrat_id)
-            print(filename)
-
-            filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
-            print(filename)
-            await FileManager.download(self, filename)
-            data = None
-
+            if extension:
+                filelist = FileManager.GetFileList(extension)
+                data = filelist
+            else:
+                raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
         self.finish(data)
 
     @tornado.web.authenticated
