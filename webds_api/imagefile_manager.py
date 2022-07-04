@@ -58,6 +58,8 @@ class ImageFileHandler(APIHandler):
         crc = binascii.crc32(config_bytearray)
         body[config_offset+32:config_offset+36] = int2le(crc, 4)
 
+        return body
+
     def UpdateConfig(packrat_id):
         try:
             body = []
@@ -72,10 +74,9 @@ class ImageFileHandler(APIHandler):
                     pass
             if body == []:
                 raise RuntimeError("Base image file not found.")
-            ImageFileHandler._update_config(body)
+            body = ImageFileHandler._update_config(body)
         except Exception as e:
             print(e)
             raise e
 
-        print(body)
         return body

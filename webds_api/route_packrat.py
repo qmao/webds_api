@@ -35,8 +35,9 @@ class PackratHandler(APIHandler):
                 if file_type and file_type != 'base':
                     print("implement image function here", filename)
                     body = ImageFileHandler.UpdateConfig(packrat_id)
-                    await FileManager.downloadBlob(self, bytes(body))
-                    data = None
+                    data = {"data": body}
+                    await FileManager.downloadBlob(self, data)
+                    return
                 else:
                     filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
                     print(filename)

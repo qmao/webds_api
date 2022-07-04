@@ -19,9 +19,9 @@ class FileManager():
         jsonString = json.dumps(data)
         return jsonString
 
-    async def downloadBlob(Handler, blob):
+    async def downloadBlob(Handler, content):
         try:
-            Handler.write(blob)
+            Handler.write(content)
             await Handler.flush()
             print("write flush")
         except iostream.StreamClosedError:
