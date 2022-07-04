@@ -27,16 +27,13 @@ class CommandHandler(APIHandler):
 
         try:
             tc = TouchcommManager()
-            tc.function(command, payload)
+            response = tc.function(command, payload)
         except Exception as e:
             print(e)
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
 
-        data = {'data': 'done'}
-        self.set_header('content-type', 'application/json')
-        self.finish(json.dumps(data))
-
+        self.finish(json.dumps(response))
 
     @tornado.web.authenticated
     def get(self):

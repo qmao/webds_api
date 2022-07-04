@@ -18,8 +18,8 @@ def int2le(foo, num_bytes):
     return list(foo.to_bytes(num_bytes, "little"))
 
 
-class ImageHandler(APIHandler):
-    def _update_config(self, body):
+class ImageFileHandler(APIHandler):
+    def _update_config(body):
         tc = TouchcommManager().getInstance()
         num_areas = le2int(body[4:8])
         config_offset = 0
@@ -58,14 +58,7 @@ class ImageHandler(APIHandler):
         crc = binascii.crc32(config_bytearray)
         body[config_offset+32:config_offset+36] = int2le(crc, 4)
 
-    # The following decorator should be present on all verb methods (head, get, post,
-    # patch, put, delete, options) to ensure only authorized user can request the
-    # Jupyter server
-    @tornado.web.authenticated
-    async def post(self):
-        input_data = self.get_json_body()
-        packrat_id = input_data["packrat_id"]
-
+    def UpdateConfig(packrat_id):
         try:
             body = []
             file_names = [os.path.join(webds.PACKRAT_CACHE, packrat_id, "PR" + packrat_id + ".img")]
@@ -79,17 +72,10 @@ class ImageHandler(APIHandler):
                     pass
             if body == []:
                 raise RuntimeError("Base image file not found.")
-            self._update_config(body)
+            ImageFileHandler._update_config(body)
         except Exception as e:
             print(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise e
 
-        try:
-            data = {"data": body}
-            self.set_header("content-type", "application/json")
-            self.finish(json.dumps(data))
-        except tornado.iostream.StreamClosedError:
-            print("iostream.StreamClosedError")
-        except Exception as e:
-            print(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+        print(body)
+        return body

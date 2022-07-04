@@ -19,10 +19,24 @@ class FileManager():
         jsonString = json.dumps(data)
         return jsonString
 
+    async def downloadBlob(Handler, blob):
+        try:
+            Handler.write(blob)
+            await Handler.flush()
+            print("write flush")
+        except iostream.StreamClosedError:
+            print("iostream error")
+        finally:
+            print("iostream finally")
+            # pause the coroutine so other handlers can run
+            await gen.sleep(0.000000001) # 1 nanosecond
+
     async def download(Handler, filename):
         # chunk size to read
         chunk_size = 1024 * 1024 * 1 # 1 MiB
 
+        if not os.path.exists(filename):
+            raise Exception(filename + " not exist")
         with open(filename, 'rb') as f:
             while True:
                 print("ready to read file")

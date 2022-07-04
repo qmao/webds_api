@@ -6,6 +6,7 @@ import json
 from . import webds
 from .utils import HexFile, SystemHandler
 from .file_manager import FileManager
+from .imagefile_manager import ImageFileHandler
 
 class PackratHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -33,6 +34,9 @@ class PackratHandler(APIHandler):
                 file_type = self.get_argument('type', None)
                 if file_type and file_type != 'base':
                     print("implement image function here", filename)
+                    body = ImageFileHandler.UpdateConfig(packrat_id)
+                    await FileManager.downloadBlob(self, bytes(body))
+                    data = None
                 else:
                     filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
                     print(filename)
@@ -80,16 +84,17 @@ class PackratHandler(APIHandler):
         self.finish(json.dumps("{delete: yes}"))
 
     def save_file(self, packrat_id=None):
+        if len(self.request.files.items()) is 0:
+            message = "request.files.items len=0"
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+
         for field_name, files in self.request.files.items():
-            print(field_name)
             for f in files:
                 filename, content_type = f["filename"], f["content_type"]
                 body = f["body"]
                 #logging.info(
                 #    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
                 #)
-                print(filename)
-
                 if packrat_id is None:
                 # user upload a hex file from local drive
                     try:
