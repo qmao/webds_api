@@ -59,7 +59,6 @@ class FileManager():
 
     def GetTree(path):
         try:
-            SystemHandler.UpdatePackratLink()
             if not os.path.exists(path):
                 raise Exception(path + " not exist")
             d = {'name': os.path.basename(path)}

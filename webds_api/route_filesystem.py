@@ -62,6 +62,7 @@ class FilesystemHandler(APIHandler):
         print(folder)
         if folder is not None:
             try:
+                SystemHandler.UpdatePackratLink()
                 data = FileManager.GetTree(folder)
             except Exception as e:
                 raise tornado.web.HTTPError(status_code=400, log_message=str(e))
