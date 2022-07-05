@@ -59,4 +59,4 @@ def setup_handlers(web_app):
 
     web_app.add_handlers(host_pattern, handlers)
 
-    api_doc(web_app, config_path='/home/dsdkuser/jupyter/workspace/test.yaml', url_prefix='/api/doc', title='API doc')
+    api_doc(web_app, config_path='/home/dsdkuser/jupyter/workspace/Synaptics/Documentation/WebDS_API/webds_api.yaml', url_prefix='/api/doc', title='API doc')

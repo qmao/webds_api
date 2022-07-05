@@ -8,7 +8,7 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 
-host: "localhost:8889"
+host: "localhost:8888"
 basePath: "/webds"
 
 tags:
