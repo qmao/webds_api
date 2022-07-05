@@ -4,37 +4,34 @@ info:
   version: "1.0.0"
   title: "WebDS REST API"
   termsOfService: "https://confluence.synaptics.com/display/PRJRN/%5BWebDS%5D+WebDS+API+Definition"
-  ###contact:
-    ###email: "achin@synaptics.com"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
 host: "localhost:8889"
 basePath: "/webds"
+
 tags:
 - name: "About"
   description: "about endpoints"
+  #externalDocs:
+  #  description: "Find out more"
+  #  url: "https://confluence.synaptics.com/display/~scottl/WebDS+API"
 
 - name: "Command"
   description: "send touchcomm commands"
-  ##externalDocs:
-    ##description: "Find out more"
-    ##url: "http://localhost:8889"
-    
+
 - name: "Config"
   description: "config endpoints"
 
 - name: "Filesystem"
-  description: "PinormOS Filesystem"
+  description: "ilesystem endponits"
 
 - name: "Gear Selection"
   description: "gear selection endpoints"
 
 - name: "General"
   description: "general endpoints"
-
-- name: "Image"
-  description: "image endpoints"
 
 - name: "Packrat"
   description: "packrat endpoints"
@@ -73,7 +70,6 @@ paths:
       - name: "extension"
         in: "query"
         description: "Extension values that need to be considered for filter"
-        required: true
         type: "array"
         items:
           type: "string"
@@ -82,17 +78,16 @@ paths:
           - "hex"
           - "img"
           default: "hex"
-          
-      - in: "query"
-        name: "packrat-id"
-        type: "integer"
-        collectionFormat: "multi"
+
+      requestBody:
+        description: The list of items for which to get the HTML
+        content:
+          application/octet-stream:
+          schema:
+            type: string
+            format: binary
+        required: true
         
-      - in: "query"
-        name: "filename"
-        type: "string"
-        collectionFormat: "multi"
-      
       responses:
         "200":
           description: "successful operation"
@@ -141,7 +136,32 @@ paths:
         "400":
           description: "Invalid status value"
       deprecated: true
-          
+    
+    post:
+      tags:
+      - "Packrat"
+      summary: "Upload a packrat file to server"
+      description: "Client uploads packrat file to packrat cache on server.\n
+                    Server parses packrat ID from contents of packrat file and places packrat file in appropriate location in packrat cache."
+      operationId: "post-packrat-id"
+      consumes:
+      - "multipart/form-data"
+      parameters:
+      - in: "path"
+        name: "id"   # Note the name is the same as in the path
+        required: true
+        type: "integer"
+        description: "The Packrat ID"
+      - in: "formData"
+        name: "upfile"
+        type: "file"
+        description: "The packrat file to upload."
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
     delete:
       tags:
       - "Packrat"
@@ -189,12 +209,21 @@ paths:
         required: true
         type: "string"
         description: "The Packrat file"
+      - name: "type"
+        in: "query"
+        description: "type for filter"
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "base"
+          - "updated"
+          default: "updated"
       responses:
         "200":
           description: "successful operation"
         "400":
           description: "Invalid status value"
-      deprecated: true
       
   /command:
     get:
@@ -223,6 +252,7 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid status value"
+      deprecated: true
     post:
       tags:
       - "Command"
@@ -446,15 +476,15 @@ paths:
         '200':
           description: Connection result
 
-  /config:
+  /config/{type}:
     get:
       tags:
       - "Config"
       summary: "Client requests firmware configuration"
       operationId: "get-config"
       parameters:
-      - name: "query"
-        in: "query"
+      - name: "type"
+        in: "path"
         required: true
         type: "string"
         enum:
@@ -465,12 +495,19 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid status value"
-    options:
+    post:
       tags:
       - "Config"
       summary: "JSON containing configuration to set (POST TBC)"
       operationId: "post-config"
       parameters:
+      - name: "type"
+        in: "path"
+        required: true
+        type: "string"
+        enum:
+        - "static"
+        - "dynamic"
       - in: "body"
         name: "body"
         description: "reset/update connection settings"
@@ -601,26 +638,8 @@ paths:
         "200":
           description: "successful operation"
         "400":
-          description: "Invalid status value"      
-  
-  /image:
-    post:
-      tags:
-      - "Image"
-      summary: "JSON containing packrate ID of base image"
-      operationId: "post-image"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "run test"
-        required: true
-        schema:
-          $ref: "#/definitions/Image"
-      responses:
-        "200":
-          description: "JSON containing image file content including updated configuration"
-        "400":
           description: "Invalid status value"
+
 definitions:
   Command:
     type: "object"
