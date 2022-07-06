@@ -1,4 +1,5 @@
-swagger: "2.0"
+openapi: "3.0.3"
+
 info:
   description: "Welcome to WebDS API documentation!"
   version: "1.0.0"
@@ -8,8 +9,14 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 
-host: "localhost:8888"
-basePath: "/webds"
+servers:
+  - url: '{protocol}://localhost/webds'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
 
 tags:
 - name: "About"
@@ -45,14 +52,9 @@ tags:
 - name: "Reprogram"
   description: "reporgram endpoints"
 
-- name: "Settings"
+- name: Settings
   description: "settings endpoints"
 
-  
-
-schemes:
-- "http"
-- "https"
 
 paths:
   /packrat:
@@ -62,32 +64,15 @@ paths:
       summary: "Get file list by given extension"
       description: "Client requests list of packrat files in packrat cache on server with specified file extension."
       operationId: "get-packrat"
-      produces:
-      - "application/json"
-      - "text/plain"
-      - "application/octet-stream"
       parameters:
-      - name: "extension"
-        in: "query"
+      - name: extension
+        in: query
         description: "Extension values that need to be considered for filter"
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "json"
-          - "hex"
-          - "img"
+        schema:
+          type: string
+          enum: ["hex", "json", "img"]
           default: "hex"
 
-      requestBody:
-        description: The list of items for which to get the HTML
-        content:
-          application/octet-stream:
-          schema:
-            type: string
-            format: binary
-        required: true
-        
       responses:
         "200":
           description: "successful operation"
@@ -101,13 +86,11 @@ paths:
       description: "Client uploads packrat file to packrat cache on server.\n
                     Server parses packrat ID from contents of packrat file and places packrat file in appropriate location in packrat cache."
       operationId: "post-packrat"
-      consumes:
-      - "multipart/form-data"
-      parameters:
-      - in: "formData"
-        name: "upfile"
-        type: "file"
-        description: "The packrat file to upload."
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: object
       responses:
         "200":
           description: "successful operation"
@@ -115,20 +98,19 @@ paths:
           description: "Invalid status value"
    
           
-  /packrat/{id}:
+  /packrat/{packrat-id}:
     get:
       tags:
       - "Packrat"
       summary: "JSON containing list of packrat files"
       description: "Client requests list of packrat files in packrat cache on server for specified packrat ID."
       operationId: "packrat-id-get"
-      produces:
-      - "application/json"
       parameters:
-      - in: "path"
-        name: "id"   # Note the name is the same as in the path
+      - in: path
+        name: packrat-id   # Note the name is the same as in the path
         required: true
-        type: "integer"
+        schema:
+          type: integer
         description: "The Packrat ID"
       responses:
         "200":
@@ -144,80 +126,54 @@ paths:
       description: "Client uploads packrat file to packrat cache on server.\n
                     Server parses packrat ID from contents of packrat file and places packrat file in appropriate location in packrat cache."
       operationId: "post-packrat-id"
-      consumes:
-      - "multipart/form-data"
-      parameters:
-      - in: "path"
-        name: "id"   # Note the name is the same as in the path
-        required: true
-        type: "integer"
-        description: "The Packrat ID"
-      - in: "formData"
-        name: "upfile"
-        type: "file"
+      requestBody:
         description: "The packrat file to upload."
-      responses:
-        "200":
-          description: "successful operation"
-        "400":
-          description: "Invalid status value"
-
-    delete:
-      tags:
-      - "Packrat"
-      summary: "JSON containing name of packrat file to delete"
-      description: "Client requests for deletion of specific packrat file in packrat cache on server"
-      operationId: "delete-packrat-id"
-      produces:
-      - "application/json"
+        content:
+          application/octet-stream:
+            schema:
+              type: object
       parameters:
-      - in: "path"
-        name: "id"
-        required: true
-        type: "integer"
-        description: "The Packrat ID"
-        default: 3318382
-      - in: "body"
-        name: "body"
-        description: "File name"
+      - in: path
+        name: packrat-id   # Note the name is the same as in the path
         required: true
         schema:
-          $ref: "#/definitions/Packrat"
+          type: integer
+          default: 3318382
+        description: "The Packrat ID"
       responses:
         "200":
           description: "successful operation"
         "400":
           description: "Invalid status value"
 
-  /packrat/{id}/{filename}:
+  /packrat/{packrat-id}/{filename}:
     get:
       tags:
       - "Packrat"
       summary: "Blob containing requested packrat file"
       description: "Client requests specific packrat file from packrat cache on server"
       operationId: "get-packrat-id-filename"
-      produces:
-      - "application/json"
       parameters:
-      - in: "path"
-        name: "id"   # Note the name is the same as in the path
+      - in: path
+        name: packrat-id   # Note the name is the same as in the path
         required: true
-        type: "integer"
+        schema:
+          type: integer
+          default: 3318382
         description: "The Packrat ID"
-      - in: "path"
-        name: "filename"   # Note the name is the same as in the path
+      - in: path
+        name: filename   # Note the name is the same as in the path
         required: true
-        type: "string"
+        schema:
+          type: string
+          default: "PR3318382.img"
         description: "The Packrat file"
-      - name: "type"
-        in: "query"
+      - name: type
+        in: query
         description: "type for filter"
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "base"
-          - "updated"
+        schema:
+          type: string
+          enum: ["base", "updated"]
           default: "updated"
       responses:
         "200":
@@ -225,6 +181,32 @@ paths:
         "400":
           description: "Invalid status value"
       
+    delete:
+      tags:
+      - "Packrat"
+      summary: "JSON containing name of packrat file to delete"
+      description: "Client requests for deletion of specific packrat file in packrat cache on server"
+      operationId: "delete-packrat-id"
+      parameters:
+      - in: path
+        name: packrat-id
+        required: true
+        schema:
+          type: integer
+          default: 3318382
+        description: "The Packrat ID"
+      - in: path
+        name: filename
+        required: true
+        schema:
+          type: string
+          default: "config_private.json"
+        description: "File name"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
   /command:
     get:
       tags:
@@ -232,21 +214,15 @@ paths:
       summary: "query command"
       description: "Multiple status values can be provided with comma separated strings"
       operationId: "get-command"
-      produces:
-      - "application/json"
       parameters:
-      - name: "query"
-        in: "query"
+      - name: query
+        in: query
         description: "Status values that need to be considered for filter"
         required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "identify"
-          - "getAppInfo"
+        schema:
+          type: string
+          enum: ["identify", "getAppInfo"]
           default: "identify"
-        collectionFormat: "multi"
       responses:
         "200":
           description: "successful operation"
@@ -260,17 +236,13 @@ paths:
       description: "Client issues TouchComm command with necessary payload data to server.\n
                     Server replies client with response data from execution of command."
       operationId: "post-command"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
+      requestBody:
+        description: "json content"
         required: true
-        schema:
-          $ref: "#/definitions/Command"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Command"
       responses:
         '201':
           description: Created
@@ -282,17 +254,13 @@ paths:
       summary: "JSON containing report ID to enable/disable"
       description: "Client requests for server to enable/disable specific report type."
       operationId: "post-report"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
+      requestBody:
         description: "report ID to enable/disable"
         required: true
-        schema:
-          $ref: "#/definitions/Report"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Report"
       responses:
         '201':
           description: Created
@@ -331,16 +299,13 @@ paths:
       summary: "JSON containing directory tree content"
       description: "Client requests directory tree content of specified location in file system on server."
       operationId: "get-filesystem"
-      produces:
-      - "application/json"
       parameters:
-      - name: "dir"
-        in: "query"
+      - name: dir
+        in: query
         description: "show directory fs tree"
         required: true
-        type: "array"
-        items:
-          type: "string"
+        schema:
+          type: string
           default: "/home/dsdkuser/jupyter/workspace"
       responses:
         "200":
@@ -354,27 +319,19 @@ paths:
       summary: "FormData containing file(s) to upload and location in file system on server to upload file(s) to"
       description: "Client uploads file(s) to specified location in file system on server."
       operationId: "post-filesystem"
-      consumes:
-      - "multipart/form-data"
-      parameters:
-      - in: formData
-        name: location
-        type: string
-        default: "/home/dsdkuser/"
-        required: true
-        description: Specified location in file system.
-      - in: formData
-        name: upfile
-        type: file
-        required: true
-      - in: formData
-        name: upfile2
-        type: file
-        required: false
-      - in: formData
-        name: upfile3
-        type: file
-        required: false
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  default: "/home/dsdkuser/"
+                files:
+                  type: array
+                  items:
+                    type: object
       responses:
         "200":
           description: "successful operation"
@@ -400,17 +357,13 @@ paths:
       summary: "JSON containing path to .hex file in packrat cache to use for reprogram process"
       description: "Client requests for server to initiate reprogram process with specified .hex file in packrat cache"
       operationId: "post-reprogram"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "report ID to enable/disable"
+      requestBody:
+        description: "json content"
         required: true
-        schema:
-          $ref: "#/definitions/Reprogram"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Reprogram"
       responses:
         '201':
           description: Created
@@ -426,14 +379,15 @@ paths:
                     - versions of sub-modules\n"
       operationId: "get-about"
       parameters:
-      - name: "query"
-        in: "query"
+      - name: query
+        in: query
         required: true
-        type: "string"
-        enum:
-        - "os-info"
-        - "system-info"
-        - "android-connection"
+        schema:
+          type: string
+          enum:
+          - "os-info"
+          - "system-info"
+          - "android-connection"
       responses:
         "200":
           description: "successful operation"
@@ -447,13 +401,14 @@ paths:
       summary: "Client requests connection settings"
       operationId: "get-settings"
       parameters:
-      - name: "query"
-        in: "query"
+      - name: query
+        in: query
         required: true
-        type: "string"
-        enum:
-        - "default"
-        - "custom"
+        schema:
+          type: string
+          enum:
+          - "default"
+          - "custom"
       responses:
         "200":
           description: "successful operation"
@@ -465,13 +420,13 @@ paths:
       - "Settings"
       summary: "JSON containing connection settings action"
       operationId: "post-settings"
-      parameters:
-      - in: "body"
-        name: "body"
+      requestBody:
         description: "reset/update connection settings"
         required: true
-        schema:
-          $ref: "#/definitions/SettingsConnection"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsConnection"
       responses:
         '200':
           description: Connection result
@@ -483,13 +438,14 @@ paths:
       summary: "Client requests firmware configuration"
       operationId: "get-config"
       parameters:
-      - name: "type"
-        in: "path"
+      - name: type
+        in: path
         required: true
-        type: "string"
-        enum:
-        - "static"
-        - "dynamic"
+        schema:
+          type: string
+          enum:
+          - "static"
+          - "dynamic"
       responses:
         "200":
           description: "successful operation"
@@ -498,22 +454,24 @@ paths:
     post:
       tags:
       - "Config"
-      summary: "JSON containing configuration to set (POST TBC)"
+      summary: "JSON containing configuration to set"
       operationId: "post-config"
       parameters:
-      - name: "type"
-        in: "path"
-        required: true
-        type: "string"
-        enum:
-        - "static"
-        - "dynamic"
-      - in: "body"
-        name: "body"
-        description: "reset/update connection settings"
+      - name: type
+        in: path
         required: true
         schema:
-          type: object
+          type: string
+          enum:
+          - "static"
+          - "dynamic"
+      requestBody:
+        description: "config json"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         '200':
           description: Connection result
@@ -536,13 +494,13 @@ paths:
       - "Gear Selection"
       summary: "JSON containing function and arguments for execution in GearSelectionManager"
       operationId: "post-gear-selection"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "reset/update connection settings"
+      requestBody:
+        description: "config json"
         required: true
-        schema:
-          $ref: "#/definitions/GearSelection"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GearSelection"
       responses:
         '200':
           description: Connection result
@@ -568,11 +526,12 @@ paths:
       description: "Client requests available test sets for specified part number"
       operationId: "get-production-tests-partnumber"
       parameters:
-      - in: "path"
-        name: "part-number"   # Note the name is the same as in the path
+      - in: path
+        name: part-number   # Note the name is the same as in the path
         required: true
-        type: "string"
-        default: "S3908-15.0.0"
+        schema:
+          type: string
+          default: "S3908-15.0.0"
         description: "The Part Number"
       responses:
         "200":
@@ -586,18 +545,20 @@ paths:
       summary: "JSON containing parameters for specifying test set to run  "
       operationId: "post-production-tests-partnumber"
       parameters:
-      - in: "path"
-        name: "part-number"   # Note the name is the same as in the path
-        required: true
-        type: "string"
-        default: "S3908-15.0.0"
-        description: "The Part Number"
-      - in: "body"
-        name: "body"
-        description: "run test"
+      - in: path
+        name: part-number   # Note the name is the same as in the path
         required: true
         schema:
-          $ref: "#/definitions/ProductionTestsPartnumber"
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+      requestBody:
+        description: "run test"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductionTestsPartnumber"
       responses:
         "200":
           description: "successful operation"
@@ -610,18 +571,20 @@ paths:
       summary: "JSON containing data for updating custom test sets for specified part number  "
       operationId: "put-production-tests-partnumber"
       parameters:
-      - in: "path"
-        name: "part-number"   # Note the name is the same as in the path
-        required: true
-        type: "string"
-        default: "S3908-15.0.0"
-        description: "The Part Number"
-      - in: "body"
-        name: "body"
-        description: "run test"
+      - in: path
+        name: part-number   # Note the name is the same as in the path
         required: true
         schema:
-          $ref: "#/definitions/ProductionTestsList"
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+      requestBody:
+        description: "update test"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductionTestsList"
       responses:
         "200":
           description: "successful operation"
@@ -640,130 +603,116 @@ paths:
         "400":
           description: "Invalid status value"
 
-definitions:
-  Command:
-    type: "object"
-    properties:
-      command:
-        type: "string"
-        default: "identify"
-      payload:
-        type: "array"
-        items:
-          type: "integer"
-          format: "int8"
-        default: []
 
-  Packrat:
-    type: object
-    properties:
-      file:
-        type: "string"
-        default: "config_private.json"
-    required:
-      - file
-  
-  Report:
-    type: "object"
-    properties:
-      enable:
-        type: "array"
-        items:
-          type: "integer"
-          format: "int8"
-        default: [17,18]
-      disable:
-        type: "array"
-        items:
-          type: "integer"
-          format: "int8"
-        default: [19]
-      fps:
-        type: "integer"
-        default: "300"  
-        
-    
-  Reprogram:
-    type: "object"
-    properties:
-      action:
-        type: "string"
-        enum:
-        - "start"
-        - "cancel"
-        default: "start"
-      filename:
-        type: "string"
-        default: "3318382/PR3318382.hex"
 
-  ConnectionParam:
-    type: "object"
-    properties:
-      interfaces:
-        type: "array"
-        items:
-          type: "string"
-        default: ["i2c","spi"]
-      port:
-        type: "integer"
-        default: 1729
-      speed:
-        type: "integer"
-        default: null
-        
-  SettingsConnection:
-    type: "object"
-    properties:
-      action:
-        type: "string"
-        enum:
-        - "reset"
-        - "update"
-        default: "update"
-      value:
-        $ref: "#/definitions/ConnectionParam"
-        
-  GearSelection:
-    type: "object"
-    properties:
-      function:
-        type: "string"
-      arguments:
-        type: "string"
-        
-  ProductionTestsPartnumber:
-    type: "object"
-    properties:
-      test:
-        type: "string"
-        default: "all"
-    
-  ProductionTestsList:
-    type: "array"
-    items:
-      $ref: "#/definitions/ProductionTestsItem"
-
-  ProductionTestsItem:
-    type: "object"
-    properties:
-      id:
-        type: string
-        default: "b7f7ec88-f551-4593-9087-7a230be5a483"
-      name:
-        type: string
-        default: "Test Set N"
-      tests:
-        type: "array"
-        items:
+components:
+  schemas:
+    SettingsConnection:
+      type: object
+      properties:
+        action:
           type: string
-          default: 'ResetPinTest'
-       
-  Image:
-    type: "object"
-    properties:
-      packrat_id:
-        type: integer
-        default: 3318382
+          enum:
+          - "reset"
+          - "update"
+          default: "update"
+        value:
+          $ref: "#/components/schemas/ConnectionParam"
+    Command:
+      type: object
+      properties:
+        command:
+          type: string
+          default: "identify"
+        payload:
+          type: array
+          items:
+            type: integer
+            format: int8
+          default: []
+    
+    Report:
+      type: object
+      properties:
+        enable:
+          type: array
+          items:
+            type: integer
+            format: int8
+          default: [17,18]
+        disable:
+          type: array
+          items:
+            type: integer
+            format: int8
+          default: [19]
+        fps:
+          type: integer
+          default: 300  
+          
+      
+    Reprogram:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - "start"
+          - "cancel"
+          default: "start"
+        filename:
+          type: string
+          default: "3318382/PR3318382.hex"
+  
+    ConnectionParam:
+      type: object
+      properties:
+        interfaces:
+          type: array
+          items:
+            type: string
+          default: ["i2c","spi"]
+        port:
+          type: integer
+          default: 1729
+        speed:
+          type: integer
+          default: null
+          
+    GearSelection:
+      type: object
+      properties:
+        function:
+          type: string
+        arguments:
+          type: string
+          
+    ProductionTestsPartnumber:
+      type: object
+      properties:
+        test:
+          type: string
+          default: "all"
+      
+    ProductionTestsList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ProductionTestsItem"
+  
+    ProductionTestsItem:
+      type: object
+      properties:
+        id:
+          type: string
+          default: "b7f7ec88-f551-4593-9087-7a230be5a483"
+        name:
+          type: string
+          default: "Test Set N"
+        tests:
+          type: array
+          items:
+            type: string
+            default: 'ResetPinTest'
 
 externalDocs:
   description: "Find out more about Swagger"

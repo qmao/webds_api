@@ -73,16 +73,28 @@ class PackratHandler(APIHandler):
             return self.save_file()
 
     @tornado.web.authenticated
-    def delete(self, packrat_id: str = ""):
+    def delete(self, cluster_id: str = ""):
         print(self.request)
-        input_data = self.get_json_body()
 
-        filename = os.path.join(webds.PACKRAT_CACHE, packrat_id[1:], input_data["file"])
-        print("delete file: ", filename)
-        SystemHandler.CallSysCommand(['rm', filename])
-        SystemHandler.UpdateWorkspace()
+        param = cluster_id.split("/")
+        packrat_id = None
+        filename = None
+        data = {}
 
-        self.finish(json.dumps("{delete: yes}"))
+        if len(param) > 3:
+            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+        if len(param) > 1:
+            packrat_id = param[1]
+        if len(param) > 2:
+            filename = param[2]
+        if packrat_id and filename:
+            f = os.path.join(webds.PACKRAT_CACHE,packrat_id, filename)
+            print("delete file: ", f)
+            SystemHandler.CallSysCommand(['rm', f])
+            SystemHandler.UpdateWorkspace()
+            self.finish(json.dumps("{data: done}"))
+        else:
+            raise tornado.web.HTTPError(status_code=405, log_message="Not support")
 
     def save_file(self, packrat_id=None):
         if len(self.request.files.items()) is 0:
