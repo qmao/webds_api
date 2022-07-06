@@ -15,6 +15,7 @@ from .route_settings         import SettingsHandler
 from .route_production_tests import ProductionTestsHandler
 from .route_gear_selection   import GearSelectionHandler
 from .route_config           import ConfigHandler
+from .route_software_update  import SoftwareUpdateHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -43,6 +44,8 @@ def setup_handlers(web_app):
 
     config_pattern = url_path_join(base_url, "webds", "config/" + '(.*)')
 
+    software_update_pattern = url_path_join(base_url, "webds", "software-update")
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -54,7 +57,8 @@ def setup_handlers(web_app):
                 (settings_pattern, SettingsHandler),
                 (production_tests_pattern, ProductionTestsHandler),
                 (gear_selection_pattern, GearSelectionHandler),
-                (config_pattern, ConfigHandler)
+                (config_pattern, ConfigHandler),
+                (software_update_pattern, SoftwareUpdateHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)
