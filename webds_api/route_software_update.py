@@ -53,6 +53,7 @@ class SoftwareUpdateHandler(APIHandler):
                status = monitor.getStatus()
                if status is not None:
                    send = { "status": status }
+                   send = json.dumps(send)
                    yield self.publish(send)
                else:
                    yield tornado.gen.sleep(0.0001)
