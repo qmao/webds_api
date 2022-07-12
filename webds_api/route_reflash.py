@@ -4,7 +4,6 @@ import os
 import json
 
 from . import webds
-from .programmer_manager import ProgrammerManager
 from .touchcomm_manager import TouchcommManager
 
 import threading
@@ -198,7 +197,7 @@ class ReflashHandler(APIHandler):
                 handler.set_status("error")
             else:
                 TouchcommManager().getInstance()
-                handler.set_message("Programmed with " + filename)
+                handler.set_message("Reflash with " + filename)
                 handler.set_status("success")
 
         except Exception as error:
