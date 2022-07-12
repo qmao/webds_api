@@ -5,6 +5,7 @@ from swagger_ui import api_doc
 import tornado
 
 from .route_reprogram        import ProgramHandler
+from .route_reflash          import ReflashHandler
 from .route_general          import GeneralHandler
 from .route_packrat          import PackratHandler
 from .route_about            import AboutHandler
@@ -25,6 +26,8 @@ def setup_handlers(web_app):
     general_pattern = url_path_join(base_url, "webds", "general")
 
     reprogram_pattern = url_path_join(base_url, "webds", "reprogram")
+
+    reflash_pattern = url_path_join(base_url, "webds", "reflash")
 
     packrat_pattern = url_path_join(base_url, "webds", "packrat" + '(.*)')
 
@@ -58,7 +61,8 @@ def setup_handlers(web_app):
                 (production_tests_pattern, ProductionTestsHandler),
                 (gear_selection_pattern, GearSelectionHandler),
                 (config_pattern, ConfigHandler),
-                (software_update_pattern, SoftwareUpdateHandler)
+                (software_update_pattern, SoftwareUpdateHandler),
+                (reflash_pattern, ReflashHandler),
                ]
 
     web_app.add_handlers(host_pattern, handlers)
