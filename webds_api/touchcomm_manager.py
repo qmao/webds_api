@@ -27,7 +27,12 @@ class TouchcommManager(object):
             if self._tc is not None:
                 version = self._tc.comm.send_and_check("version")
             if self._tc is None or version['content'] == 'disconnect':
-                self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', packratCachePath=webds.WORKSPACE_PACKRAT_DIR, streaming=False)
+                self._tc = TouchComm.make(
+                                protocols='report_streamer',
+                                server='127.0.0.1',
+                                packratCachePath=webds.WORKSPACE_PACKRAT_DIR,
+                                streaming=False,
+                                useAttn=True)
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))
