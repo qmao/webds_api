@@ -28,24 +28,24 @@ class GeneralHandler(APIHandler):
         if "command" in data:
             param = data["command"]
             print(param)
-            if "action" in param and param["action"] == "reset":
-                print("reset")
+            if "action" in param and param["action"] == "reboot":
+                print("reboot")
                 if "target" in param and param["target"] == "rpi4":
-                    print("reset rpi4")
+                    print("reboot rpi4")
                     global rand_token
                     print(rand_token)
-                    if "uuid" in param:
-                        print("uuid found")
-                        uuid = param["uuid"]
-                        print(uuid)
-                        if uuid == rand_token:
-                            print("uuid matched")
+                    if "token" in param:
+                        print("token found")
+                        token = param["token"]
+                        print(token)
+                        if token == rand_token:
+                            print("token matched")
                             self.finish(json.dumps("done"))
                             SystemHandler.CallSysCommandFulfil('reboot')
                             return
                         else:
-                            print("uuid not matched")
-                            raise tornado.web.HTTPError(status_code=400, log_message="uuid not matched")
+                            print("token not matched")
+                            raise tornado.web.HTTPError(status_code=400, log_message="token not matched")
                     else:
                         rand_token = str(uuid4())
                         print(rand_token)
