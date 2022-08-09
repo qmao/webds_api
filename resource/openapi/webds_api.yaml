@@ -603,7 +603,21 @@ paths:
         "400":
           description: "Invalid status value"
 
-
+    post:
+      tags:
+      - "General"
+      summary: "JSON containing command to execute"
+      operationId: "post-general"
+      requestBody:
+        description: "config json"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/General"
+      responses:
+        '200':
+          description: result
 
 components:
   schemas:
@@ -618,6 +632,26 @@ components:
           default: "update"
         value:
           $ref: "#/components/schemas/ConnectionParam"
+
+    General:
+      type: object
+      properties:
+        command:
+          $ref: "#/components/schemas/GeneralCommand"
+
+    GeneralCommand:
+      type: object
+      properties:
+        action:
+          type: string
+          default: "reboot"
+        target:
+          type: string
+          default: "rpi4"
+        token:
+          type: string
+          default: "none"
+
     Command:
       type: object
       properties:
