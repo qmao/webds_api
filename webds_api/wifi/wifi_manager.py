@@ -21,7 +21,7 @@ class WifiManager():
             return found.group(0)
 
     def getList():
-        current = WifiManager.current()
+        current = WifiManager.getCurrent()
         connected = None
 
         wlan_list = []
@@ -38,7 +38,13 @@ class WifiManager():
         if connected is not None:
             wlan_list.insert(0, connected)
 
-        print(wlan_list)
+        data = {'status': 'on', 'list': wlan_list}
+        if connected is None:
+            data['connected'] = False
+        else:
+            data['connected'] = True
+
+        return data
 
     def connect(network, password):
         WifiManager.disconnect()
