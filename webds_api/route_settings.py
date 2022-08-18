@@ -2,6 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
+import subprocess
 
 from . import webds
 from .utils import SystemHandler
@@ -171,6 +172,48 @@ class SettingsHandler(APIHandler):
                     raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
             else:
                 raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+
+        elif subpath == 'adb':
+            input_data = self.get_json_body()
+            print(input_data)
+            if "ip" in input_data and "connect-port" in input_data and "pair-port" in input_data and "pair-code" in input_data:
+                pair_code = input_data["pair-code"]
+                ### echo $3 | adb pair $2
+                ### adb connect $1
+                pair_ip = input_data["ip"] + ":" + input_data["pair-port"]
+                connect_ip = input_data["ip"] + ":" + input_data["connect-port"]
+
+                ### try to connect directly
+                result = SystemHandler.CallSysCommandCapture(['adb', 'connect', connect_ip])
+                if "connected" in result:
+                     data = {"connect": True, "pair": None}
+                     self.finish(data)
+                     return
+
+                ### [PASS] (returncode=0, stdout='Enter pairing code: Successfully paired to xxx.xxx.xxx.xxx:xxxxx [guid=adb-R3CR1099MNB-KOcNXW]\n', stderr='')
+                ### [FAIL] (returncode=0, stdout='Enter pairing code: Failed: Unable to start pairing client.\n', stderr=''
+                password = subprocess.run(['echo', pair_code ], check=True, capture_output=True, text=True)
+                result = subprocess.run(['adb', 'pair', pair_ip], input=password.stdout, capture_output=True, text=True)
+                print(result.stdout)
+                if "Failed"  in result.stdout:
+                    data = {"connect": False, "pair": False}
+                    self.finish(data)
+                    return
+
+                ### [PASS] connected to xxx.xxx.xxx.xxx:xxxxx
+                ### [FAIL] failed to connect to xxx.xxx.xxx.xxx:xxxxx
+                result = SystemHandler.CallSysCommandCapture(['adb', 'connect', connect_ip])
+                if "failed" in result:
+                     data = {"connect": False, "pair": True}
+                     self.finish(data)
+                     return
+
+                data = {"connect": True, "pair": True}
+                self.finish(data)
+                return
+
+            else:
+                raise tornado.web.HTTPError(status_code=405, log_message="Invalid input params for adb connect")
 
         else:
             raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
