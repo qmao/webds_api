@@ -105,7 +105,7 @@ class SettingsHandler(APIHandler):
         else:
             raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
 
-        self.finish(data)
+        self.finish(json.dumps(data))
 
     @tornado.web.authenticated
     def post(self, subpath: str = "", cluster_id: str = ""):
@@ -176,6 +176,7 @@ class SettingsHandler(APIHandler):
                         raise tornado.web.HTTPError(status_code=405, log_message="network and password not in json body")
                 elif input_data["action"] == 'disconnect':
                     print("disconnect")
+                    status = WifiManager.disconnect()
                     data = {"status": "done"}
 
                 else:
@@ -190,7 +191,7 @@ class SettingsHandler(APIHandler):
                 if input_data["action"] == "disconnect":
                     result = SystemHandler.CallSysCommandCapture(['adb', 'disconnect'])
                     data = {"disconnect": result}
-                    self.finish(data)
+                    self.finish(json.dumps(data))
                     return
 
                 elif input_data["action"] == "connect":
@@ -205,7 +206,7 @@ class SettingsHandler(APIHandler):
                         result = SystemHandler.CallSysCommandCapture(['adb', 'connect', connect_ip])
                         if "connected" in result:
                              data = {"connect": True, "pair": None}
-                             self.finish(data)
+                             self.finish(json.dumps(data))
                              return
 
                         ### [PASS] (returncode=0, stdout='Enter pairing code: Successfully paired to xxx.xxx.xxx.xxx:xxxxx [guid=adb-R3CR1099MNB-KOcNXW]\n', stderr='')
@@ -215,7 +216,7 @@ class SettingsHandler(APIHandler):
                         print(result.stdout)
                         if "Failed"  in result.stdout:
                             data = {"connect": False, "pair": False}
-                            self.finish(data)
+                            self.finish(json.dumps(data))
                             return
 
                         ### [PASS] connected to xxx.xxx.xxx.xxx:xxxxx
@@ -227,7 +228,7 @@ class SettingsHandler(APIHandler):
                              return
 
                         data = {"connect": True, "pair": True}
-                        self.finish(data)
+                        self.finish(json.dumps(data))
                         return
 
                     else:
@@ -236,4 +237,4 @@ class SettingsHandler(APIHandler):
         else:
             raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
 
-        self.finish(data)
+        self.finish(json.dumps(data))
