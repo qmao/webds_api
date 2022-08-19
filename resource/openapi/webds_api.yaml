@@ -399,7 +399,7 @@ paths:
       tags:
       - "Settings"
       summary: "Client requests connection settings"
-      operationId: "get-settings"
+      operationId: "get-settings-connection"
       parameters:
       - name: query
         in: query
@@ -419,7 +419,7 @@ paths:
       tags:
       - "Settings"
       summary: "JSON containing connection settings action"
-      operationId: "post-settings"
+      operationId: "post-settings-connection"
       requestBody:
         description: "reset/update connection settings"
         required: true
@@ -430,6 +430,51 @@ paths:
       responses:
         '200':
           description: Connection result
+
+  /settings/wifi:
+    get:
+      tags:
+      - "Settings"
+      summary: "Client requests wifi settings"
+      operationId: "get-settings-wifi"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    post:
+      tags:
+      - "Settings"
+      summary: "JSON containing wifi settings action"
+      operationId: "post-settings-wifi"
+      requestBody:
+        description: "update wifi settings"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsWifi"
+      responses:
+        '200':
+          description: Wifi result
+
+  /settings/adb:
+    post:
+      tags:
+      - "Settings"
+      summary: "JSON containing adb settings"
+      operationId: "post-settings-adb"
+      requestBody:
+        description: "adb pair & connect"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsADB"
+      responses:
+        '200':
+          description: Wifi result
 
   /config/{type}:
     get:
@@ -619,6 +664,8 @@ paths:
         '200':
           description: result
 
+
+
 components:
   schemas:
     SettingsConnection:
@@ -632,6 +679,47 @@ components:
           default: "update"
         value:
           $ref: "#/components/schemas/ConnectionParam"
+
+    SettingsWifi:
+      type: object
+      properties:
+        status:
+          type: string
+          default: "on"
+        action:
+          type: string
+          enum:
+          - "connect"
+          - "disconnect"
+          default: "connect"
+        network:
+          type: string
+          default: "Guest"
+        password:
+          type: string
+          default: "********"
+
+    SettingsADB:
+      type: object
+      properties:
+        action:
+          type: string
+          default: "connect"
+          enum:
+          - "connect"
+          - "disconnect"
+        ip:
+          type: string
+          default: "999.999.999.999"
+        connectPort:
+          type: string
+          default: "00000"
+        pairPort:
+          type: string
+          default: "00001"
+        pairingCode:
+          type: string
+          default: "000000"
 
     General:
       type: object
@@ -697,7 +785,7 @@ components:
         filename:
           type: string
           default: "3318382/PR3318382.hex"
-  
+
     ConnectionParam:
       type: object
       properties:
@@ -712,7 +800,24 @@ components:
         speed:
           type: integer
           default: null
-          
+
+    WifiConnectParam:
+      type: object
+      properties:
+        network:
+          type: string
+          default: "Guest"
+        password:
+          type: string
+          default: "********"
+
+    WifiDisconnectParam:
+      type: object
+      properties:
+        network:
+          type: string
+          default: "Guest"
+
     GearSelection:
       type: object
       properties:
