@@ -12,9 +12,10 @@ class WifiManager():
     def getCurrent():
         current = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-c'])
 
-        regex = re.compile('(?<=SSID: )[A-Za-z0-9-]+')
+        regex = re.compile('(?<=SSID: )[A-Za-z0-9-_\s]+')
         found = regex.search(current)
 
+        print(found)
         if found is None:
             return None
         else:
