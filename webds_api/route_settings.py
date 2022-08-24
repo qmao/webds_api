@@ -88,19 +88,25 @@ class SettingsHandler(APIHandler):
                 data = ConnectionSettings.getValue('custom')
 
         elif paths[0] == 'wifi':
-            print("get wifi list")
-            data = {'status': 'on', 'list': "1111", 'current': "2222"}
             data = WifiManager.getList()
             print(data)
 
         elif paths[0] == 'adb':
+            data = {"connect": None}
             result = SystemHandler.CallSysCommandCapture(['adb', 'devices'])
-            regex = re.compile('\d+\.\d+\.\d+\.\d+:\d+\s+device')
+
+            # check adb over wifi
+            regex = re.compile('\d+\.\d+\.\d+\.\d+:\d+\s+')
             found = regex.search(result)
             if found is not None:
-                data = {"connected": True}
+                data = {"connect": "Wi-Fi"}
             else:
-                data = {"connected": False}
+                regex = re.compile('(?<=List of devices attached)[A-Za-z0-9-\s]+')
+                found = regex.search(result)
+                print(result)
+                print(found)
+                if found is not None and found.group(0) != '\n\n':
+                    data = {"connect": "USB"}
 
         else:
             raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
