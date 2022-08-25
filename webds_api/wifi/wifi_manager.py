@@ -51,7 +51,7 @@ class WifiManager():
     def connect(network, password):
         WifiManager.disconnect()
 
-        status = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-s', network, '-p', password])
+        status = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-s', f'"{network}"', '-p', password])
         print(status)
         regex = re.compile('(?<=status: )\w+')
         found = regex.search(status)
