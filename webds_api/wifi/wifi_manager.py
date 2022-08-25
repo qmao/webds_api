@@ -29,8 +29,9 @@ class WifiManager():
         wlist = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-l'])
         param = wlist.split("\n")
         for network in param:
-            token = network.split(" ")
+            token = network.split(" (")
             if len(token) == 2:
+                token[1] = token[1][:-1]
                 if token[0] == current:
                     connected = token
                 else:
