@@ -32,7 +32,8 @@ class TouchcommManager(object):
                                 server='127.0.0.1',
                                 packratCachePath=webds.WORKSPACE_PACKRAT_DIR,
                                 streaming=False,
-                                useAttn=False)
+                                useAttn=False,
+                                resetOnConnect=False)
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))
