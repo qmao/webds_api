@@ -1,19 +1,20 @@
-
 import os
 import sys
 import re
 
-sys.path.append("/home/dsdkuser/jupyter/workspace")
-from wlan_helper import WlanHelper
-
 from ..utils import SystemHandler
+
+from .. import webds
 
 class WifiManager():
     def getCurrent():
-        current = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-c'])
+        current = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-c'])
 
-        regex = re.compile('(?<=SSID: )[A-Za-z0-9-_.\s]+')
+        regex = re.compile('(?<=SSID: )[A-Za-z0-9-_.\s]+(?= \()')
         found = regex.search(current)
+
+        ##regex = re.compile('(?<=Mode: )[A-Za-z0-9-_.]+')
+        ##found = regex.search(current)
 
         print(found)
         if found is None:
@@ -26,7 +27,7 @@ class WifiManager():
         connected = None
 
         wlan_list = []
-        wlist = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-l'])
+        wlist = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-l'])
         param = wlist.split("\n")
         for network in param:
             token = network.split(" (")
@@ -51,7 +52,7 @@ class WifiManager():
     def connect(network, password):
         WifiManager.disconnect()
 
-        status = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-s', f'"{network}"', '-p', password])
+        status = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-s', f'"{network}"', '-p', password])
         print(status)
         regex = re.compile('(?<=status: )\w+')
         found = regex.search(status)
@@ -63,5 +64,5 @@ class WifiManager():
         return True
 
     def disconnect():
-        status = SystemHandler.CallSysCommandCapture(['python3', '/home/dsdkuser/jupyter/workspace/wlan_helper.py', '-d'])
+        status = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-d'])
         print(status)

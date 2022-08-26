@@ -16,7 +16,7 @@ CONNECTION_SETTINGS_FILE = '/usr/local/syna/lib/python/touchcomm/connection_para
 CONNECTION_SETTINGS_FILE_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'connection_params.json')
 
 # wifi settings
-WIFI_SETTINGS_FILE = '/home/dsdkuser/jupyter/workspace/wlan_helper.py'
+WIFI_HELPER_PY = '/usr/local/syna/lib/python/system/wlan/wlan_manager.py'
 
 # production tests
 PRODUCTION_TEST_JSON_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.json.cache')
