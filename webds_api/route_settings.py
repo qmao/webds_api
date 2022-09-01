@@ -10,7 +10,7 @@ from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
 from os.path import exists
 
-from .wifi.wifi_manager import WifiManager
+from .wifi_manager import WifiManager
 
 class ConnectionSettings:
     @staticmethod
