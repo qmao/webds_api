@@ -2,9 +2,9 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from . import webds
-from .utils import SystemHandler
-from .file_manager import FileManager
+from .. import webds
+from ..utils import SystemHandler
+from ..file.file_manager import FileManager
 
 
 def save(files, location):

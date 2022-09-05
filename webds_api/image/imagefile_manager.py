@@ -4,8 +4,8 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 import binascii
-from . import webds
-from .touchcomm_manager import TouchcommManager
+from .. import webds
+from ..touchcomm.touchcomm_manager import TouchcommManager
 
 config_label = [22, 229, 5, 124, 65, 80, 80, 95, 67, 79, 78, 70, 73, 71, 32, 32, 32, 32, 32, 32]
 

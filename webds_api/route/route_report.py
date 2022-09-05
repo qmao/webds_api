@@ -4,10 +4,10 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 import numpy as np
-from . import webds
-from .utils import SystemHandler
-from .touchcomm_manager import TouchcommManager
-from .report_manager import ReportManager
+from .. import webds
+from ..utils import SystemHandler
+from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..report.report_manager import ReportManager
 import time
 from copy import deepcopy
 

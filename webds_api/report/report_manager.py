@@ -2,7 +2,7 @@ import sys
 sys.path.append("/usr/local/syna/lib/python")
 import threading
 import time
-from .touchcomm_manager import TouchcommManager
+from ..touchcomm.touchcomm_manager import TouchcommManager
 from threading import Thread
 from threading import Lock
 from time import sleep

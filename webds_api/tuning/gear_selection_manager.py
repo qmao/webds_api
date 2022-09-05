@@ -3,7 +3,7 @@ import numpy
 import struct
 import threading
 from . import tunePDNR_covMat_v3
-from .touchcomm_manager import TouchcommManager
+from ..touchcomm.touchcomm_manager import TouchcommManager
 
 debug = False
 

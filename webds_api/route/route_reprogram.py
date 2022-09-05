@@ -3,9 +3,9 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 
-from . import webds
-from .programmer_manager import ProgrammerManager
-from .touchcomm_manager import TouchcommManager
+from .. import webds
+from ..program.programmer_manager import ProgrammerManager
+from ..touchcomm.touchcomm_manager import TouchcommManager
 
 import threading
 from queue import Queue

@@ -2,7 +2,7 @@ import sys
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 from threading import Lock
-from . import webds
+from .. import webds
 
 class TouchcommManager(object):
     _instance = None

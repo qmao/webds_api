@@ -3,7 +3,7 @@ import json
 import tornado
 from jupyter_server.base.handlers import APIHandler
 
-from .gear_selection_manager import GearSelectionManager
+from ..tuning.gear_selection_manager import GearSelectionManager
 
 class GearSelectionHandler(APIHandler):
     @tornado.web.authenticated

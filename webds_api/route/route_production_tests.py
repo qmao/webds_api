@@ -6,7 +6,7 @@ import os
 import json
 
 import time
-from .production_test_manager import ProductionTestsManager
+from ..production_test.production_test_manager import ProductionTestsManager
 import threading
 
 g_production_test_thread = None

@@ -2,7 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from .utils import SystemHandler
+from ..utils import SystemHandler
 
 def ReadPhoneInfo():
     connected=os.path.isfile('/tmp/.android.connected')

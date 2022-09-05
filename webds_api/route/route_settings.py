@@ -5,12 +5,12 @@ import json
 import subprocess
 import re
 
-from . import webds
-from .utils import SystemHandler
-from .touchcomm_manager import TouchcommManager
+from .. import webds
+from ..utils import SystemHandler
+from ..touchcomm.touchcomm_manager import TouchcommManager
 from os.path import exists
 
-from .wifi.wifi_manager import WifiManager
+from ..wifi.wifi_manager import WifiManager
 
 class ConnectionSettings:
     @staticmethod

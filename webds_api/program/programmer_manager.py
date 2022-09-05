@@ -1,7 +1,7 @@
 import sys
 sys.path.append("/usr/local/syna/lib/python")
 from programmer import AsicProgrammer
-from .touchcomm_manager import TouchcommManager
+from ..touchcomm.touchcomm_manager import TouchcommManager
 
 class ProgrammerManager(object):
     _instance = None

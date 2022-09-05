@@ -2,9 +2,9 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from . import webds
-from .utils import SystemHandler
-from .touchcomm_manager import TouchcommManager
+from .. import webds
+from ..utils import SystemHandler
+from ..touchcomm.touchcomm_manager import TouchcommManager
 
 
 class CommandHandler(APIHandler):

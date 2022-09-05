@@ -3,10 +3,10 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 
-from . import webds
-from .utils import HexFile, SystemHandler
-from .file_manager import FileManager
-from .imagefile_manager import ImageFileHandler
+from .. import webds
+from ..utils import HexFile, SystemHandler
+from ..file.file_manager import FileManager
+from ..image.imagefile_manager import ImageFileHandler
 
 class PackratHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,

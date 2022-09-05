@@ -7,9 +7,8 @@ import py
 from pathlib import Path
 from os import listdir
 from os.path import isfile, join, exists
-from . import webds
-from .utils import SystemHandler
-from . import webds
+from .. import webds
+from ..utils import SystemHandler
 import threading
 
 import time
@@ -18,8 +17,8 @@ import pytest
 import logging
 from queue import Queue
 
-sys.path.append("/usr/local/syna/lib/python")
-from .touchcomm_manager import TouchcommManager
+from ..touchcomm.touchcomm_manager import TouchcommManager
+
 
 PT_ROOT = '/usr/local/syna/lib/python/production_tests/'
 PT_LIB_ROOT = os.path.join(PT_ROOT, "lib")

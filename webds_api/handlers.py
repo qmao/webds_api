@@ -4,19 +4,19 @@ from swagger_ui import api_doc
 
 import tornado
 
-from .route_reprogram        import ProgramHandler
-from .route_reflash          import ReflashHandler
-from .route_general          import GeneralHandler
-from .route_packrat          import PackratHandler
-from .route_about            import AboutHandler
-from .route_filesystem       import FilesystemHandler
-from .route_command          import CommandHandler
-from .route_report           import ReportHandler
-from .route_settings         import SettingsHandler
-from .route_production_tests import ProductionTestsHandler
-from .route_gear_selection   import GearSelectionHandler
-from .route_config           import ConfigHandler
-from .route_software_update  import SoftwareUpdateHandler
+from .route.route_reprogram        import ProgramHandler
+from .route.route_reflash          import ReflashHandler
+from .route.route_general          import GeneralHandler
+from .route.route_packrat          import PackratHandler
+from .route.route_about            import AboutHandler
+from .route.route_filesystem       import FilesystemHandler
+from .route.route_command          import CommandHandler
+from .route.route_report           import ReportHandler
+from .route.route_settings         import SettingsHandler
+from .route.route_production_tests import ProductionTestsHandler
+from .route.route_gear_selection   import GearSelectionHandler
+from .route.route_config           import ConfigHandler
+from .route.route_software_update  import SoftwareUpdateHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
