@@ -2,9 +2,9 @@ import os
 import sys
 import re
 
-from .utils import SystemHandler
+from ..utils import SystemHandler
 
-from . import webds
+from .. import webds
 
 class WifiManager():
     def getCurrent():
