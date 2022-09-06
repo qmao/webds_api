@@ -4,8 +4,7 @@ import json
 from . import webds
 import sys
 
-sys.path.append("/usr/local/syna/lib/python/production_tests/wrapper/obfuscate")
-from goalkeeper import Goalkeeper
+from .obfuscate.goalkeeper import Goalkeeper
 
 class SystemHandler():
 

@@ -26,3 +26,7 @@ global-exclude .ipynb_checkpoints
 
 # server python subfolder
 recursive-include webds_api/ *.py
+
+# obfuscate
+graft webds_api/obfuscate
+

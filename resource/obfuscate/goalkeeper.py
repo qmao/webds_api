@@ -6,30 +6,25 @@ import re
 class Goalkeeper():
     def CheckStack():
         slist = []
+        isCallFromUtil = False
+        isCallFromRoute = False
         for line in traceback.format_stack():
             current=line.strip()
             regex = re.compile('(?<=File \")[A-Za-z0-9-_.\s\/]+(?=\",)')
             found = regex.search(current)
 
             if found is not None:
-                slist.append(found.group(0))
+                token = found.group(0)
+                slist.append(token)
+
+                if "/usr/local/lib/python3.7/dist-packages/webds_api/utils.py" in token:
+                    isCallFromUtil = True
+                if "/usr/local/lib/python3.7/dist-packages/webds_api/route/" in token:
+                    isCallFromRoute = True
 
         isCallFromJupyterLab = False
         if "/usr/local/bin/jupyter-lab" in slist[0]:
             isCallFromJupyterLab = True
-
-        slist.reverse()
-
-        isCallFromUtil = False
-        if slist[2] == "/usr/local/lib/python3.7/dist-packages/webds_api/utils.py":
-            isCallFromUtil = True
-
-        isCallFromRoute = False
-        regex = re.compile('^/usr/local/lib/python3.7/dist-packages/webds_api/route/')
-        found = regex.search(slist[3])
-
-        if found is not None:
-            isCallFromRoute = True
 
         if isCallFromUtil and isCallFromRoute and isCallFromJupyterLab:
             return True
