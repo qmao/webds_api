@@ -16,8 +16,8 @@ PT_RECIPE = os.path.join(PT_RUN, "Recipe.json")
 PT_LIMITS = os.path.join(PT_RUN, "Recipe.limits.json")
 PT_LOG_DIR = os.path.join(PT_RUN, "log")
 
-sys.path.append(os.path.join(PT_ROOT, "wrapper", "obfucate"))
-from goalkeeper import Goalkeeper
+####sys.path.append(os.path.join(PT_ROOT, "wrapper", "obfucate"))
+####from goalkeeper import Goalkeeper
 
 df = None
 tc = None
@@ -351,10 +351,10 @@ class Comm2DsCore(object):
         Comm2DsCore.ExecuteCommand(commands["CMD_SET_CONFIG_ID"], map(str, config), packet)
 
         protocol = tc.comm.get_interface()
-        if protocol == "i2c":
-            Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset')
-        elif protocol == "spi":
-            Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset')
+        ####if protocol == "i2c":
+        ####    Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_i2c.0/sysfs/reset')
+        ####elif protocol == "spi":
+        ####    Goalkeeper.CallSysCommandFulfil('echo 2 > /sys/bus/platform/devices/syna_tcm_spi.0/sysfs/reset')
 
         sleep(1)
 
