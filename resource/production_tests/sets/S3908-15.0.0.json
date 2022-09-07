@@ -1,15 +1,23 @@
 {
-	"sets": [{
-		"id": "b7f7ec88-f551-4593-9087-7a230be5a483",
-		"name": "Test Set 1",
-		"tests": []
-	}],
-	"settings": {
-		"voltages": {
-			"vdd": "1200",
-			"vddtx": "3300",
-			"vled": "1800",
-			"vpu": "1200"
-		}
-	}
+    "sets": [
+        {
+            "id": "b7f7ec88-f551-4593-9087-7a230be5a483",
+            "name": "Test Set 1",
+            "tests": [
+                "FirmwareID",
+                "Configuration"
+            ]
+        }
+    ],
+    "settings": {
+        "voltages": {
+            "vdd": "1200",
+            "vddtx": "3300",
+            "vled": "1800",
+            "vpu": "1200"
+        },
+        "reflash": {
+            "enable": false
+        }
+    }
 }
