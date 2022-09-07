@@ -4,10 +4,11 @@ import traceback
 import re
 
 class Goalkeeper():
-    def CheckStack():
+    def CheckStack(command):
         slist = []
         isCallFromUtil = False
         isCallFromRoute = False
+        isCallFromProductionTest = False
         for line in traceback.format_stack():
             current=line.strip()
             regex = re.compile('(?<=File \")[A-Za-z0-9-_.\s\/]+(?=\",)')
@@ -21,21 +22,23 @@ class Goalkeeper():
                     isCallFromUtil = True
                 if "/usr/local/lib/python3.7/dist-packages/webds_api/route/" in token:
                     isCallFromRoute = True
+                if "/usr/local/lib/python3.7/dist-packages/webds_api/production_test/production_test_manager.py" in token:
+                    isCallFromProductionTest = True
 
         isCallFromJupyterLab = False
         if "/usr/local/bin/jupyter-lab" in slist[0]:
             isCallFromJupyterLab = True
 
-        if isCallFromUtil and isCallFromRoute and isCallFromJupyterLab:
+        if isCallFromUtil and isCallFromRoute and isCallFromJupyterLab or isCallFromProductionTest:
             return True
         else:
-            print("Invalid call stack")
+            print("Invalid call stack", command)
             for path in slist:
                 print(path)
             return False
 
     def CallSysCommand(command, user = False):
-        if Goalkeeper.CheckStack() == False:
+        if Goalkeeper.CheckStack(command) == False:
             return
         if os.geteuid() != 0 and user != True:
             command = ' '.join(command)
@@ -45,7 +48,7 @@ class Goalkeeper():
         subprocess.run(command, input=password.stdout)
 
     def CallSysCommandCapture(command, user = False):
-        if Goalkeeper.CheckStack() == False:
+        if Goalkeeper.CheckStack(command) == False:
             return ""
         if os.geteuid() != 0 and user != True:
             command = ' '.join(command)
@@ -56,7 +59,7 @@ class Goalkeeper():
         return result.stdout
 
     def CallSysCommandFulfil(command, user = False):
-        if Goalkeeper.CheckStack() == False:
+        if Goalkeeper.CheckStack(command) == False:
             return
         if os.geteuid() != 0 and user != True:
             command =  "echo 'pi.x@=syna' | su -c " + "'" + command + "'"
