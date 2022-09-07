@@ -109,11 +109,11 @@ class ProductionTestsManager():
 
         return finalContent
 
-    def copyRootFile(src, dst, action = 'mv'):
+    def __copyRootFile(src, dst, action = 'mv'):
         SystemHandler.CallSysCommand([ action, src, dst])
         SystemHandler.CallSysCommandFulfil('chown root:root ' + dst)
 
-    def updatePyTest(src, dst):
+    def __updatePyTest(src, dst):
         temp_file = webds.PRODUCTION_TEST_PY_TEMP
         try:
             with open (src, 'r' ) as f:
@@ -122,7 +122,7 @@ class ProductionTestsManager():
 
                 dstFile = open(temp_file, "w")
                 dstFile.write(finalContent)
-                ProductionTestsManager.copyRootFile(temp_file, dst)
+                ProductionTestsManager.__copyRootFile(temp_file, dst)
                 print('[CREATE] ', dst, " created")
         except:
             print('[ERROR ] ', dst, " not created!!!!!")
@@ -149,13 +149,13 @@ class ProductionTestsManager():
                 raise tornado.web.HTTPError(status_code=400, log_message='unknown script: {}'.format(pyName))
 
             dst = join(PT_RUN, pyName)
-            ProductionTestsManager.updatePyTest(src, dst)
+            ProductionTestsManager.__updatePyTest(src, dst)
 
         recipes = [".json", ".limits.json"]
         for val in recipes:
             fname = "Recipe" + val
             SystemHandler.CallSysCommand(['rm', join(PT_RUN, fname)])
-            ProductionTestsManager.copyRootFile(os.path.join(PT_SETS, partNumber + val), join(PT_RUN, fname), 'cp')
+            ProductionTestsManager.__copyRootFile(os.path.join(PT_SETS, partNumber + val), join(PT_RUN, fname), 'cp')
 
         if not exists(PT_RESOURCE):
             SystemHandler.CallSysCommandFulfil('mkdir ' + PT_RESOURCE)
@@ -195,7 +195,7 @@ class ProductionTestsManager():
             dst_img = os.path.join(PT_RESOURCE, image)
 
             if exists(src_img):
-                ProductionTestsManager.copyRootFile(src_img, dst_img)
+                ProductionTestsManager.__copyRootFile(src_img, dst_img)
 
             try:
                 print(settings["reflash"]["file"])
@@ -339,7 +339,7 @@ class ProductionTestsManager():
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
             json.dump(data, f, indent=4)
-            ProductionTestsManager.copyRootFile(temp_file, sets_file)
+            ProductionTestsManager.__copyRootFile(temp_file, sets_file)
         return sets_file
 
     def setTests(partNumber, data):
@@ -351,7 +351,7 @@ class ProductionTestsManager():
         temp_file = webds.PRODUCTION_TEST_JSON_TEMP
         with open(temp_file, 'w') as f:
             json.dump(content, f, indent=4)
-            ProductionTestsManager.copyRootFile(temp_file, sets_file)
+            ProductionTestsManager.__copyRootFile(temp_file, sets_file)
         return sets_file
 
     def checkTestBridge(self):
