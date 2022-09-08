@@ -28,5 +28,5 @@ global-exclude .ipynb_checkpoints
 recursive-include webds_api/ *.py
 
 # obfuscate
-graft webds_api/obfuscate
+include webds_api/obfuscate/pytransform/_pytransform.so
 
