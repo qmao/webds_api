@@ -176,25 +176,29 @@ class SettingsHandler(APIHandler):
             elif "action" in input_data:
                 if input_data["action"] == 'connect':
                     if "network" in input_data and "password" in input_data:
-                        status = WifiManager.setSTAMode(input_data["network"], input_data["password"])
+                        status = WifiManager.connect(input_data["network"], input_data["password"])
                         data = {"status": status}
                     else:
                         raise tornado.web.HTTPError(status_code=405, log_message="network and password not in json body")
                 elif input_data["action"] == 'disconnect':
                     print("disconnect")
                     status = WifiManager.disconnect()
-                    data = {"status": "done"}
+                    data = {"status": status}
                 elif input_data["action"] == 'turnOn':
                     print("turnOn")
                     status = WifiManager.turnOn()
-                    data = {"status": "done"}
+                    data = {"status": status}
                 elif input_data["action"] == 'turnOff':
                     print("turnOff")
                     status = WifiManager.turnOff()
-                    data = {"status": "done"}
+                    data = {"status": status}
                 elif input_data["action"] == 'setAP':
                     print("setAP")
                     status = WifiManager.setAP()
+                    data = {"status": status}
+                elif input_data["action"] == 'setSTA':
+                    print("setSTA")
+                    status = WifiManager.setSTA()
                     data = {"status": status}
                 elif input_data["action"] == 'getMode':
                     print("getMode")

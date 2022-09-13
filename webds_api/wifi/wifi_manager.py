@@ -20,11 +20,6 @@ class WifiManager():
         else:
             return found.group(0)
 
-    def setAP():
-        ret = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-a'])
-        print(ret)
-        return ret
-
     def getConnectedSSID():
         current = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-c'])
 
@@ -39,6 +34,16 @@ class WifiManager():
             return None
         else:
             return found.group(0)
+
+    def setSTA():
+        ret = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '--sta'])
+        print(ret)
+        return ret
+
+    def setAP():
+        ret = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '--ap'])
+        print(ret)
+        return ret
 
     def getList():
         current = WifiManager.getConnectedSSID()
@@ -67,8 +72,8 @@ class WifiManager():
 
         return data
 
-    def setSTAMode(network, password):
-        WifiManager.disconnect()
+    def connect(network, password):
+        ###WifiManager.disconnect()
 
         status = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-s', f'"{network}"', '-p', password])
         print(status)
@@ -91,8 +96,4 @@ class WifiManager():
 
     def turnOff():
         status = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '--off'])
-        print(status)
-
-    def setAPMode():
-        status = SystemHandler.CallSysCommandCapture(['python3', webds.WIFI_HELPER_PY, '-a'])
         print(status)
