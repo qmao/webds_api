@@ -3,7 +3,6 @@ from tornado.iostream import StreamClosedError
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-import numpy as np
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
@@ -15,11 +14,6 @@ from copy import deepcopy
 fps = 300
 debug = True
 
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
 
 class ReportHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -121,13 +115,13 @@ class ReportHandler(APIHandler):
                     if frame_count != data[1]:
                         report = deepcopy(data[0])
                         if report[0] == 'delta' or report[0] == 'raw':
-                            report[1]['image'] = report[1]['image'].tolist()
+                            report[1]['image'] = report[1]['image']
                         report_count += 1
                         send = {"report": report, "frame": report_count}
-                        yield self.publish(json.dumps(send, cls=NumpyEncoder))
+                        yield self.publish(json.dumps(send))
                         frame_count = data[1]
                     else:
-                        yield self.publish(json.dumps({}, cls=NumpyEncoder))
+                        yield self.publish(json.dumps({}))
                 if (t1 - t0 >= 1):
                     t0 = t1
                     print(str(report_count) + ' fps', flush = True)
