@@ -25,18 +25,31 @@ def ReadOsInfo():
 
 def ReadSystemInfo():
     packages = [
-      'report-streamer',
-      'tcm2-driver',
-      'libpython-touchcomm',
+      'gpio-tool',
+      'jupyterlab',
       'libpython-asic-programmer',
-      'sprog-server']
+      'libpython-touchcomm',
+      'pinormos-base',
+      'pinormos-dsdk-rev',
+      'pinormos-eep',
+      'power-dac8574',
+      'report-streamer',
+      'sprog-server',
+      'streamer-router',
+      'tcm2-driver',
+      'updatedaemon',
+      'webds',
+      'wlan-manager']
 
     package_info = {}
 
     for i in packages:
         result = SystemHandler.CallSysCommandCapture(['dpkg-query', '-W', i])
-        name, version = result.split('\t')
-        package_info[name] = version.strip()
+        try:
+            name, version = result.split('\t')
+            package_info[name] = version.strip()
+        except:
+            pass
 
     print(package_info)
     return package_info
