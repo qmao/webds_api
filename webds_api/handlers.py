@@ -37,7 +37,7 @@ def setup_handlers(web_app):
 
     command_pattern = url_path_join(base_url, "webds", "command")
 
-    report_pattern = url_path_join(base_url, "webds", "report")
+    report_pattern = url_path_join(base_url, "webds", "report" + '(.*)')
 
     settings_pattern = url_path_join(base_url, "webds", "settings/" + '(.*)?' + '(.*)')
 

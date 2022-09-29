@@ -20,7 +20,7 @@ class ReportHandler(APIHandler):
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
     @tornado.web.authenticated
-    def post(self):
+    def post(self, subpath: str = "", cluster_id: str = ""):
         input_data = self.get_json_body()
         print(input_data)
         frameRate = None
@@ -92,9 +92,7 @@ class ReportHandler(APIHandler):
         except StreamClosedError:
             raise
 
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def get(self):
+    def getSSE(self):
         print("get report")
 
         manager = None
@@ -144,3 +142,64 @@ class ReportHandler(APIHandler):
             if manager:
                 print("Finally stop report manager")
                 manager.setState('stop')
+
+    def getReportOneShot(self, rtype):
+        reportType = {
+          "touch": 17,
+          "delta": 18,
+          "raw" : 19,
+          "baseline": 20
+        }
+
+        disable=[]
+        enable=[]
+        for k, v in reportType.items():
+            print(k, v)
+            if k == rtype:
+                enable.append(v)
+            else:
+                disable.append(v)
+        tc = TouchcommManager()
+
+        for x in disable:
+            print('disable:{}'.format(x))
+            ret = tc.disableReport(x)
+
+        for x in enable:
+            print('enable:{}'.format(x))
+            ret = tc.enableReport(x)
+
+
+        data = tc.getReport()
+        if data[0] == rtype:
+            send = {"report": data[1]['image']}
+        else:
+            message=str("report not found" + data)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+        return send
+
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
+    def get(self, subpath: str = "", cluster_id: str = ""):
+        print("self.request:", self.request)
+        print("subpath:",subpath)
+
+        data = json.loads("{}")
+
+        paths = subpath.split("/")
+
+        if len(paths) == 1:
+            return self.getSSE()
+        elif len(paths) > 1:
+            tc = TouchcommManager()
+            disable=[17,18,19]
+            enable=[20]
+            for x in disable:
+                print('disable:{}'.format(x))
+                ret = tc.disableReport(x)
+            for x in enable:
+                print('enable:{}'.format(x))
+                ret = tc.enableReport(x)
+
+            report = self.getReportOneShot(paths[1])
+            self.finish(json.dumps(report))
