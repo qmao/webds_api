@@ -55,6 +55,8 @@ tags:
 - name: Settings
   description: "settings endpoints"
 
+- name: "Tutor"
+  description: "tutor endpoints"
 
 paths:
   /packrat:
@@ -291,7 +293,28 @@ paths:
           ##                   name:
           ##                   type: "string"
 
-  
+  /report/{type}:
+    get:
+      tags:
+      - "Report"
+      summary: "Client requests one shot report"
+      operationId: "get-report-type"
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - "baseline"
+          - "delta"
+          - "raw"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
   /filesystem:
     get:
       tags:
@@ -675,6 +698,48 @@ paths:
         '200':
           description: result
 
+  /tutor/{module}:
+    get:
+      tags:
+      - "Tutor"
+      summary: "Client requests tutor get"
+      operationId: "get-tutor-module"
+      parameters:
+      - name: module
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - "InitialSetup"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    post:
+      tags:
+      - "Tutor"
+      summary: "JSON containing tutor post"
+      operationId: "post-tutor-module"
+      parameters:
+      - name: module
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - "InitialSetup"
+      requestBody:
+        description: "tutor json"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: result
 
 
 components:
