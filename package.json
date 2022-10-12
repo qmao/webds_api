@@ -47,6 +47,8 @@
   "dependencies": {
     "@emotion/react": "11.7.1",
     "@emotion/styled": "11.6.0",
+    "@lumino/application": "1.29.3",
+    "@lumino/widgets": "1.34.0",
     "@jupyterlab/application": "3.4.5",
     "@jupyterlab/coreutils": "5.4.5",
     "@jupyterlab/apputils": "3.4.5",
