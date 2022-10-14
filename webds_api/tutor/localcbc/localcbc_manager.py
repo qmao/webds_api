@@ -1,7 +1,9 @@
 import sys
 import re
-from ..touchcomm.touchcomm_manager import TouchcommManager
-from ..configuration.config_handler import ConfigHandler
+import time
+from ...touchcomm.touchcomm_manager import TouchcommManager
+from ...configuration.config_handler import ConfigHandler
+from ..tutor_utils import SSEQueue
 
 class SortedData():
     _list = []
@@ -53,6 +55,7 @@ class IntStatisticsSet():
         self._MinOfMax = sys.maxsize
         self._MaxOfMin = -sys.maxsize - 1
         self._sortedData = SortedData()
+        self._subchannels = []
 
     def __init__(self):
         self.reset()
@@ -71,7 +74,7 @@ class IntStatisticsSet():
                     self._subchannels.append(obj)
 
                 sc = self._subchannels[i];
-                sc.Process([item]);
+                sc.Process([item])
 
             self._Count = self._Count + 1
             self._Sum = self._Sum + item;
@@ -83,7 +86,7 @@ class IntStatisticsSet():
         self._MinOfMax = min(self._MinOfMax, self._LocalMax)
         self._MaxOfMin = max(self._MaxOfMin, self._LocalMin)
         self._Mean = (self._Sum) / self._Count
-        self._Median = self._sortedData.GetMedian()   
+        self._Median = self._sortedData.GetMedian()
 
     def GetChannels(self):
         return self._subchannels
@@ -92,14 +95,23 @@ class IntStatisticsSet():
         return self._Median
 
     def printResult(self):
-        print("Param1: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax)
-        print("Param2: ", self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
+        if False:
+            print("Param: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax, self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
 
-class LocalCBC():
+class LocalCBCManager():
     _tc = None
+    _start = None
+    _config_handler = None
+    _queue = None
 
     def __init__(self):
+        self._queue = SSEQueue()
         self._tc = TouchcommManager()
+        self._tc.getInstance().reset() #### fixme
+        self._config_handler = ConfigHandler(self._tc)
+        self._config_handler.update_dynamic_config({"requestedNoiseMode": 5})
+        self._config_handler.update_dynamic_config({"noLowPower": 1})
+        self._config_handler.update_static_config({"adnsEnabled": 0})
 
     def getSignalClarityType(self):
         return 1
@@ -116,10 +128,10 @@ class LocalCBC():
         return False
 
     def init(self):
+        print("init")
         self._tc.disableReport(17)
         self._tc.disableReport(18)
         self._tc.disableReport(19)
-        self._tc.disableReport(20)
 
     def convertInt16ToData(self, x):
       data = [0, 0]
@@ -128,7 +140,7 @@ class LocalCBC():
       return data
 
     def updateImageCBCs(self, data):
-        config = ConfigHandler._update_static_config({"imageCBCs": data}, self._tc)
+        config = self._config_handler.update_static_config({"imageCBCs": data})
 
     def setReport(self, enable, report):
         if enable:
@@ -144,6 +156,7 @@ class LocalCBC():
                 if report == ('timeout', None):
                     continue
                 if report[0] == 31:
+                    ## print("data: ", ''.join('{:02x}'.format(x) for x in report[1]))
                     return report[1]
             except:
                 pass
@@ -158,6 +171,14 @@ class LocalCBC():
             arr.append(arrRow)
         return arr
 
+    def printTime(self, tag):
+        if False:
+            if self._start == None:
+                self._start = time.time()
+            now = time.time()
+            print("[ TIME ]", tag, "--- %s seconds ---" % (now - self._start))
+            self._start = now
+
     def convertCBCSValue(self, data, count):
         base = (count + 1) / 2 
 
@@ -165,12 +186,15 @@ class LocalCBC():
         for i in data:
             value = 0
             if i < base:
-               value = abs(i - base + 1) * 0.5
+               value = i * 0.5
             else:
                value = 0 - ((i - base) * 0.5)
             print(i, "=>",value)
             arr.append(value)
         return arr
+
+    def updateInfo(self, progress, state = "run"):
+        self._queue.setInfo("LocalCBC", {"state": state, "progress": progress})
 
     def run(self):
         self.init()
@@ -194,14 +218,13 @@ class LocalCBC():
         stepPercentage = 100 / (numofsteps * samplesLimit);
         currentPercent = 0;
 
-        ##print("Progress param:", numofsteps, samplesLimit, stepPercentage)
+        print("Progress param:", signalClarityEnabled, cdmOrder, burstsPerCluster)
 
         # item1 is best score, item 2 is index of best score
         bestScores = [[sys.maxsize, -1]] * rxCount
         polarity = [False] * rxCount
 
-        ##print(bestScores, polarity)
-
+        self.printTime("Start")
         # 1. Set Image CBC for each enabled Rx to 0. 
         # For Gluon, setting CBC_CHn to 0 means that the local CBC for that channel is off.
         # There is no separate CBC_CARRIER_SEL value for each Rx.
@@ -213,19 +236,21 @@ class LocalCBC():
                     value = _CBC_flagPolarity
                 array_[index] = step | value
             self.updateImageCBCs(array_)
+            self.printTime("updateImageCBCs")
 
             status = self.setReport(True, reportId)
-            if status:
-                print("transaction success")
-            else:
+            self.printTime("setReport")
+
+            if status == False:
                 print("transaction failed")
+                raise Exception('setReport transaction failed')
 
             if terminate:
                 print("user terminate")
                 break
 
             currentPercent = step * samplesLimit * stepPercentage;
-            print(currentPercent)
+            self.updateInfo(currentPercent)
 
             samples = []
             # start data collecting
@@ -236,12 +261,15 @@ class LocalCBC():
                     break
 
                 data = self.getReport()
+                self.printTime("getReport")
 
                 samples.append(data)
                 progress = currentPercent + (samplesCollected * stepPercentage)
+                self.updateInfo(progress)
 
             # stop data collecting
             status = self.setReport(False, reportId)
+            self.printTime("setReport disable")
 
             # Calculate stats
             statisticsSet = IntStatisticsSet()
@@ -251,20 +279,20 @@ class LocalCBC():
                     raise Exception('cannot get valid report')
                 rows = self.getRow(sample, rxCount, txCount, numButtons, cdmOrder)
                 for row in rows:
-                    statisticsSet.Process(row, True);
+                    statisticsSet.Process(row, True)
 
             # Calculate the best scores
             statisticsRows = statisticsSet.GetChannels()
 
             for idx, i in enumerate(statisticsRows):
-                ###i.printResult()
+                i.printResult()
                 intvar = i.GetMedian()
 
                 score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
                 if abs(score) < abs(bestScores[idx][0]):
                     bestScores[idx] = [score, step]
-
-            #print("BEST SCORE: ", bestScores)
+            if False:
+                print("BEST SCORE: ", bestScores)
 
             # 5.For CBC off (== 0) For each receiver, if Score is positive, 
             # set CBC TX Pl for that receiver = 0 (charge subtraction). 
@@ -286,6 +314,10 @@ class LocalCBC():
                     bestValues[idx] = bestValues[idx] | _CBC_flagPolarity
                 else:
                     bestValues[idx] = bestValues[idx] & ~_CBC_flagPolarity
+        if False:
+            print("[Best]: ", bestValues)
 
-        print("[Best]: ", bestValues)
+        self.updateInfo(100, "run")
+        self.updateInfo(100, "stop")
+
         return self.convertCBCSValue(bestValues, cbcAvailableValues)

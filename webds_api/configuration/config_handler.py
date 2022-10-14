@@ -4,52 +4,84 @@ from ..touchcomm.touchcomm_manager import TouchcommManager
 
 
 class ConfigHandler():
-    def _set_static_config(static, handle=None):
-        if handle is None:
-            _tc = TouchcommManager().getInstance()
-        else:
-            _tc = handle.getInstance()
-        _tc.reset()
-        _tc.getAppInfo()
+    _static_config = {}
+    _dynamic_config = {}
+    _tc = None
 
-        arg = _tc.decoder.encodeStaticConfig(static)
+    def __init__(self, tc):
+        identify = tc.getInstance().identify()
+        print("identify: ", identify)
 
+        info = tc.getInstance().getAppInfo()
+        print("getAppInfo: ", info)
+
+        self._static_config = tc.getInstance().getStaticConfig()
+        print("[Static Config]", self._static_config)
+        v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
+        print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
+
+        self._dynamic_config = tc.getInstance().getDynamicConfig()
+        print("[Dynamic Config]", self._dynamic_config)
+        v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
+        print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
+
+        self._tc = tc
+
+    def setStaticConfig(self, config):
+        tc = self._tc.getInstance()
+        v = tc.decoder.encodeStaticConfig(config)
         try:
-            _tc.sendCommand(34, arg)
-            _tc.getResponse()
-        except:
-            try:
-                _tc.sendCommand(56)
-                _tc.getResponse()
+            tc.sendCommand(34, v)
+            tc.getResponse()
+            time.sleep(0.1)
+        except Exception as e:
+            tc.sendCommand(56)
+            tc.getResponse()
+            time.sleep(0.1)
 
-                _tc.sendCommand(57, arg)
-                _tc.getResponse()
+            tc.sendCommand(57, v)
+            tc.getResponse()
+            time.sleep(0.1)
 
-                _tc.sendCommand(55)
-                _tc.getResponse()
-                time.sleep(0.1)
-            except Exception as e:
-                raise Exception(str(e))
-                print("Set static config failed")
-                #### error handling
+            tc.sendCommand(55)
+            tc.getResponse()
+            time.sleep(0.1)
 
-    def _update_static_config(configToSet, handle=None):
+    def setDynamicConfig(self, config):
+        print("setDynamicConfig: ", config)
+
+        self._tc.getInstance().setDynamicConfig(config)
+
+    def update_static_config(self, configToSet):
         try:
-            if handle is None:
-                tc = TouchcommManager()
-            else:
-                tc = handle
-            config = tc.function("getStaticConfig")
-
             for key in configToSet:
                 config_value = configToSet[key]
                 print(key, '->', config_value)
                 if isinstance(config_value, list):
                     for idx, x in enumerate(config_value):
-                        config[key][idx] = int(x)
+                        self._static_config[key][idx] = int(x)
                 else:
-                    config[key] = int(config_value)
-            ConfigHandler._set_static_config(config, tc)
+                    self._static_config[key] = int(config_value)
+
+            self.setStaticConfig(self._static_config)
+
         except Exception as e:
             raise Exception(str(e))
-        return config
+        return self._static_config
+
+    def update_dynamic_config(self, configToSet):
+        try:
+            for key in configToSet:
+                config_value = configToSet[key]
+                print(key, '->', config_value)
+                if isinstance(config_value, list):
+                    for idx, x in enumerate(config_value):
+                        self._dynamic_config[key][idx] = int(x)
+                else:
+                    self._dynamic_config[key] = int(config_value)
+
+            self.setDynamicConfig(self._dynamic_config)
+
+        except Exception as e:
+            raise Exception(str(e))
+        return self._static_config
