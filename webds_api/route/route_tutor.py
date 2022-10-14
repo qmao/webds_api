@@ -39,6 +39,7 @@ class TutorHandler(APIHandler):
                 name, info = queue.getQueue()
                 if info is not None:
                     if info["state"] == "stop":
+                        yield self.publish(name, json.dumps(info))
                         self.finish(json.dumps({}))
                         break
                     else:
