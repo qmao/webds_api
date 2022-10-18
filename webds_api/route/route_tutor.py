@@ -8,6 +8,7 @@ from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 import sys
 from ..tutor.localcbc.localcbc import LocalCBC
+from ..tutor.max_capacitance.max_capacitance import MaxCapacitance
 import time
 from ..tutor.tutor_utils import SSEQueue
 
@@ -80,7 +81,7 @@ class TutorHandler(APIHandler):
                     tutor = paths[0]
                     cls = globals()[tutor]
                     function = getattr(cls, 'get')
-                    data = function(self, input_data)
+                    data = function(self)
             else:
                 print("TBC")
         except Exception as e:
