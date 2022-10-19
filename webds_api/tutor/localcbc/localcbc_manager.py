@@ -113,16 +113,14 @@ class LocalCBCManager():
         self._config_handler.update_dynamic_config({"noLowPower": 1})
         self._config_handler.update_static_config({"adnsEnabled": 0})
 
-    def getSignalClarityType(self):
-        return 1
-        if signalClarityOrder in data:
+    def getSignalClarityType(self, data):
+        if "signalClarityOrder" in data:
             value = data["signalClarityOrder"]
             return value >= 0
         return False
 
-    def getSignalClarityEnable(self):
-        return True
-        if signalClarityOrder in data:
+    def getSignalClarityEnable(self, data):
+        if "signalClarityEnable" in data:
             value = data["signalClarityEnable"]
             return value
         return False
@@ -148,15 +146,17 @@ class LocalCBCManager():
 
         return True
 
-    def getReport(self, report):
+    def getReport(self, reportId):
         for i in range(5):
             try:
                 report = self._tc.getReport()
                 if report == ('timeout', None):
                     continue
-                if report[0] == report:
+                if report[0] == reportId:
                     ## print("data: ", ''.join('{:02x}'.format(x) for x in report[1]))
                     return report[1]
+                else:
+                    print("unmatched report: ", report)
             except:
                 pass
         raise Exception('cannot get valid report')
@@ -203,11 +203,17 @@ class LocalCBCManager():
 
         reportId = 31  ###195
         cbcAvailableValues = 63
-        txCount = 18
-        rxCount = 40
-        numButtons = 0
-        signalClarityEnabled = self.getSignalClarityEnable()
-        cdmOrder = self.getSignalClarityType()
+
+        static_config = self._config_handler.getStaticConfig()
+
+        txCount = static_config["txCount"]
+        rxCount = static_config["rxCount"]
+        numButtons = static_config["numButtons"]
+        signalClarityEnabled = self.getSignalClarityEnable(static_config)
+
+        touch = self._tc.getInstance().getTouchInfo()
+        print(touch)
+        cdmOrder = self.getSignalClarityType(touch)
         burstsPerCluster = 1
 
         realReportId = 0

@@ -14,15 +14,21 @@ class ConfigHandler():
 
         self._static_config = tc.getInstance().getStaticConfig()
         ### print("[Static Config]", self._static_config)
-        v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
+        ### v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
         ### print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
 
         self._dynamic_config = tc.getInstance().getDynamicConfig()
         ### print("[Dynamic Config]", self._dynamic_config)
-        v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
+        ### v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
         ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
 
         self._tc = tc
+
+    def getStaticConfig(self):
+        return self._static_config
+
+    def getDynamicConfig(self):
+        return self._dynamic_config
 
     def setStaticConfig(self, config):
         tc = self._tc.getInstance()
@@ -45,8 +51,6 @@ class ConfigHandler():
             time.sleep(0.1)
 
     def setDynamicConfig(self, config):
-        ### print("setDynamicConfig: ", config)
-
         self._tc.getInstance().setDynamicConfig(config)
 
     def update_static_config(self, configToSet):
@@ -81,4 +85,4 @@ class ConfigHandler():
 
         except Exception as e:
             raise Exception(str(e))
-        return self._static_config
+        return self._dynamic_config
