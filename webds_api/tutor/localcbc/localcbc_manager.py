@@ -103,6 +103,7 @@ class LocalCBCManager():
     _start = None
     _config_handler = None
     _queue = None
+    _debug = False
 
     def __init__(self):
         self._queue = SSEQueue()
@@ -148,13 +149,13 @@ class LocalCBCManager():
 
         return True
 
-    def getReport(self, report):
+    def getReport(self, reportId):
         for i in range(5):
             try:
                 report = self._tc.getReport()
                 if report == ('timeout', None):
                     continue
-                if report[0] == report:
+                if report[0] == reportId:
                     ## print("data: ", ''.join('{:02x}'.format(x) for x in report[1]))
                     return report[1]
             except:
@@ -171,7 +172,7 @@ class LocalCBCManager():
         return arr
 
     def printTime(self, tag):
-        if False:
+        if self._debug:
             if self._start == None:
                 self._start = time.time()
             now = time.time()
@@ -213,10 +214,8 @@ class LocalCBCManager():
         realReportId = 0
         response = []
         numofsteps = int((cbcAvailableValues + 1) / 2);
-        stepPercentage = 100 / (numofsteps * samplesLimit);
-        currentPercent = 0;
-
-        print("Progress param:", signalClarityEnabled, cdmOrder, burstsPerCluster)
+        stepPercentage = 100 / (numofsteps * samplesLimit)
+        currentPercent = 0
 
         # item1 is best score, item 2 is index of best score
         bestScores = [[sys.maxsize, -1]] * rxCount
@@ -289,7 +288,7 @@ class LocalCBCManager():
                 score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
                 if abs(score) < abs(bestScores[idx][0]):
                     bestScores[idx] = [score, step]
-            if False:
+            if self._debug:
                 print("BEST SCORE: ", bestScores)
 
             # 5.For CBC off (== 0) For each receiver, if Score is positive, 
@@ -301,6 +300,8 @@ class LocalCBCManager():
                         polarity[i] = False
                     else:
                         polarity[i] = True
+                if self._debug:
+                    print("polarity: ", polarity)
 
         # set best cbcs to memory
         bestValues = [0] * len(bestScores)
@@ -312,7 +313,7 @@ class LocalCBCManager():
                     bestValues[idx] = bestValues[idx] | _CBC_flagPolarity
                 else:
                     bestValues[idx] = bestValues[idx] & ~_CBC_flagPolarity
-        if False:
+        if self._debug:
             print("[Best]: ", bestValues)
 
         self.updateInfo(100, "run")

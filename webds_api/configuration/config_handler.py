@@ -10,16 +10,15 @@ class ConfigHandler():
 
     def __init__(self, tc):
         info = tc.getInstance().getAppInfo()
-        print("getAppInfo: ", info)
 
         self._static_config = tc.getInstance().getStaticConfig()
         ### print("[Static Config]", self._static_config)
-        v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
+        ### v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
         ### print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
 
         self._dynamic_config = tc.getInstance().getDynamicConfig()
         ### print("[Dynamic Config]", self._dynamic_config)
-        v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
+        ### v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
         ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
 
         self._tc = tc
@@ -46,7 +45,6 @@ class ConfigHandler():
 
     def setDynamicConfig(self, config):
         ### print("setDynamicConfig: ", config)
-
         self._tc.getInstance().setDynamicConfig(config)
 
     def update_static_config(self, configToSet):
@@ -59,7 +57,6 @@ class ConfigHandler():
                         self._static_config[key][idx] = int(x)
                 else:
                     self._static_config[key] = int(config_value)
-
             self.setStaticConfig(self._static_config)
 
         except Exception as e:
