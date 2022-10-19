@@ -133,29 +133,28 @@ class LocalCBCManager():
         self._tc.disableReport(18)
         self._tc.disableReport(19)
 
-    def convertInt16ToData(self, x):
-      data = [0, 0]
-      data[0] = x & 0xFF;
-      data[1] = (x >> 8) & 0xFF;
-      return data
-
     def updateImageCBCs(self, data):
         config = self._config_handler.update_static_config({"imageCBCs": data})
 
     def setReport(self, enable, report):
-        if enable:
-            ret = self._tc.enableReport(report)
-        else:
-            ret = self._tc.disableReport(report)
+        try:
+            if enable:
+                ret = self._tc.enableReport(report)
+            else:
+                ret = self._tc.disableReport(report)
+        except:
+            print("set report error, ignore")
+            pass
+
         return True
 
-    def getReport(self):
+    def getReport(self, report):
         for i in range(5):
             try:
                 report = self._tc.getReport()
                 if report == ('timeout', None):
                     continue
-                if report[0] == 31:
+                if report[0] == report:
                     ## print("data: ", ''.join('{:02x}'.format(x) for x in report[1]))
                     return report[1]
             except:
@@ -196,7 +195,7 @@ class LocalCBCManager():
     def updateInfo(self, progress, state = "run"):
         self._queue.setInfo("LocalCBC", {"state": state, "progress": progress})
 
-    def run(self):
+    def run(self, samplesLimit):
         self.init()
         ### global
         _CBC_flagPolarity = 0x20
@@ -204,7 +203,6 @@ class LocalCBCManager():
 
         reportId = 31  ###195
         cbcAvailableValues = 63
-        samplesLimit = 10
         txCount = 18
         rxCount = 40
         numButtons = 0
@@ -260,7 +258,7 @@ class LocalCBCManager():
                     print("user terminate")
                     break
 
-                data = self.getReport()
+                data = self.getReport(reportId)
                 self.printTime("getReport")
 
                 samples.append(data)
