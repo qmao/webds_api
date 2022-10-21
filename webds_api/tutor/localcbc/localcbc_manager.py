@@ -193,8 +193,8 @@ class LocalCBCManager():
             arr.append(value)
         return arr
 
-    def updateInfo(self, progress, state = "run"):
-        self._queue.setInfo("LocalCBC", {"state": state, "progress": progress})
+    def updateProgress(self, progress):
+        self._queue.setInfo("LocalCBC", {"state": "run", "progress": progress})
 
     def run(self, samplesLimit):
         self.init()
@@ -247,7 +247,7 @@ class LocalCBCManager():
                 break
 
             currentPercent = step * samplesLimit * stepPercentage;
-            self.updateInfo(currentPercent)
+            self.updateProgress(currentPercent)
 
             samples = []
             # start data collecting
@@ -262,7 +262,7 @@ class LocalCBCManager():
 
                 samples.append(data)
                 progress = currentPercent + (samplesCollected * stepPercentage)
-                self.updateInfo(progress)
+                self.updateProgress(progress)
 
             # stop data collecting
             status = self.setReport(False, reportId)
@@ -316,7 +316,8 @@ class LocalCBCManager():
         if self._debug:
             print("[Best]: ", bestValues)
 
-        self.updateInfo(100, "run")
-        self.updateInfo(100, "stop")
+        self.updateImageCBCs(bestValues)
+        self.updateProgress(100)
+        self._queue.setInfo("LocalCBC", {"state": "stop", "data": bestValues})
 
         return self.convertCBCSValue(bestValues, cbcAvailableValues)

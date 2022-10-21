@@ -14,14 +14,25 @@ class MaxCapacitanceManager():
     _queue = None
     _terminate = False
     _report_id = 18
+    _max = -sys.maxsize - 1
+    _cumMax = -sys.maxsize - 1
+
     def __init__(self):
+        print("__init__")
+
+    def init(self):
+        print("init")
+        self._tc = None
+        self._start = None
+        self._config_handler = None
+        self._queue = None
+        self._terminate = False
+        self._terminated = False
+
         self._queue = SSEQueue()
         self._tc = TouchcommManager()
         self._config_handler = ConfigHandler(self._tc)
 
-
-    def init(self):
-        print("init")
         self._tc.disableReport(17)
         self._tc.disableReport(19)
 
@@ -57,17 +68,30 @@ class MaxCapacitanceManager():
         self._queue.setInfo("MaxCapacitance", {"state": state, "value": data})
 
     def run(self):
-        _max = -sys.maxsize - 1
-        _cumMax = -sys.maxsize - 1
-
         try:
             self.init()
             self.setReport(True, self._report_id)
+            self._terminated = self._terminate
             while self._terminate is False:
                 report = self.getReport()
-                _max = np.amax(report)
-                _cumMax = max(_max, _cumMax)
-                self.updateInfo({"max": int(_max), "cum_max": int(_cumMax)}, "run")
+                self._max = np.amax(report)
+                self._cumMax = max(self._max, self._cumMax)
+                self.updateInfo({"max": int(self._max), "cum_max": int(self._cumMax)}, "run")
+
+            print("While loop terminate")
+            self._terminated = True
         except e as Exception:
             print(str(e))
         return
+
+    def terminate(self):
+        self._terminate = True
+        while True:
+            if self._terminated:
+                break
+            time.sleep(0.005)
+        print("Terminated!")
+
+    def reset(self):
+        self._max = -sys.maxsize - 1
+        self._cumMax = -sys.maxsize - 1
