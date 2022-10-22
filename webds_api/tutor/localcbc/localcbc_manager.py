@@ -104,15 +104,32 @@ class LocalCBCManager():
     _config_handler = None
     _queue = None
     _debug = False
+    _terminate = False
+    _terminated = False
+    _static_config_default = {}
+    _dynamic_config_default = {}
 
     def __init__(self):
         self._queue = SSEQueue()
         self._tc = TouchcommManager()
         self._tc.getInstance().reset() #### fixme
         self._config_handler = ConfigHandler(self._tc)
+        self._static_config_default = self._config_handler.getStaticConfig()
+        self._dynamic_config_default = self._config_handler.getDynamicConfig()
+
+        self._terminate = False
+        self._terminated = False
+
+    def after_run(self):
+        self._config_handler.update_dynamic_config({"requestedNoiseMode": self._dynamic_config_default["requestedNoiseMode"]})
+        self._config_handler.update_dynamic_config({"noLowPower": self._dynamic_config_default["noLowPower"]})
+        self._config_handler.update_static_config({"adnsEnabled": self._static_config_default["adnsEnabled"]})
+
+    def before_run(self):
         self._config_handler.update_dynamic_config({"requestedNoiseMode": 5})
         self._config_handler.update_dynamic_config({"noLowPower": 1})
         self._config_handler.update_static_config({"adnsEnabled": 0})
+
 
     def getSignalClarityType(self):
         return 1
@@ -193,14 +210,30 @@ class LocalCBCManager():
             arr.append(value)
         return arr
 
+    def convertCBCSValueToBase(data):
+        arr = []
+        for i in data:
+            value = 0
+            if i is 0:
+                value = 32
+            if i > 0:
+               value = i * 2
+            else:
+               value = abs(i * 2) + 32
+            print(i, "=>",value)
+            arr.append(value)
+        return arr
+
     def updateProgress(self, progress):
         self._queue.setInfo("LocalCBC", {"state": "run", "progress": progress})
 
     def run(self, samplesLimit):
+        self._terminated = self._terminate
         self.init()
+
+        self.before_run()
         ### global
         _CBC_flagPolarity = 0x20
-        terminate = False
 
         reportId = 31  ###195
         cbcAvailableValues = 63
@@ -242,7 +275,7 @@ class LocalCBCManager():
                 print("transaction failed")
                 raise Exception('setReport transaction failed')
 
-            if terminate:
+            if self._terminate:
                 print("user terminate")
                 break
 
@@ -253,7 +286,7 @@ class LocalCBCManager():
             # start data collecting
             for samplesCollected in range(samplesLimit):
                 ###print("LOOP:", step, samplesCollected)
-                if terminate:
+                if self._terminate:
                     print("user terminate")
                     break
 
@@ -303,6 +336,11 @@ class LocalCBCManager():
                 if self._debug:
                     print("polarity: ", polarity)
 
+        if self._terminate:
+            self._terminated = True
+            self.after_run()
+            return {"data": "cancel"}
+
         # set best cbcs to memory
         bestValues = [0] * len(bestScores)
 
@@ -313,11 +351,19 @@ class LocalCBCManager():
                     bestValues[idx] = bestValues[idx] | _CBC_flagPolarity
                 else:
                     bestValues[idx] = bestValues[idx] & ~_CBC_flagPolarity
-        if self._debug:
-            print("[Best]: ", bestValues)
 
+        print("[Best]: ", bestValues)
+
+        self.after_run()
         self.updateImageCBCs(bestValues)
         self.updateProgress(100)
-        self._queue.setInfo("LocalCBC", {"state": "stop", "data": bestValues})
-
+        self._queue.setInfo("LocalCBC", {"state": "stop", "data": self.convertCBCSValue(bestValues, cbcAvailableValues)})
         return self.convertCBCSValue(bestValues, cbcAvailableValues)
+
+    def terminate(self):
+        self._terminate = True
+        while True:
+            if self._terminated:
+                break
+            time.sleep(0.005)
+        print("Terminated!")

@@ -2,6 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
+import time
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
@@ -11,7 +12,6 @@ class ConfigHandler(APIHandler):
 
     def _set_static_config(static):
         _tc = TouchcommManager().getInstance()
-        _tc.reset()
         _tc.getAppInfo()
 
         arg = _tc.decoder.encodeStaticConfig(static)
@@ -30,8 +30,8 @@ class ConfigHandler(APIHandler):
                 _tc.sendCommand(55)
                 _tc.getResponse()
                 time.sleep(0.1)
-            except:
-                print("Set static config failed")
+            except Exception as e:
+                print("Set static config failed:", str(e))
                 #### error handling
 
     def _update_static_config(configToSet):
@@ -82,12 +82,10 @@ class ConfigHandler(APIHandler):
         try:
             if config_type == 'static':
                 config = tc.function("getStaticConfig")
-                print(config)
                 self.finish(json.dumps(config))
                 return
             elif config_type == 'dynamic':
                 config = tc.function("getDynamicConfig")
-                print(config)
                 self.finish(json.dumps(config))
                 return
             else:

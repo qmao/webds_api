@@ -169,14 +169,18 @@ class ReportHandler(APIHandler):
             print('enable:{}'.format(x))
             ret = tc.enableReport(x)
 
+        for i in range(5):
+            data = tc.getReport()
+            if data[0] == rtype:
+                send = {"report": data[1]['image']}
+                return send
+            else:
+                continue
 
-        data = tc.getReport()
-        if data[0] == rtype:
-            send = {"report": data[1]['image']}
-        else:
-            message=str("report not found" + data)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
-        return send
+        print("[ERROR]", data)
+        message="report not found"
+        raise tornado.web.HTTPError(status_code=400, log_message=message)
+
 
     @tornado.web.authenticated
     @tornado.gen.coroutine

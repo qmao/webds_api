@@ -13,6 +13,7 @@ class MaxCapacitanceManager():
     _config_handler = None
     _queue = None
     _terminate = False
+    _terminated = False
     _report_id = 18
     _max = -sys.maxsize - 1
     _cumMax = -sys.maxsize - 1
@@ -44,16 +45,13 @@ class MaxCapacitanceManager():
         return True
 
     def getReport(self):
-        for i in range(10):
-            try:
-                report = self._tc.getReport()
-                if report == ('timeout', None):
-                    continue
-                if report[0] == 'delta':
-                    return report[1]['image']
-            except:
-                pass
-        raise Exception('cannot get valid report')
+        try:
+            report = self._tc.getReport()
+            if report[0] == 'delta':
+                return report[1]['image']
+        except:
+            pass
+        return None
 
     def printTime(self, tag):
         if False:
@@ -74,9 +72,10 @@ class MaxCapacitanceManager():
             self._terminated = self._terminate
             while self._terminate is False:
                 report = self.getReport()
-                self._max = np.amax(report)
-                self._cumMax = max(self._max, self._cumMax)
-                self.updateInfo({"max": int(self._max), "cum_max": int(self._cumMax)}, "run")
+                if report is not None:
+                    self._max = np.amax(report)
+                    self._cumMax = max(self._max, self._cumMax)
+                    self.updateInfo({"max": int(self._max), "cum_max": int(self._cumMax)}, "run")
 
             print("While loop terminate")
             self._terminated = True
