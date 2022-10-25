@@ -1,6 +1,7 @@
 import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
+import re
 import json
 from ..utils import SystemHandler
 
@@ -54,6 +55,30 @@ def ReadSystemInfo():
     print(package_info)
     return package_info
 
+def read_cpu_info():
+    cpu_info = {}
+    result = SystemHandler.CallSysCommandCapture(["cat", "/proc/cpuinfo"])
+    info = result.split("\n")
+
+    try:
+        processor = ""
+        for element in info:
+            if element == "":
+                processor = ""
+                continue
+            key, val = re.split("\t*: ", element)
+            if key == "processor":
+                processor = key + " " + val
+                cpu_info[processor] = {}
+            elif processor != "":
+                cpu_info[processor][key] = val
+            else:
+                cpu_info[key] = val
+    except:
+      print("something wrong")
+
+    return cpu_info
+
 class AboutHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
@@ -75,6 +100,10 @@ class AboutHandler(APIHandler):
 
         elif query == 'os-info':
             info = ReadOsInfo()
+            self.finish(json.dumps(info))
+
+        elif query == 'cpu-info':
+            info = read_cpu_info()
             self.finish(json.dumps(info))
 
         else:
