@@ -189,22 +189,24 @@ class ProductionTestsManager():
 
     def reflash(partNumber):
         settings = ProductionTestsManager.getSettings(partNumber)
-        if settings["reflash"]["enable"]:
-            image = settings["reflash"]["file"]
-            src_img = os.path.join(PT_IMAGE_TEMP, image)
-            dst_img = os.path.join(PT_RESOURCE, image)
+        if "reflash" in settings:
+            if settings["reflash"]["enable"]:
+                image = settings["reflash"]["file"]
+                src_img = os.path.join(PT_IMAGE_TEMP, image)
+                dst_img = os.path.join(PT_RESOURCE, image)
 
-            if exists(src_img):
-                ProductionTestsManager.__copyRootFile(src_img, dst_img)
+                if exists(src_img):
+                    ProductionTestsManager.__copyRootFile(src_img, dst_img)
 
-            try:
-                print(settings["reflash"]["file"])
-                tc = TouchcommManager()
-                tc.function("reflashImageFile", [dst_img])
-            except Exception as e:
-                print('Reflash exception:{}'.format(e))
-                raise tornado.web.HTTPError(status_code=400, log_message='Reflash exception:{}'.format(e))
-
+                try:
+                    print(settings["reflash"]["file"])
+                    tc = TouchcommManager()
+                    tc.function("reflashImageFile", [dst_img])
+                except Exception as e:
+                    print('Reflash exception:{}'.format(e))
+                    raise tornado.web.HTTPError(status_code=400, log_message='Reflash exception:{}'.format(e))
+            else:
+                print("reflash disable")
         else:
             print("skip reflash")
 
