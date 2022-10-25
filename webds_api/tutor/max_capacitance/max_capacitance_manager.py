@@ -46,10 +46,11 @@ class MaxCapacitanceManager():
 
     def getReport(self):
         try:
-            report = self._tc.getReport()
+            report = self._tc.getReport(0.5)
             if report[0] == 'delta':
                 return report[1]['image']
-        except:
+        except Exception as e:
+            print("[getReport error]", str(e))
             pass
         return None
 
@@ -77,7 +78,7 @@ class MaxCapacitanceManager():
                     self._cumMax = max(self._max, self._cumMax)
                     self.updateInfo({"max": int(self._max), "cum_max": int(self._cumMax)}, "run")
 
-            print("While loop terminate")
+            print("run While loop terminate")
             self._terminated = True
         except e as Exception:
             print(str(e))

@@ -18,7 +18,7 @@ class SSEQueue():
 
     def getQueue(self):
         try:
-            result = self._queue.get(True, 3)
+            result = self._queue.get(True, 1)
         except:
             return [None, None]
         return result
