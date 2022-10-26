@@ -361,6 +361,7 @@ class LocalCBCManager():
         return self.convertCBCSValue(bestValues, cbcAvailableValues)
 
     def terminate(self):
+        self._queue.setInfo("LocalCBC", {"state": "terminate"})
         self._terminate = True
         while True:
             if self._terminated:

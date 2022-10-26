@@ -43,6 +43,10 @@ class TutorHandler(APIHandler):
                         yield self.publish(name, json.dumps(info))
                         self.finish(json.dumps({}))
                         break
+                    elif info["state"] == "terminate":
+                        yield self.publish(name, json.dumps(info))
+                        self.finish(json.dumps({}))
+                        break
                     else:
                         ### runing
                         yield self.publish(name, json.dumps(info))

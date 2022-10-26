@@ -178,9 +178,9 @@ class ReportHandler(APIHandler):
             else:
                 continue
 
-        for x, v in reportType.items():
-            print('enable:{}'.format(v))
-            ret = tc.enableReport(v)
+        ##for x, v in reportType.items():
+        ##    print('enable:{}'.format(v))
+        ##    ret = tc.enableReport(v)
 
         if "report" not in send:
             print("[ERROR]", data)

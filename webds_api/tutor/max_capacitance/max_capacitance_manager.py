@@ -85,6 +85,7 @@ class MaxCapacitanceManager():
         return
 
     def terminate(self):
+        self.updateInfo({}, "terminate")
         self._terminate = True
         while True:
             if self._terminated:
