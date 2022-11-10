@@ -24,6 +24,8 @@ class ConfigHandler():
 
         self._touch_info = tc.getInstance().getTouchInfo()
 
+        self._app_info = tc.getInstance().getAppInfo()
+
         self._tc = tc
 
     def getStaticConfig(self):
@@ -34,6 +36,9 @@ class ConfigHandler():
 
     def getTouchInfo(self):
         return self._touch_info
+
+    def getAppInfo(self):
+        return self._app_info
 
     def setStaticConfig(self, config):
         tc = self._tc.getInstance()

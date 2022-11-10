@@ -117,6 +117,7 @@ class LocalCBCManager():
         self._static_config_default = self._config_handler.getStaticConfig()
         self._dynamic_config_default = self._config_handler.getDynamicConfig()
         self._touch_info = self._config_handler.getTouchInfo()
+        self._app_info = self._config_handler.getAppInfo()
 
         self._terminate = False
         self._terminated = False
@@ -238,7 +239,7 @@ class LocalCBCManager():
         cbcAvailableValues = 63
         txCount = self._static_config_default["txCount"]
         rxCount = self._static_config_default["rxCount"]
-        numButtons = 0
+        numButtons = self._app_info["numButtons"]
         signalClarityEnabled = self.getSignalClarityEnable()
         cdmOrder = self.getSignalClarityType()
         burstsPerCluster = self._static_config_default["imageBurstsPerCluster"]
