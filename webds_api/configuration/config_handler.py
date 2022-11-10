@@ -6,35 +6,33 @@ from ..touchcomm.touchcomm_manager import TouchcommManager
 class ConfigHandler():
     _static_config = {}
     _dynamic_config = {}
+    _touch_info = {}
+    _app_info = {}
     _tc = None
 
     def __init__(self, tc):
-        info = tc.getInstance().getAppInfo()
-        ### print("getAppInfo: ", info)
-
-        self._static_config = tc.getInstance().getStaticConfig()
-        ### print("[Static Config]", self._static_config)
-        ### v = tc.getInstance().decoder.encodeStaticConfig(self._static_config)
-        ### print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
-
-        self._dynamic_config = tc.getInstance().getDynamicConfig()
-        ### print("[Dynamic Config]", self._dynamic_config)
-        ### v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
-        ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
-
-        self._touch_info = tc.getInstance().getTouchInfo()
-
         self._app_info = tc.getInstance().getAppInfo()
-
         self._tc = tc
 
     def getStaticConfig(self):
+        if not self._static_config:
+            self._static_config = self._tc.getInstance().getStaticConfig()
+            ### print("[Static Config]", self._static_config)
+            ### v = self._tc.getInstance().decoder.encodeStaticConfig(self._static_config)
+            ### print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
         return self._static_config
 
     def getDynamicConfig(self):
+        if not self._dynamic_config:
+            self._dynamic_config = self._tc.getInstance().getDynamicConfig()
+            ### print("[Dynamic Config]", self._dynamic_config)
+            ### v = self._tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
+            ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
         return self._dynamic_config
 
     def getTouchInfo(self):
+        if not self._touch_info:
+            self._touch_info = self._tc.getInstance().getTouchInfo()
         return self._touch_info
 
     def getAppInfo(self):
