@@ -22,6 +22,8 @@ class ConfigHandler():
         ### v = tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
         ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
 
+        self._touch_info = tc.getInstance().getTouchInfo()
+
         self._tc = tc
 
     def getStaticConfig(self):
@@ -29,6 +31,9 @@ class ConfigHandler():
 
     def getDynamicConfig(self):
         return self._dynamic_config
+
+    def getTouchInfo(self):
+        return self._touch_info
 
     def setStaticConfig(self, config):
         tc = self._tc.getInstance()

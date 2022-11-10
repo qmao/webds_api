@@ -116,6 +116,7 @@ class LocalCBCManager():
         self._config_handler = ConfigHandler(self._tc)
         self._static_config_default = self._config_handler.getStaticConfig()
         self._dynamic_config_default = self._config_handler.getDynamicConfig()
+        self._touch_info = self._config_handler.getTouchInfo()
 
         self._terminate = False
         self._terminated = False
@@ -132,16 +133,14 @@ class LocalCBCManager():
 
 
     def getSignalClarityType(self):
-        return 1
-        if signalClarityOrder in data:
-            value = data["signalClarityOrder"]
+        if "signalClarityOrder" in self._touch_info:
+            value = self._touch_info.get("signalClarityOrder", 0)
             return value >= 0
         return False
 
     def getSignalClarityEnable(self):
-        return True
-        if signalClarityOrder in data:
-            value = data["signalClarityEnable"]
+        if "signalClarityOrder" in self._touch_info:
+            value = self._static_config_default["signalClarityEnable"]
             return value
         return False
 
