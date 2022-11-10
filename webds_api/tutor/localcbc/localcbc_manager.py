@@ -237,12 +237,12 @@ class LocalCBCManager():
 
         reportId = 31  ###195
         cbcAvailableValues = 63
-        txCount = 18
-        rxCount = 40
+        txCount = self._static_config_default["txCount"]
+        rxCount = self._static_config_default["rxCount"]
         numButtons = 0
         signalClarityEnabled = self.getSignalClarityEnable()
         cdmOrder = self.getSignalClarityType()
-        burstsPerCluster = 1
+        burstsPerCluster = self._static_config_default["imageBurstsPerCluster"]
 
         realReportId = 0
         response = []
