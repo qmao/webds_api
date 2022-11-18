@@ -93,7 +93,7 @@ class TutorHandler(APIHandler):
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
 
-        self.finish(data)
+        self.finish(json.dumps(data))
 
     @tornado.web.authenticated
     def post(self, subpath: str = "", cluster_id: str = ""):
