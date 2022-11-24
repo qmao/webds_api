@@ -300,8 +300,8 @@ class ProductionTestsManager():
         ]
         tests = []
         for test in src:
-            if test in supported_lib:
-                tests.append(test)
+            ###if test in supported_lib:
+            tests.append(test)
         return tests
 
     def getCommon():
