@@ -1,0 +1,53 @@
+{
+    "common": [
+        "Attention",
+        "Configuration",
+        "FirmwareID",
+        "ResetPinTest"
+    ],
+    "lib": [
+        "AbsRawCapTest",
+        "AdcRangeTest",
+        "BK-ExtendedTRxShort",
+        "BSCCalibration",
+        "DevicePackageTest",
+        "ExtendedHighResistance",
+        "ExtendedTRxShort",
+        "ForceButtonOpenGuardPlane",
+        "ForceButtonOpenGuardTrace",
+        "FullRawCapTest",
+        "GPIOOpen",
+        "GPIOShort",
+        "HighResistanceTest",
+        "LockdownTest",
+        "NoiseTest",
+        "SensorSpeedTest",
+        "SyncConnectionTest",
+        "SyncShortTest",
+        "TRxGround",
+        "TRxSensorOpen",
+        "TagsMoisture",
+        "TransRawCap",
+        "TrxTrxShortTest"
+    ],
+    "sets": [
+        {
+            "name": "Test Set",
+            "id": "b11da7e6-9c3a-48f8-b375-e330a89eb468",
+            "tests": [
+                "HighResistanceTest"
+            ]
+        }
+    ],
+    "settings": {
+        "voltages": {
+            "vdd": "1200",
+            "vddtx": "3300",
+            "vled": "1800",
+            "vpu": "1200"
+        },
+        "reflash": {
+            "enable": false
+        }
+    }
+}
