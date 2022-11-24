@@ -18,6 +18,7 @@ from .route.route_gear_selection   import GearSelectionHandler
 from .route.route_config           import ConfigHandler
 from .route.route_software_update  import SoftwareUpdateHandler
 from .route.route_tutor            import TutorHandler
+from .route.route_data_collection  import DataCollectionHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -52,6 +53,8 @@ def setup_handlers(web_app):
 
     tutor_pattern = url_path_join(base_url, "webds", "tutor/" + '(.*)')
 
+    data_collection_pattern = url_path_join(base_url, "webds", "data-collection")
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -66,7 +69,8 @@ def setup_handlers(web_app):
                 (config_pattern, ConfigHandler),
                 (software_update_pattern, SoftwareUpdateHandler),
                 (reflash_pattern, ReflashHandler),
-                (tutor_pattern, TutorHandler)
+                (tutor_pattern, TutorHandler),
+                (data_collection_pattern, DataCollectionHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)

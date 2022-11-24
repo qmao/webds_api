@@ -7,10 +7,12 @@ from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 import sys
-from ..tutor.localcbc.localcbc import LocalCBC
-from ..tutor.max_capacitance.max_capacitance import MaxCapacitance
 import time
 from ..tutor.tutor_utils import SSEQueue
+
+from ..tutor.localcbc.localcbc import LocalCBC
+from ..tutor.max_capacitance.max_capacitance import MaxCapacitance
+from ..tutor.int_dur.int_dur import IntDur
 
 class TutorHandler(APIHandler):
     @tornado.web.authenticated
