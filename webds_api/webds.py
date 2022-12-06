@@ -1,9 +1,10 @@
 import getpass
 import os
 
+WORKSPACE = os.path.join('/home', getpass.getuser(), 'jupyter/workspace')
+
 # packrat
 PACKRAT_CACHE = '/var/cache/syna/packrat'
-WORKSPACE = os.path.join('/home', getpass.getuser(), 'jupyter/workspace')
 WORKSPACE_PACKRAT_DIR = os.path.join(WORKSPACE, 'Packrat')
 WORKSPACE_PACKRAT_CACHE_DIR = os.path.join(WORKSPACE_PACKRAT_DIR, 'Cache')
 
@@ -23,3 +24,6 @@ PRODUCTION_TEST_JSON_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.json.cache'
 PRODUCTION_TEST_PY_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.py.cache')
 PRODUCTION_TEST_LOG_FILE = '/var/log/syna/production_tests.log'
 PRODUCTION_TEST_LOG_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.log.cache')
+
+# testrail
+TESTRAIL_CACHE = '/var/cache/syna/testrail/suites'
