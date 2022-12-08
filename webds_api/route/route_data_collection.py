@@ -2,6 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 
 import json
+import gzip
 from os.path import exists
 from ..utils import SystemHandler
 
@@ -11,14 +12,12 @@ DATA_COLLECTION_TEMP = "/home/dsdkuser/jupyter/workspace/.cache/stash.cache"
 class DataCollectionHandler(APIHandler):
     @tornado.web.authenticated
     def get(self):
-        print("DataCollectionHandler GET")
-
         stash = {"stash": []}
         stash_file = DATA_COLLECTION_STASH
 
         try:
             if exists(stash_file):
-                with open(stash_file) as f:
+                with gzip.open(stash_file, "r") as f:
                     stash = json.load(f)
         except json.decoder.JSONDecodeError:
             pass
@@ -30,8 +29,6 @@ class DataCollectionHandler(APIHandler):
 
     @tornado.web.authenticated
     def post(self):
-        print("DataCollectionHandler POST")
-
         stash = {"stash": []}
         stash_file = DATA_COLLECTION_STASH
         temp_file = DATA_COLLECTION_TEMP
@@ -43,7 +40,7 @@ class DataCollectionHandler(APIHandler):
             try:
                 data = input_data["data"]
                 if exists(stash_file):
-                    with open(stash_file) as f:
+                    with gzip.open(stash_file, "r") as f:
                         stash = json.load(f)
             except json.decoder.JSONDecodeError:
                 pass
@@ -66,8 +63,8 @@ class DataCollectionHandler(APIHandler):
             raise tornado.web.HTTPError(status_code=400, log_message=e)
 
         try:
-            with open(temp_file, "w+", encoding="utf-8") as f:
-                json.dump(stash, f, ensure_ascii=False, indent=2)
+            with gzip.open(temp_file, "wt", encoding="utf-8") as zip_file:
+                json.dump(stash, zip_file, ensure_ascii=False, indent=2)
             SystemHandler.CallSysCommand(["mv", temp_file, stash_file])
             SystemHandler.CallSysCommandFulfil("chown root:root " + stash_file)
         except Exception as e:
