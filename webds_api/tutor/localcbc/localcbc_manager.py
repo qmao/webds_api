@@ -94,6 +94,12 @@ class IntStatisticsSet():
     def GetMedian(self):
         return self._Median
 
+    def GetMax(self):
+        return self._Max
+
+    def GetMin(self):
+        return self._Min
+
     def printResult(self):
         if False:
             print("Param: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax, self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
@@ -235,6 +241,7 @@ class LocalCBCManager():
         ### global
         _CBC_flagPolarity = 0x20
 
+        adcRange = 4096
         reportId = 31  ###195
         cbcAvailableValues = 63
         txCount = self._static_config_default["txCount"]
@@ -321,10 +328,25 @@ class LocalCBCManager():
             statisticsRows = statisticsSet.GetChannels()
 
             for idx, i in enumerate(statisticsRows):
-                i.printResult()
-                intvar = i.GetMedian()
+                if step is 0:
+                    if i.GetMax() < 3000:
+                        adcRange = 2048
 
-                score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
+                i.printResult()
+
+                lmin = i.GetMin()
+                lmax = i.GetMax()
+                ## intvar = i.GetMedian()
+                ## score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
+
+                scoreNext = 0
+                scorePrev = 0
+                if idx is not 0:
+                    scorePrev = abs((statisticsRows[idx - 1].GetMax() - adcRange) - (adcRange - statisticsRows[idx - 1].GetMin()))
+                if idx is not (rxCount -1):
+                    scoreNext = abs((statisticsRows[idx + 1].GetMax() - adcRange) - (adcRange - statisticsRows[idx + 1].GetMin()))
+                score = abs((lmax - adcRange) - (adcRange - lmin)) + scorePrev + scoreNext
+
                 if abs(score) < abs(bestScores[idx][0]):
                     bestScores[idx] = [score, step]
             if self._debug:
