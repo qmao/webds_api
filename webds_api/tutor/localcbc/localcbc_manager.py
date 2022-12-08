@@ -131,12 +131,14 @@ class LocalCBCManager():
     def after_run(self):
         self._config_handler.update_dynamic_config({"requestedNoiseMode": self._dynamic_config_default["requestedNoiseMode"]})
         self._config_handler.update_dynamic_config({"noLowPower": self._dynamic_config_default["noLowPower"]})
-        self._config_handler.update_static_config({"adnsEnabled": self._static_config_default["adnsEnabled"]})
+        if "adnsEnabled" in self._static_config_default:
+            self._config_handler.update_static_config({"adnsEnabled": self._static_config_default["adnsEnabled"]})
 
     def before_run(self):
         self._config_handler.update_dynamic_config({"requestedNoiseMode": 5})
         self._config_handler.update_dynamic_config({"noLowPower": 1})
-        self._config_handler.update_static_config({"adnsEnabled": 0})
+        if "adnsEnabled" in self._static_config_default:
+            self._config_handler.update_static_config({"adnsEnabled": 0})
 
 
     def getSignalClarityType(self):
