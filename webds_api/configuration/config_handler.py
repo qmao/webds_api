@@ -1,6 +1,9 @@
 import json
 import time
-from ..touchcomm.touchcomm_manager import TouchcommManager
+import sys
+
+sys.path.append('/usr/local/lib/python3.7/dist-packages/webds_api/touchcomm')
+from touchcomm_manager import TouchcommManager
 
 
 class ConfigHandler():

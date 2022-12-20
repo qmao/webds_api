@@ -2,11 +2,14 @@
 from device_base import DeviceBase
 from device_route import DeviceRoute
 
-class Device(object):
+class Runtime(object):
     _instance = None
-    
-    def __init__(self, name):
+    _callback = None
+
+    def __init__(self, name, callback):
         print("device init", name)
+
+        self._callback = callback
         if name == "route":
             self._instance = DeviceRoute(name)
         else:
@@ -44,7 +47,8 @@ class Device(object):
         return self._instance.getReport()
     
     def sendEvent(self, module, event):
-        self._instance.sendEvent(module, event)
+        self._callback(module, event)
+        ###self._instance.sendEvent(module, event)
 
     
     
