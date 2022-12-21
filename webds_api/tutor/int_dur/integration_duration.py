@@ -37,7 +37,7 @@ def log(message):
     else:
         pass
 
-class IntegrationDurationManager(object):
+class IntegrationDuration(object):
     _instance = None
     _lock = threading.Lock()
     _initialized = False
@@ -46,13 +46,13 @@ class IntegrationDurationManager(object):
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
-                    cls._instance = super(IntegrationDurationManager, cls).__new__(cls)
+                    cls._instance = super(IntegrationDuration, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
-        log("IntegrationDurationManager")
+        log("IntegrationDuration")
 
-        if IntegrationDurationManager._initialized:
+        if IntegrationDuration._initialized:
             return
 
         self._thread = None
@@ -78,7 +78,7 @@ class IntegrationDurationManager(object):
         self._test_pixel_signal_min = []
         self._test_pixel_signal_mean = []
 
-        IntegrationDurationManager._initialized = True
+        IntegrationDuration._initialized = True
 
     def _connect_tc(self):
         self._tcm = TouchcommManager()
@@ -195,7 +195,7 @@ class IntegrationDurationManager(object):
 
             log("\nInitialized")
         except Exception as e:
-            print("IntegrationDurationManager error executing initialize: {}".format(e))
+            print("IntegrationDuration error executing initialize: {}".format(e))
             self._disconnect_tc()
             raise e
 
@@ -268,7 +268,7 @@ class IntegrationDurationManager(object):
             log("Collected baseline data")
             return
         except Exception as e:
-            print("IntegrationDurationManager error executing collect_baseline_data: {}".format(e))
+            print("IntegrationDuration error executing collect_baseline_data: {}".format(e))
             self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
             self._disconnect_tc()
             self._inited = False
@@ -327,7 +327,7 @@ class IntegrationDurationManager(object):
             log("Collected test pixel {} data".format(pixel))
             return
         except Exception as e:
-            print("IntegrationDurationManager error executing collect_test_pixel_data: {}".format(e))
+            print("IntegrationDuration error executing collect_test_pixel_data: {}".format(e))
             self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
             self._disconnect_tc()
             self._inited = False
@@ -355,7 +355,7 @@ class IntegrationDurationManager(object):
             log("Optimal integration duration = {}".format(optimal_int_dur))
             return {"tau": tau, "bigA": big_a, "bigD": big_d, "minimumIntDur": minimum_int_dur, "optimalIntDur": optimal_int_dur}
         except Exception as e:
-            print("IntegrationDurationManager error executing get_results: {}".format(e))
+            print("IntegrationDuration error executing get_results: {}".format(e))
             raise e
 
     def join(self):
@@ -383,6 +383,6 @@ class IntegrationDurationManager(object):
             else:
                 retval = getattr(self, fn)(*args)
         except Exception as e:
-            print("IntegrationDurationManager error executing {}: {}".format(fn, e))
+            print("IntegrationDuration error executing {}: {}".format(fn, e))
             raise e
         return retval

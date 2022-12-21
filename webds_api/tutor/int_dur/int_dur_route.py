@@ -1,20 +1,20 @@
 import numpy as np
 from scipy.optimize import curve_fit
 
-from .integration_duration_manager import IntegrationDurationManager
+from .integration_duration import IntegrationDuration
 
 def sigmoid(x, L ,x0, k, b):
     y = L / (1 + np.exp(-k*(x-x0))) + b
     return y
 
-class IntDur():
+class IntDurRoute():
     def post(handle, input_data):
         request = input_data["request"]
         args = None
         if "arguments" in input_data:
             args = input_data["arguments"]
 
-        idm = IntegrationDurationManager()
+        idm = IntegrationDuration()
 
         if request == None:
             raise Exception("No request specified: ", input_data)

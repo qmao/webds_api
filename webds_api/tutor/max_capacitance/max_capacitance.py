@@ -1,53 +1,98 @@
-import tornado
-from tornado.iostream import StreamClosedError
-from tornado import gen
+import sys
+import re
+import time
+import numpy as np
+from ...touchcomm.touchcomm_manager import TouchcommManager
+from ...configuration.config_handler import ConfigHandler
+from ..tutor_utils import SSEQueue
 
-import threading
-from .max_capacitance_manager import MaxCapacitanceManager
-
-g_max_capacitance_thread = None
-g_max_capacitance_handle = None
 
 class MaxCapacitance():
-    def get(handle):
+    _tc = None
+    _start = None
+    _config_handler = None
+    _queue = None
+    _terminate = False
+    _terminated = False
+    _report_id = 18
+    _max = -sys.maxsize - 1
+    _cumMax = -sys.maxsize - 1
+
+    def __init__(self):
+        print("__init__")
+
+    def init(self):
+        print("init")
+        self._tc = None
+        self._start = None
+        self._config_handler = None
+        self._queue = None
+        self._terminate = False
+        self._terminated = False
+
+        self._queue = SSEQueue()
+        self._tc = TouchcommManager()
+        self._config_handler = ConfigHandler(self._tc)
+
+        self._tc.disableReport(17)
+        self._tc.disableReport(19)
+
+    def setReport(self, enable, report):
+        if enable:
+            ret = self._tc.enableReport(report)
+        else:
+            ret = self._tc.disableReport(report)
+        return True
+
+    def getReport(self):
         try:
-            data = MaxCapacitanceManager().run()
+            report = self._tc.getReport(0.5)
+            if report[0] == 'delta':
+                return report[1]['image']
         except Exception as e:
-            return {"error": str(e)}
-        return {"data": "start"}
+            print("[getReport error]", str(e))
+            pass
+        return None
 
-    def post(handle, input_data):
-        print(input_data)
-        task = input_data["task"]
-        
+    def printTime(self, tag):
+        if False:
+            if self._start == None:
+                self._start = time.time()
+            now = time.time()
+            print("[ TIME ]", tag, "--- %s seconds ---" % (now - self._start))
+            self._start = now
+
+
+    def updateInfo(self, data, state = "run"):
+        self._queue.setInfo("MaxCapacitance", {"state": state, "value": data})
+
+    def run(self):
         try:
-            if task == None:
-                raise Exception('Unsupport input parameters: ', input_data)
+            self.init()
+            self.setReport(True, self._report_id)
+            self._terminated = self._terminate
+            while self._terminate is False:
+                report = self.getReport()
+                if report is not None:
+                    self._max = np.amax(report)
+                    self._cumMax = max(self._max, self._cumMax)
+                    self.updateInfo({"max": int(self._max), "cum_max": int(self._cumMax)}, "run")
 
-            if task == "run":
-                return MaxCapacitance.run()
-            elif task == "reset":
-                if g_max_capacitance_handle is not None:
-                    return g_max_capacitance_handle.reset()
-                return {"done"}
-            elif task == "terminate":
-                if g_max_capacitance_handle is not None:
-                    return g_max_capacitance_handle.terminate()
-                return {"done"}
-            else:
-                raise Exception('Unsupport parameters: ', input_data)
-        except Exception as e:
-            raise Exception('MaxCapacitance Manager Post error: ', str(e))
+            print("run While loop terminate")
+            self._terminated = True
+        except e as Exception:
+            print(str(e))
+        return
 
-    def run():
-        global g_max_capacitance_handle
-        g_max_capacitance_handle = MaxCapacitanceManager()
+    def terminate(self):
+        self.updateInfo({}, "terminate")
+        self._terminate = True
+        while True:
+            if self._terminated:
+                break
+            time.sleep(0.005)
+        print("Terminated!")
 
-        global g_max_capacitance_thread
-        if g_max_capacitance_thread is not None and g_max_capacitance_thread.is_alive():
-            raise Exception('Prev thread is running')
-
-        g_max_capacitance_thread = threading.Thread(target=g_max_capacitance_handle.run)
-        g_max_capacitance_thread.start()
-        print("thread start")
-        return {"data": "start"}
+    def reset(self):
+        self._max = -sys.maxsize - 1
+        self._cumMax = -sys.maxsize - 1

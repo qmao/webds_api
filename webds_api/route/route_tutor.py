@@ -8,11 +8,17 @@ from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 import sys
 import time
+import re
 from ..tutor.tutor_utils import SSEQueue
 
-from ..tutor.localcbc.localcbc import LocalCBC
-from ..tutor.max_capacitance.max_capacitance import MaxCapacitance
-from ..tutor.int_dur.int_dur import IntDur
+### auto import tutor routes from webds_api
+for folder in os.scandir("/usr/local/lib/python3.7/dist-packages/webds_api/tutor"):
+    if folder.is_dir():
+        for entry in os.scandir(folder):
+            if entry.is_file() and entry.name.endswith('_route.py'):
+                string = f'from ..tutor.{folder.name}.{entry.name[:-3]} import *'
+                exec (string)
+
 
 class TutorHandler(APIHandler):
     @tornado.web.authenticated
@@ -84,7 +90,7 @@ class TutorHandler(APIHandler):
                 if paths[0] == "event":
                     return self.getSSE()
                 else:
-                    tutor = paths[0]
+                    tutor = paths[0] + "Route"
                     cls = globals()[tutor]
                     function = getattr(cls, 'get')
                     data = function(self)
@@ -107,7 +113,7 @@ class TutorHandler(APIHandler):
             paths = subpath.split("/")
 
             if len(paths) == 1:
-                tutor = paths[0]
+                tutor = paths[0] + "Route"
                 cls = globals()[tutor]
                 function = getattr(cls, 'post')
                 data = function(self, input_data)
@@ -120,3 +126,6 @@ class TutorHandler(APIHandler):
         print("--- %s seconds ---" % (time.time() - start_time))
 
         self.finish(json.dumps(data))
+
+    def camel_case_to_snake_case(name):
+        return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
