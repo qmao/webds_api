@@ -19,7 +19,6 @@ for folder in os.scandir("/usr/local/lib/python3.7/dist-packages/webds_api/tutor
                 string = f'from ..tutor.{folder.name}.{entry.name[:-3]} import *'
                 exec (string)
 
-
 class TutorHandler(APIHandler):
     @tornado.web.authenticated
     @tornado.gen.coroutine
