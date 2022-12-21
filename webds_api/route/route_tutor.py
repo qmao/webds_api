@@ -10,9 +10,11 @@ import sys
 import time
 from ..tutor.tutor_utils import SSEQueue
 
-from ..tutor.localcbc.localcbc import LocalCBC
-from ..tutor.max_capacitance.max_capacitance import MaxCapacitance
-from ..tutor.int_dur.int_dur import IntDur
+from ..tutor.localcbc.localcbc_route import LocalCBCRoute
+from ..tutor.max_capacitance.max_capacitance_route import MaxCapacitanceRoute
+from ..tutor.int_dur.int_dur_route import IntDurRoute
+
+import re
 
 class TutorHandler(APIHandler):
     @tornado.web.authenticated
@@ -84,7 +86,7 @@ class TutorHandler(APIHandler):
                 if paths[0] == "event":
                     return self.getSSE()
                 else:
-                    tutor = paths[0]
+                    tutor = paths[0] + "Route"
                     cls = globals()[tutor]
                     function = getattr(cls, 'get')
                     data = function(self)
@@ -107,7 +109,7 @@ class TutorHandler(APIHandler):
             paths = subpath.split("/")
 
             if len(paths) == 1:
-                tutor = paths[0]
+                tutor = paths[0] + "Route"
                 cls = globals()[tutor]
                 function = getattr(cls, 'post')
                 data = function(self, input_data)
@@ -120,3 +122,6 @@ class TutorHandler(APIHandler):
         print("--- %s seconds ---" % (time.time() - start_time))
 
         self.finish(json.dumps(data))
+        
+    def camel_case_to_snake_case(name):
+        return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
