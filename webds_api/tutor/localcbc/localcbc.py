@@ -43,7 +43,7 @@ class SortedData():
     def __init__(self):
         self._list = []
 
-    def GetMedian(self):
+    def get_median(self):
         # sort the list
         ls = self._list
         ls_sorted = ls.sort()
@@ -92,7 +92,7 @@ class IntStatisticsSet():
     def __init__(self):
         self.reset()
 
-    def Process(self, data, perChannel=False):
+    def process(self, data, perChannel=False):
         self._LocalMin = sys.maxsize
         self._LocalMax = -sys.maxsize - 1
 
@@ -106,7 +106,7 @@ class IntStatisticsSet():
                     self._subchannels.append(obj)
 
                 sc = self._subchannels[i];
-                sc.Process([item])
+                sc.process([item])
 
             self._Count = self._Count + 1
             self._Sum = self._Sum + item;
@@ -118,21 +118,21 @@ class IntStatisticsSet():
         self._MinOfMax = min(self._MinOfMax, self._LocalMax)
         self._MaxOfMin = max(self._MaxOfMin, self._LocalMin)
         self._Mean = (self._Sum) / self._Count
-        self._Median = self._sortedData.GetMedian()
+        self._Median = self._sortedData.get_median()
 
-    def GetChannels(self):
+    def get_channels(self):
         return self._subchannels
 
-    def GetMedian(self):
+    def get_median(self):
         return self._Median
 
-    def GetMax(self):
+    def get_max(self):
         return self._Max
 
-    def GetMin(self):
+    def get_min(self):
         return self._Min
 
-    def printResult(self):
+    def print_result(self):
         if False:
             print("Param: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax, self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
 
@@ -146,7 +146,7 @@ class LocalCBC():
     _static_config = {}
     _dynamic_config = {}
 
-    def __init__(self, handle, callback):
+    def __init__(self, handle, callback=print):
         self._handle = handle
         self._callback = callback
         self._static_config = self._handle.getStaticConfig()
@@ -176,7 +176,7 @@ class LocalCBC():
             return value >= 0
         return False
 
-    def getSignalClarityEnable(self):
+    def get_signal_clarity_enable(self):
         if "signalClarityOrder" in self._touch_info:
             value = self._static_config["signalClarityEnable"]
             return value
@@ -188,10 +188,10 @@ class LocalCBC():
         self._handle.disableReport(18)
         self._handle.disableReport(19)
 
-    def updateImageCBCs(self, data):
+    def update_image_cbcs(self, data):
         self._static_config = update_static_config(self._handle, self._static_config, {"imageCBCs": data})
 
-    def setReport(self, enable, report):
+    def set_report(self, enable, report):
         try:
             if enable:
                 ret = self._handle.enableReport(report)
@@ -203,7 +203,7 @@ class LocalCBC():
 
         return True
 
-    def getReport(self, reportId):
+    def get_report(self, reportId):
         for i in range(5):
             try:
                 report = self._handle.getReport()
@@ -216,7 +216,7 @@ class LocalCBC():
                 pass
         raise Exception('cannot get valid report')
 
-    def getRow(self, data, row, column, numButtons, cdmOrder):
+    def get_row(self, data, row, column, numButtons, cdmOrder):
         arr = []
         for c in range(column):
             arrRow = []
@@ -225,7 +225,7 @@ class LocalCBC():
             arr.append(arrRow)
         return arr
 
-    def printTime(self, tag):
+    def print_time(self, tag):
         if self._debug:
             if self._start == None:
                 self._start = time.time()
@@ -233,7 +233,7 @@ class LocalCBC():
             print("[ TIME ]", tag, "--- %s seconds ---" % (now - self._start))
             self._start = now
 
-    def convertCBCSValue(self, data, count):
+    def convert_cbcs_value(self, data, count):
         base = (count + 1) / 2 
 
         arr = []
@@ -247,7 +247,7 @@ class LocalCBC():
             arr.append(value)
         return arr
 
-    def convertCBCSValueToBase(data):
+    def convert_cbcs_valueToBase(data):
         arr = []
         for i in data:
             value = 0
@@ -261,7 +261,7 @@ class LocalCBC():
             arr.append(value)
         return arr
 
-    def updateProgress(self, progress):
+    def update_progress(self, progress):
         self._callback({"state": "run", "progress": progress})
 
     def run(self, samplesLimit):
@@ -278,7 +278,7 @@ class LocalCBC():
         txCount = self._static_config["txCount"]
         rxCount = self._static_config["rxCount"]
         numButtons = self._app_info["numButtons"]
-        signalClarityEnabled = self.getSignalClarityEnable()
+        signalClarityEnabled = self.get_signal_clarity_enable()
         cdmOrder = self.getSignalClarityType()
 
         if "imageBurstsPerCluster" in self._static_config:
@@ -298,7 +298,7 @@ class LocalCBC():
         bestScores = [[sys.maxsize, -1]] * rxCount
         polarity = [False] * rxCount
 
-        self.printTime("Start")
+        self.print_time("Start")
         # 1. Set Image CBC for each enabled Rx to 0. 
         # For Gluon, setting CBC_CHn to 0 means that the local CBC for that channel is off.
         # There is no separate CBC_CARRIER_SEL value for each Rx.
@@ -309,22 +309,22 @@ class LocalCBC():
                 if polarity[index]:
                     value = _CBC_flagPolarity
                 array_[index] = step | value
-            self.updateImageCBCs(array_)
-            self.printTime("updateImageCBCs")
+            self.update_image_cbcs(array_)
+            self.print_time("update_image_cbcs")
 
-            status = self.setReport(True, reportId)
-            self.printTime("setReport")
+            status = self.set_report(True, reportId)
+            self.print_time("set_report")
 
             if status == False:
                 print("transaction failed")
-                raise Exception('setReport transaction failed')
+                raise Exception('set_report transaction failed')
 
             if self._terminate:
                 print("user terminate")
                 break
 
             currentPercent = step * samplesLimit * stepPercentage;
-            self.updateProgress(currentPercent)
+            self.update_progress(currentPercent)
 
             samples = []
             # start data collecting
@@ -334,16 +334,16 @@ class LocalCBC():
                     print("user terminate")
                     break
 
-                data = self.getReport(reportId)
-                self.printTime("getReport")
+                data = self.get_report(reportId)
+                self.print_time("get_report")
 
                 samples.append(data)
                 progress = currentPercent + (samplesCollected * stepPercentage)
-                self.updateProgress(progress)
+                self.update_progress(progress)
 
             # stop data collecting
-            status = self.setReport(False, reportId)
-            self.printTime("setReport disable")
+            status = self.set_report(False, reportId)
+            self.print_time("set_report disable")
 
             # Calculate stats
             statisticsSet = IntStatisticsSet()
@@ -351,31 +351,31 @@ class LocalCBC():
             for sample in samples:
                 if len(sample) == 0:
                     raise Exception('cannot get valid report')
-                rows = self.getRow(sample, rxCount, txCount, numButtons, cdmOrder)
+                rows = self.get_row(sample, rxCount, txCount, numButtons, cdmOrder)
                 for row in rows:
-                    statisticsSet.Process(row, True)
+                    statisticsSet.process(row, True)
 
             # Calculate the best scores
-            statisticsRows = statisticsSet.GetChannels()
+            statisticsRows = statisticsSet.get_channels()
 
             for idx, i in enumerate(statisticsRows):
                 if step is 0:
-                    if i.GetMax() < 3000:
+                    if i.get_max() < 3000:
                         adcRange = 2048
 
-                i.printResult()
+                i.print_result()
 
-                lmin = i.GetMin()
-                lmax = i.GetMax()
-                ## intvar = i.GetMedian()
+                lmin = i.get_min()
+                lmax = i.get_max()
+                ## intvar = i.get_median()
                 ## score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
 
                 scoreNext = 0
                 scorePrev = 0
                 if idx is not 0:
-                    scorePrev = abs((statisticsRows[idx - 1].GetMax() - adcRange) - (adcRange - statisticsRows[idx - 1].GetMin()))
+                    scorePrev = abs((statisticsRows[idx - 1].get_max() - adcRange) - (adcRange - statisticsRows[idx - 1].get_min()))
                 if idx is not (rxCount -1):
-                    scoreNext = abs((statisticsRows[idx + 1].GetMax() - adcRange) - (adcRange - statisticsRows[idx + 1].GetMin()))
+                    scoreNext = abs((statisticsRows[idx + 1].get_max() - adcRange) - (adcRange - statisticsRows[idx + 1].get_min()))
                 score = abs((lmax - adcRange) - (adcRange - lmin)) + scorePrev + scoreNext
 
                 if abs(score) < abs(bestScores[idx][0]):
@@ -414,9 +414,9 @@ class LocalCBC():
         print("[Best]: ", bestValues)
 
         self.after_run()
-        self.updateImageCBCs(bestValues)
-        self.updateProgress(100)
-        return self.convertCBCSValue(bestValues, cbcAvailableValues)
+        self.update_image_cbcs(bestValues)
+        self.update_progress(100)
+        return self.convert_cbcs_value(bestValues, cbcAvailableValues)
 
     def terminate(self):
         self._terminate = True

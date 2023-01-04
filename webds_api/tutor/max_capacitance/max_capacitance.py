@@ -13,7 +13,7 @@ class MaxCapacitance():
     _max = -sys.maxsize - 1
     _cumMax = -sys.maxsize - 1
 
-    def __init__(self, handle, callback):
+    def __init__(self, handle, callback=print):
         print("__init__")
         self._handle = handle
         self._callback = callback
