@@ -1,9 +1,41 @@
 import sys
 import re
 import time
-from ...touchcomm.touchcomm_manager import TouchcommManager
-from ...configuration.config_handler import ConfigHandler
-from ..tutor_utils import SSEQueue
+
+
+def update_static_config(handle, config, configToSet):
+    try:
+        for key in configToSet:
+            config_value = configToSet[key]
+            print(key, '->', config_value)
+            if isinstance(config_value, list):
+                for idx, x in enumerate(config_value):
+                    config[key][idx] = int(x)
+            else:
+                config[key] = int(config_value)
+
+        handle.setStaticConfig(config)
+
+    except Exception as e:
+        raise Exception(str(e))
+    return config
+
+def update_dynamic_config(handle, config, configToSet):
+    try:
+        for key in configToSet:
+            config_value = configToSet[key]
+            print(key, '->', config_value)
+            if isinstance(config_value, list):
+                for idx, x in enumerate(config_value):
+                    config[key][idx] = int(x)
+            else:
+                config[key] = int(config_value)
+
+        handle.setDynamicConfig(config)
+
+    except Exception as e:
+        raise Exception(str(e))
+    return config
 
 class SortedData():
     _list = []
@@ -104,41 +136,38 @@ class IntStatisticsSet():
         if False:
             print("Param: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax, self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
 
-class Localcbc():
-    _tc = None
+class LocalCBC():
+    _handle = None
+    _callback = None
     _start = None
-    _config_handler = None
-    _queue = None
     _debug = False
     _terminate = False
     _terminated = False
-    _static_config_default = {}
-    _dynamic_config_default = {}
+    _static_config = {}
+    _dynamic_config = {}
 
-    def __init__(self):
-        self._queue = SSEQueue()
-        self._tc = TouchcommManager()
-
-        self._config_handler = ConfigHandler(self._tc)
-        self._static_config_default = self._config_handler.getStaticConfig()
-        self._dynamic_config_default = self._config_handler.getDynamicConfig()
-        self._touch_info = self._config_handler.getTouchInfo()
-        self._app_info = self._config_handler.getAppInfo()
+    def __init__(self, handle, callback):
+        self._handle = handle
+        self._callback = callback
+        self._static_config = self._handle.getStaticConfig()
+        self._dynamic_config = self._handle.getDynamicConfig()
+        self._touch_info = self._handle.getTouchInfo()
+        self._app_info = self._handle.getAppInfo()
 
         self._terminate = False
         self._terminated = False
 
     def after_run(self):
-        self._config_handler.update_dynamic_config({"requestedNoiseMode": self._dynamic_config_default["requestedNoiseMode"]})
-        self._config_handler.update_dynamic_config({"noLowPower": self._dynamic_config_default["noLowPower"]})
-        if "adnsEnabled" in self._static_config_default:
-            self._config_handler.update_static_config({"adnsEnabled": self._static_config_default["adnsEnabled"]})
+        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": self._dynamic_config["requestedNoiseMode"]})
+        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"noLowPower": self._dynamic_config["noLowPower"]})
+        if "adnsEnabled" in self._static_config:
+            self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": self._static_config["adnsEnabled"]})
 
     def before_run(self):
-        self._config_handler.update_dynamic_config({"requestedNoiseMode": 5})
-        self._config_handler.update_dynamic_config({"noLowPower": 1})
-        if "adnsEnabled" in self._static_config_default:
-            self._config_handler.update_static_config({"adnsEnabled": 0})
+        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": 5})
+        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"noLowPower": 1})
+        if "adnsEnabled" in self._static_config:
+            self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": 0})
 
 
     def getSignalClarityType(self):
@@ -149,25 +178,25 @@ class Localcbc():
 
     def getSignalClarityEnable(self):
         if "signalClarityOrder" in self._touch_info:
-            value = self._static_config_default["signalClarityEnable"]
+            value = self._static_config["signalClarityEnable"]
             return value
         return False
 
     def init(self):
         print("init")
-        self._tc.disableReport(17)
-        self._tc.disableReport(18)
-        self._tc.disableReport(19)
+        self._handle.disableReport(17)
+        self._handle.disableReport(18)
+        self._handle.disableReport(19)
 
     def updateImageCBCs(self, data):
-        config = self._config_handler.update_static_config({"imageCBCs": data})
+        self._static_config = update_static_config(self._handle, self._static_config, {"imageCBCs": data})
 
     def setReport(self, enable, report):
         try:
             if enable:
-                ret = self._tc.enableReport(report)
+                ret = self._handle.enableReport(report)
             else:
-                ret = self._tc.disableReport(report)
+                ret = self._handle.disableReport(report)
         except:
             print("set report error, ignore")
             pass
@@ -177,7 +206,7 @@ class Localcbc():
     def getReport(self, reportId):
         for i in range(5):
             try:
-                report = self._tc.getReport()
+                report = self._handle.getReport()
                 if report == ('timeout', None):
                     continue
                 if report[0] == reportId:
@@ -233,7 +262,7 @@ class Localcbc():
         return arr
 
     def updateProgress(self, progress):
-        self._queue.setInfo("LocalCBC", {"state": "run", "progress": progress})
+        self._callback({"state": "run", "progress": progress})
 
     def run(self, samplesLimit):
         self._terminated = self._terminate
@@ -246,18 +275,18 @@ class Localcbc():
         adcRange = 4096
         reportId = 31  ###195
         cbcAvailableValues = 63
-        txCount = self._static_config_default["txCount"]
-        rxCount = self._static_config_default["rxCount"]
+        txCount = self._static_config["txCount"]
+        rxCount = self._static_config["rxCount"]
         numButtons = self._app_info["numButtons"]
         signalClarityEnabled = self.getSignalClarityEnable()
         cdmOrder = self.getSignalClarityType()
 
-        if "imageBurstsPerCluster" in self._static_config_default:
-            burstsPerCluster = self._static_config_default["imageBurstsPerCluster"]
-        elif "imageBurstsPerClusterQF" in self._static_config_default:
-            burstsPerCluster = self._static_config_default["imageBurstsPerClusterQF"]
-        elif "imageBurstsPerClusterMF" in self._static_config_default:
-            burstsPerCluster = self._static_config_default["imageBurstsPerClusterMF"]
+        if "imageBurstsPerCluster" in self._static_config:
+            burstsPerCluster = self._static_config["imageBurstsPerCluster"]
+        elif "imageBurstsPerClusterQF" in self._static_config:
+            burstsPerCluster = self._static_config["imageBurstsPerClusterQF"]
+        elif "imageBurstsPerClusterMF" in self._static_config:
+            burstsPerCluster = self._static_config["imageBurstsPerClusterMF"]
 
         realReportId = 0
         response = []
@@ -387,11 +416,9 @@ class Localcbc():
         self.after_run()
         self.updateImageCBCs(bestValues)
         self.updateProgress(100)
-        self._queue.setInfo("LocalCBC", {"state": "stop", "data": self.convertCBCSValue(bestValues, cbcAvailableValues)})
         return self.convertCBCSValue(bestValues, cbcAvailableValues)
 
     def terminate(self):
-        self._queue.setInfo("LocalCBC", {"state": "terminate"})
         self._terminate = True
         while True:
             if self._terminated:

@@ -2,51 +2,41 @@ import sys
 import re
 import time
 import numpy as np
-from ...touchcomm.touchcomm_manager import TouchcommManager
-from ...configuration.config_handler import ConfigHandler
-from ..tutor_utils import SSEQueue
-
 
 class MaxCapacitance():
-    _tc = None
+    _handle = None
     _start = None
-    _config_handler = None
-    _queue = None
+    _callback = None
     _terminate = False
     _terminated = False
     _report_id = 18
     _max = -sys.maxsize - 1
     _cumMax = -sys.maxsize - 1
 
-    def __init__(self):
+    def __init__(self, handle, callback):
         print("__init__")
+        self._handle = handle
+        self._callback = callback
 
     def init(self):
         print("init")
-        self._tc = None
         self._start = None
-        self._config_handler = None
-        self._queue = None
         self._terminate = False
         self._terminated = False
 
-        self._queue = SSEQueue()
-        self._tc = TouchcommManager()
-        self._config_handler = ConfigHandler(self._tc)
-
-        self._tc.disableReport(17)
-        self._tc.disableReport(19)
+        self._handle.disableReport(17)
+        self._handle.disableReport(19)
 
     def setReport(self, enable, report):
         if enable:
-            ret = self._tc.enableReport(report)
+            ret = self._handle.enableReport(report)
         else:
-            ret = self._tc.disableReport(report)
+            ret = self._handle.disableReport(report)
         return True
 
     def getReport(self):
         try:
-            report = self._tc.getReport(0.5)
+            report = self._handle.getReport(0.5)
             if report[0] == 'delta':
                 return report[1]['image']
         except Exception as e:
@@ -62,9 +52,8 @@ class MaxCapacitance():
             print("[ TIME ]", tag, "--- %s seconds ---" % (now - self._start))
             self._start = now
 
-
     def updateInfo(self, data, state = "run"):
-        self._queue.setInfo("MaxCapacitance", {"state": state, "value": data})
+        self._callback({"state": state, "value": data})
 
     def run(self):
         try:
@@ -85,7 +74,6 @@ class MaxCapacitance():
         return
 
     def terminate(self):
-        self.updateInfo({}, "terminate")
         self._terminate = True
         while True:
             if self._terminated:
