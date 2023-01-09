@@ -273,9 +273,8 @@ class LocalCBC():
         self.init()
 
         self.before_run()
+
         adc_range = 4096
-
-
         tx_count = self._static_config["txCount"]
         rx_count = self._static_config["rxCount"]
         num_buttons = self._app_info["numButtons"]

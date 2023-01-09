@@ -3,10 +3,10 @@ import re
 import time
 import numpy as np
 
-
 REPORT_ID = 18
 
 class MaxCapacitance():
+    REPORT_ID = 18
     _handle = None
     _start = None
     _callback = None
