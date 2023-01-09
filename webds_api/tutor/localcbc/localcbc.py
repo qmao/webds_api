@@ -2,11 +2,14 @@ import sys
 import re
 import time
 
+CBC_POLARITY = 0x20
+REPORT_ID = 31  ###195
+CBC_AVAILABLE_VALUES = 63
 
-def update_static_config(handle, config, configToSet):
+def update_static_config(handle, config, config_to_set):
     try:
-        for key in configToSet:
-            config_value = configToSet[key]
+        for key in config_to_set:
+            config_value = config_to_set[key]
             print(key, '->', config_value)
             if isinstance(config_value, list):
                 for idx, x in enumerate(config_value):
@@ -20,10 +23,10 @@ def update_static_config(handle, config, configToSet):
         raise Exception(str(e))
     return config
 
-def update_dynamic_config(handle, config, configToSet):
+def update_dynamic_config(handle, config, config_to_set):
     try:
-        for key in configToSet:
-            config_value = configToSet[key]
+        for key in config_to_set:
+            config_value = config_to_set[key]
             print(key, '->', config_value)
             if isinstance(config_value, list):
                 for idx, x in enumerate(config_value):
@@ -58,47 +61,48 @@ class SortedData():
             m2 = int(len(ls)/2)
             return int((ls[m1]+ls[m2])/2)
 
-    def Add(self, value):
+    def add(self, value):
         self._list.append(value)
 
 
 class IntStatisticsSet():
-    _Count = 0
-    _Sum = 0
-    _Mean = 0
-    _Median = 0
-    _Min = sys.maxsize
-    _Max = -sys.maxsize - 1
-    _MinOfMax = sys.maxsize
-    _MaxOfMin = -sys.maxsize - 1
-    _sortedData = SortedData()
-
-    _LocalMin = sys.maxsize
-    _LocalMax = -sys.maxsize - 1
+    _count = 0
+    _sum = 0
+    _mean = 0
+    _median = 0
+    _min = sys.maxsize
+    _max = -sys.maxsize - 1
+    _min_of_max = sys.maxsize
+    _max_of_min = -sys.maxsize - 1
+    _sorted_data = SortedData()
+    _local_min = sys.maxsize
+    _local_max = -sys.maxsize - 1
     _subchannels = []
 
     def reset(self):
-        self._Count = 0
-        self._Sum = 0
-        self._Mean = 0
-        self._Median = 0
-        self._Min = sys.maxsize
-        self._Max = -sys.maxsize - 1
-        self._MinOfMax = sys.maxsize
-        self._MaxOfMin = -sys.maxsize - 1
-        self._sortedData = SortedData()
+        self._count = 0
+        self._sum = 0
+        self._mean = 0
+        self._median = 0
+        self._min = sys.maxsize
+        self._max = -sys.maxsize - 1
+        self._min_of_max = sys.maxsize
+        self._max_of_min = -sys.maxsize - 1
+        self._sorted_data = SortedData()
+        self._local_min = sys.maxsize
+        self._local_max = -sys.maxsize - 1
         self._subchannels = []
 
     def __init__(self):
         self.reset()
 
     def process(self, data, perChannel=False):
-        self._LocalMin = sys.maxsize
-        self._LocalMax = -sys.maxsize - 1
+        self._local_min = sys.maxsize
+        self._local_max = -sys.maxsize - 1
 
         for i in range(len(data)):
             item = data[i]
-            self._sortedData.Add(item)
+            self._sorted_data.add(item)
 
             if perChannel:
                 if i == len(self._subchannels):
@@ -108,33 +112,33 @@ class IntStatisticsSet():
                 sc = self._subchannels[i];
                 sc.process([item])
 
-            self._Count = self._Count + 1
-            self._Sum = self._Sum + item;
-            self._Min = min(self._Min, item)
-            self._Max = max(self._Max, item)
-            self._LocalMin = min(self._LocalMin, item)
-            self._LocalMax = max(self._LocalMax, item)
+            self._count = self._count + 1
+            self._sum = self._sum + item;
+            self._min = min(self._min, item)
+            self._max = max(self._max, item)
+            self._local_min = min(self._local_min, item)
+            self._local_max = max(self._local_max, item)
 
-        self._MinOfMax = min(self._MinOfMax, self._LocalMax)
-        self._MaxOfMin = max(self._MaxOfMin, self._LocalMin)
-        self._Mean = (self._Sum) / self._Count
-        self._Median = self._sortedData.get_median()
+        self._min_of_max = min(self._min_of_max, self._local_max)
+        self._max_of_min = max(self._max_of_min, self._local_min)
+        self._mean = (self._sum) / self._count
+        self._median = self._sorted_data.get_median()
 
     def get_channels(self):
         return self._subchannels
 
     def get_median(self):
-        return self._Median
+        return self._median
 
     def get_max(self):
-        return self._Max
+        return self._max
 
     def get_min(self):
-        return self._Min
+        return self._min
 
     def print_result(self):
         if False:
-            print("Param: ", self._Count, self._Sum, self._Min, self._Max, self._LocalMin, self._LocalMax, self._MinOfMax, self._MaxOfMin, self._Mean, self._Median)
+            print("Param: ", self._count, self._sum, self._min, self._max, self._local_min, self._local_max, self._min_of_max, self._max_of_min, self._mean, self._median)
 
 class LocalCBC():
     _handle = None
@@ -170,7 +174,7 @@ class LocalCBC():
             self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": 0})
 
 
-    def getSignalClarityType(self):
+    def get_signal_clarity_type(self):
         if "signalClarityOrder" in self._touch_info:
             value = self._touch_info.get("signalClarityOrder", 0)
             return value >= 0
@@ -203,20 +207,20 @@ class LocalCBC():
 
         return True
 
-    def get_report(self, reportId):
+    def get_report(self, REPORT_ID):
         for i in range(5):
             try:
                 report = self._handle.getReport()
                 if report == ('timeout', None):
                     continue
-                if report[0] == reportId:
+                if report[0] == REPORT_ID:
                     ## print("data: ", ''.join('{:02x}'.format(x) for x in report[1]))
                     return report[1]
             except:
                 pass
         raise Exception('cannot get valid report')
 
-    def get_row(self, data, row, column, numButtons, cdmOrder):
+    def get_row(self, data, row, column):
         arr = []
         for c in range(column):
             arrRow = []
@@ -264,55 +268,52 @@ class LocalCBC():
     def update_progress(self, progress):
         self._callback({"state": "run", "progress": progress})
 
-    def run(self, samplesLimit):
+    def run(self, samples_limit):
         self._terminated = self._terminate
         self.init()
 
         self.before_run()
-        ### global
-        _CBC_flagPolarity = 0x20
+        adc_range = 4096
 
-        adcRange = 4096
-        reportId = 31  ###195
-        cbcAvailableValues = 63
-        txCount = self._static_config["txCount"]
-        rxCount = self._static_config["rxCount"]
-        numButtons = self._app_info["numButtons"]
-        signalClarityEnabled = self.get_signal_clarity_enable()
-        cdmOrder = self.getSignalClarityType()
+
+        tx_count = self._static_config["txCount"]
+        rx_count = self._static_config["rxCount"]
+        num_buttons = self._app_info["numButtons"]
+        signal_clarity_enable = self.get_signal_clarity_enable()
+        cdm_order = self.get_signal_clarity_type()
 
         if "imageBurstsPerCluster" in self._static_config:
-            burstsPerCluster = self._static_config["imageBurstsPerCluster"]
+            bursts_per_cluster = self._static_config["imageBurstsPerCluster"]
         elif "imageBurstsPerClusterQF" in self._static_config:
-            burstsPerCluster = self._static_config["imageBurstsPerClusterQF"]
+            bursts_per_cluster = self._static_config["imageBurstsPerClusterQF"]
         elif "imageBurstsPerClusterMF" in self._static_config:
-            burstsPerCluster = self._static_config["imageBurstsPerClusterMF"]
+            bursts_per_cluster = self._static_config["imageBurstsPerClusterMF"]
 
         realReportId = 0
         response = []
-        numofsteps = int((cbcAvailableValues + 1) / 2);
-        stepPercentage = 100 / (numofsteps * samplesLimit)
+        numofsteps = int((CBC_AVAILABLE_VALUES + 1) / 2);
+        step_percentage = 100 / (numofsteps * samples_limit)
         currentPercent = 0
 
         # item1 is best score, item 2 is index of best score
-        bestScores = [[sys.maxsize, -1]] * rxCount
-        polarity = [False] * rxCount
+        best_scores = [[sys.maxsize, -1]] * rx_count
+        polarity = [False] * rx_count
 
         self.print_time("Start")
         # 1. Set Image CBC for each enabled Rx to 0. 
         # For Gluon, setting CBC_CHn to 0 means that the local CBC for that channel is off.
         # There is no separate CBC_CARRIER_SEL value for each Rx.
         for step in range(numofsteps):
-            array_ = [0] * rxCount
-            for index in range(rxCount):
+            array_ = [0] * rx_count
+            for index in range(rx_count):
                 value = 0x00
                 if polarity[index]:
-                    value = _CBC_flagPolarity
+                    value = CBC_POLARITY
                 array_[index] = step | value
             self.update_image_cbcs(array_)
             self.print_time("update_image_cbcs")
 
-            status = self.set_report(True, reportId)
+            status = self.set_report(True, REPORT_ID)
             self.print_time("set_report")
 
             if status == False:
@@ -323,72 +324,72 @@ class LocalCBC():
                 print("user terminate")
                 break
 
-            currentPercent = step * samplesLimit * stepPercentage;
+            currentPercent = step * samples_limit * step_percentage;
             self.update_progress(currentPercent)
 
             samples = []
             # start data collecting
-            for samplesCollected in range(samplesLimit):
-                ###print("LOOP:", step, samplesCollected)
+            for samples_collected in range(samples_limit):
+                ###print("LOOP:", step, samples_collected)
                 if self._terminate:
                     print("user terminate")
                     break
 
-                data = self.get_report(reportId)
+                data = self.get_report(REPORT_ID)
                 self.print_time("get_report")
 
                 samples.append(data)
-                progress = currentPercent + (samplesCollected * stepPercentage)
+                progress = currentPercent + (samples_collected * step_percentage)
                 self.update_progress(progress)
 
             # stop data collecting
-            status = self.set_report(False, reportId)
+            status = self.set_report(False, REPORT_ID)
             self.print_time("set_report disable")
 
             # Calculate stats
-            statisticsSet = IntStatisticsSet()
+            statistics_set = IntStatisticsSet()
 
             for sample in samples:
                 if len(sample) == 0:
                     raise Exception('cannot get valid report')
-                rows = self.get_row(sample, rxCount, txCount, numButtons, cdmOrder)
+                rows = self.get_row(sample, rx_count, tx_count)
                 for row in rows:
-                    statisticsSet.process(row, True)
+                    statistics_set.process(row, True)
 
             # Calculate the best scores
-            statisticsRows = statisticsSet.get_channels()
+            statistics_rows = statistics_set.get_channels()
 
-            for idx, i in enumerate(statisticsRows):
+            for idx, i in enumerate(statistics_rows):
                 if step is 0:
                     if i.get_max() < 3000:
-                        adcRange = 2048
+                        adc_range = 2048
 
                 i.print_result()
 
                 lmin = i.get_min()
                 lmax = i.get_max()
                 ## intvar = i.get_median()
-                ## score = (intvar - 4096) / burstsPerCluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
+                ## score = (intvar - 4096) / bursts_per_cluster    # Juneau Specific - 13bit ADC (SWDS6-3161)
 
-                scoreNext = 0
-                scorePrev = 0
+                score_next = 0
+                score_prev = 0
                 if idx is not 0:
-                    scorePrev = abs((statisticsRows[idx - 1].get_max() - adcRange) - (adcRange - statisticsRows[idx - 1].get_min()))
-                if idx is not (rxCount -1):
-                    scoreNext = abs((statisticsRows[idx + 1].get_max() - adcRange) - (adcRange - statisticsRows[idx + 1].get_min()))
-                score = abs((lmax - adcRange) - (adcRange - lmin)) + scorePrev + scoreNext
+                    score_prev = abs((statistics_rows[idx - 1].get_max() - adc_range) - (adc_range - statistics_rows[idx - 1].get_min()))
+                if idx is not (rx_count -1):
+                    score_next = abs((statistics_rows[idx + 1].get_max() - adc_range) - (adc_range - statistics_rows[idx + 1].get_min()))
+                score = abs((lmax - adc_range) - (adc_range - lmin)) + score_prev + score_next
 
-                if abs(score) < abs(bestScores[idx][0]):
-                    bestScores[idx] = [score, step]
+                if abs(score) < abs(best_scores[idx][0]):
+                    best_scores[idx] = [score, step]
             if self._debug:
-                print("BEST SCORE: ", bestScores)
+                print("BEST SCORE: ", best_scores)
 
             # 5.For CBC off (== 0) For each receiver, if Score is positive, 
             # set CBC TX Pl for that receiver = 0 (charge subtraction). 
             # If Score is negative, set CBC TX Pl for that receiver = 1 (charge addition).
             if step == 0:
-                for i in range(rxCount):
-                    if bestScores[i][0] < 0:
+                for i in range(rx_count):
+                    if best_scores[i][0] < 0:
                         polarity[i] = False
                     else:
                         polarity[i] = True
@@ -401,22 +402,22 @@ class LocalCBC():
             return {"data": "cancel"}
 
         # set best cbcs to memory
-        bestValues = [0] * len(bestScores)
+        best_values = [0] * len(best_scores)
 
-        for idx, i in enumerate(bestScores):
-            bestValues[idx] = i[1]
-            if bestValues[idx] != 0:
+        for idx, i in enumerate(best_scores):
+            best_values[idx] = i[1]
+            if best_values[idx] != 0:
                 if polarity[idx]:
-                    bestValues[idx] = bestValues[idx] | _CBC_flagPolarity
+                    best_values[idx] = best_values[idx] | CBC_POLARITY
                 else:
-                    bestValues[idx] = bestValues[idx] & ~_CBC_flagPolarity
+                    best_values[idx] = best_values[idx] & ~CBC_POLARITY
 
-        print("[Best]: ", bestValues)
+        print("[Best]: ", best_values)
 
         self.after_run()
-        self.update_image_cbcs(bestValues)
+        self.update_image_cbcs(best_values)
         self.update_progress(100)
-        return self.convert_cbcs_value(bestValues, cbcAvailableValues)
+        return self.convert_cbcs_value(best_values, CBC_AVAILABLE_VALUES)
 
     def terminate(self):
         self._terminate = True

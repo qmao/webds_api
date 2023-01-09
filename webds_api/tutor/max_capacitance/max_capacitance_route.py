@@ -11,7 +11,7 @@ g_thread = None
 g_tutor = None
 g_queue = None
 
-module_name = "MaxCapacitance"
+MODULE_NAME = "MaxCapacitance"
 
 class MaxCapacitanceRoute():
     def get(handle):
@@ -59,7 +59,7 @@ class MaxCapacitanceRoute():
         global g_queue
         if g_queue is None:
             g_queue = SSEQueue()
-        g_queue.setInfo(module_name, event)
+        g_queue.setInfo(MODULE_NAME, event)
 
     def run():
         print("thread run")

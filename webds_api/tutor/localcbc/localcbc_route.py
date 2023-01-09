@@ -11,7 +11,7 @@ g_thread = None
 g_tutor = None
 g_queue = None
 
-module_name = "LocalCBC"
+MODULE_NAME = "LocalCBC"
 
 class LocalCBCRoute():
     def get(handle):
@@ -48,7 +48,7 @@ class LocalCBCRoute():
         global g_queue
         if g_queue is None:
             g_queue = SSEQueue()
-        g_queue.setInfo(module_name, event)
+        g_queue.setInfo(MODULE_NAME, event)
 
     def run(params):
         print("thread run")
