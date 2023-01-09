@@ -6,7 +6,7 @@ A JupyterLab extension.
 
 
 This extension is composed of a Python package named `webds_api`
-for the server extension and a NPM package named `@webds/webds-api`
+for the server extension and a NPM package named `@webds/webds_api`
 for the frontend extension.
 
 
@@ -98,7 +98,7 @@ pip uninstall webds_api
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `@webds/webds-api` within that folder.
+folder is located. Then you can remove the symlink named `@webds/webds_api` within that folder.
 
 ### Packaging the extension
 

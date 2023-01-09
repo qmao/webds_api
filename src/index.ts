@@ -34,7 +34,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       const data = await requestAPI<any>('general');
       console.log(data);
     } catch (reason) {
-      console.error(`Error on GET /webds-api/general.\n${reason}`);
+      console.error(`Error on GET /webds_api/general.\n${reason}`);
     }
 	
 	

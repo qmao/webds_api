@@ -16,7 +16,7 @@ class GeneralHandler(APIHandler):
         SystemHandler.UpdateWorkspace()
 
         self.finish(json.dumps({
-            "data": "webds-api server is running"
+            "data": "webds_api server is running"
         }))
 
     @tornado.web.authenticated
