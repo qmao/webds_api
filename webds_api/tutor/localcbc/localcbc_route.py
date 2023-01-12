@@ -11,7 +11,12 @@ g_thread = None
 g_tutor = None
 g_queue = None
 
-MODULE_NAME = "LocalCBC"
+
+def send_event(event):
+    global g_queue
+    if g_queue is None:
+        g_queue = SSEQueue()
+    g_queue.send_event(event)
 
 class LocalCBCRoute():
     def get(handle):
@@ -27,7 +32,7 @@ class LocalCBCRoute():
             frame_count = input_data["settings"]["frameCount"]
             return LocalCBCRoute.setup(frame_count)
         elif task == "terminate":
-            LocalCBCRoute.callback({"state": "terminate"})
+            send_event({"state": "terminate"})
             if g_tutor is not None:
                 g_tutor.terminate()
             return
@@ -44,20 +49,14 @@ class LocalCBCRoute():
         print("thread start")
         return {"data": "start"}
 
-    def callback(event):
-        global g_queue
-        if g_queue is None:
-            g_queue = SSEQueue()
-        g_queue.setInfo(MODULE_NAME, event)
-
     def run(params):
         print("thread run")
         global g_tutor
 
         tc = TouchcommManager().getInstance()
-        g_tutor = LocalCBC(tc, LocalCBCRoute.callback)
+        g_tutor = LocalCBC(tc)
 
         data = g_tutor.run(params)
-        LocalCBCRoute.callback({"state": "stop", "data": data})
+        send_event({"state": "stop", "data": data})
 
         print("thread finished!!!")

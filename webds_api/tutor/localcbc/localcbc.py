@@ -1,6 +1,7 @@
 import sys
 import re
 import time
+import logging
 
 CBC_POLARITY = 0x20
 REPORT_ID = 31  ###195
@@ -142,7 +143,6 @@ class IntStatisticsSet():
 
 class LocalCBC():
     _handle = None
-    _callback = None
     _start = None
     _debug = False
     _terminate = False
@@ -150,9 +150,8 @@ class LocalCBC():
     _static_config = {}
     _dynamic_config = {}
 
-    def __init__(self, handle, callback=print):
+    def __init__(self, handle):
         self._handle = handle
-        self._callback = callback
         self._static_config = self._handle.getStaticConfig()
         self._dynamic_config = self._handle.getDynamicConfig()
         self._touch_info = self._handle.getTouchInfo()
@@ -266,7 +265,7 @@ class LocalCBC():
         return arr
 
     def update_progress(self, progress):
-        self._callback({"state": "run", "progress": progress})
+        logging.getLogger('tuningProgress').info(progress)
 
     def run(self, samples_limit):
         self._terminated = self._terminate

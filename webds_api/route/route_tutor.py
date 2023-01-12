@@ -89,7 +89,7 @@ class TutorHandler(APIHandler):
                 if paths[0] == "event":
                     return self.getSSE()
                 else:
-                    tutor = paths[0] + "Route"
+                    tutor = TutorHandler.get_tutor_route_str(paths[0])
                     cls = globals()[tutor]
                     function = getattr(cls, 'get')
                     data = function(self)
@@ -112,7 +112,7 @@ class TutorHandler(APIHandler):
             paths = subpath.split("/")
 
             if len(paths) == 1:
-                tutor = paths[0] + "Route"
+                tutor = TutorHandler.get_tutor_route_str(paths[0])
                 cls = globals()[tutor]
                 function = getattr(cls, 'post')
                 data = function(self, input_data)
@@ -128,3 +128,8 @@ class TutorHandler(APIHandler):
 
     def camel_case_to_snake_case(name):
         return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+    def get_tutor_route_str(name):
+        SSEQueue().set_module_name(name)
+        name = name + "Route"
+        return name
