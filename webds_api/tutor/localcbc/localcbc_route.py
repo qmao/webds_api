@@ -2,21 +2,29 @@ import tornado
 from tornado.iostream import StreamClosedError
 from tornado import gen
 
+import math
 import threading
+import multiprocessing
+import logging
+
+from multiprocessing import Process, Pool
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import SSEQueue
 from .localcbc import LocalCBC
 
-g_thread = None
-g_tutor = None
 g_queue = None
+g_process = None
 
+class LogHandler(logging.Handler):
+    def emit(self, record):
+        progress = math.floor(float(record.getMessage()))
+        send_event({"state": "run", "progress": progress})
 
 def send_event(event):
-    global g_queue
-    if g_queue is None:
-        g_queue = SSEQueue()
-    g_queue.send_event(event)
+        global g_queue
+        if g_queue is None:
+            g_queue = SSEQueue()
+        g_queue.send_event(event)
 
 class LocalCBCRoute():
     def get(handle):
@@ -30,33 +38,38 @@ class LocalCBCRoute():
 
         if task == "run":
             frame_count = input_data["settings"]["frameCount"]
-            return LocalCBCRoute.setup(frame_count)
+            return LocalCBCRoute.run(frame_count)
         elif task == "terminate":
             send_event({"state": "terminate"})
-            if g_tutor is not None:
-                g_tutor.terminate()
+            if g_process is not None:
+                g_process.kill()
+                ##g_process.terminate()
+                g_process.join()
+                send_event({"data": "cancel"})
             return
         else:
             raise Exception('Unsupport parameters: ', input_data)
 
-    def setup(params):
-        global g_thread
-        if g_thread is not None and g_thread.is_alive():
-            raise Exception('Prev thread is running')
+    def run(params):
+        send_event({"state": "init"})
 
-        g_thread = threading.Thread(target=LocalCBCRoute.run, args=(params, ))
-        g_thread.start()
-        print("thread start")
+        global g_process
+        g_process = Process(target=LocalCBCRoute.tune, args=(params, ))
+        g_process.start()
+
         return {"data": "start"}
 
-    def run(params):
+    def done(result):
+        send_event({"state": "stop", "data": result})
+
+    def tune(params):
         print("thread run")
-        global g_tutor
+
+        logging.getLogger('tuningProgress').addHandler(LogHandler())
 
         tc = TouchcommManager().getInstance()
         g_tutor = LocalCBC(tc)
 
-        data = g_tutor.run(params)
-        send_event({"state": "stop", "data": data})
+        result = g_tutor.run(params)
 
-        print("thread finished!!!")
+        send_event({"state": "stop", "data": result})
