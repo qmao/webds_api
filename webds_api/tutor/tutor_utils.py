@@ -18,6 +18,7 @@ class SSEQueue():
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._queue = Queue()
+            logging.getLogger('tuningProgress').addHandler(LogHandler())
         return cls._instance
 
     def set_module_name(self, name):
