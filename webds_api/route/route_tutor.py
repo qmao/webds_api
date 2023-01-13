@@ -9,7 +9,7 @@ from ..touchcomm.touchcomm_manager import TouchcommManager
 import sys
 import time
 import re
-from ..tutor.tutor_utils import SSEQueue
+from ..tutor.tutor_utils import EventQueue
 
 ### auto import tutor routes from webds_api
 for folder in os.scandir("/usr/local/lib/python3.7/dist-packages/webds_api/tutor"):
@@ -39,12 +39,12 @@ class TutorHandler(APIHandler):
     @tornado.gen.coroutine
     def getSSE(self):
         print("SSE LOOP")
-        queue = SSEQueue()
+        queue = EventQueue()
         queue.reset()
 
         try:
             while True:
-                name, info = queue.getQueue()
+                name, info = queue.pop()
                 if info is not None:
                     if info["state"] == "stop":
                         yield self.publish(name, json.dumps(info))
@@ -130,6 +130,6 @@ class TutorHandler(APIHandler):
         return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
 
     def get_tutor_route_str(name):
-        SSEQueue().set_module_name(name)
+        EventQueue().set_module_name(name)
         name = name + "Route"
         return name

@@ -1,17 +1,11 @@
-import tornado
-from tornado.iostream import StreamClosedError
-from tornado import gen
-
-import threading
+import time
+from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
-from ..tutor_utils import SSEQueue
+from ..tutor_utils import EventQueue
 from .max_capacitance import MaxCapacitance
 
-g_thread = None
+g_process = None
 g_tutor = None
-g_queue = None
-
-MODULE_NAME = "MaxCapacitance"
 
 class MaxCapacitanceRoute():
     def get(handle):
@@ -30,45 +24,42 @@ class MaxCapacitanceRoute():
                 raise Exception('Unsupport input parameters: ', input_data)
 
             if task == "run":
-                return MaxCapacitanceRoute.setup()
+                return MaxCapacitanceRoute.run()
             elif task == "reset":
                 if g_tutor is not None:
                     g_tutor.reset()
                 return {"state": "done"}
-            elif task == "terminate":
-                MaxCapacitanceRoute.callback({"state": "terminate"})
-                if g_tutor is not None:
-                    g_tutor.terminate()
+            elif task == "terminate":                
+                if g_process is not None:
+                    g_process.kill()
+                    g_process.join()
+                EventQueue().close()
                 return {"state": "done"}
             else:
                 raise Exception('Unsupport parameters: ', input_data)
         except Exception as e:
             raise Exception('MaxCapacitance Manager Post error: ', str(e))
 
-    def setup():
-        global g_thread
-        if g_thread is not None and g_thread.is_alive():
-            raise Exception('Prev thread is running')
+    def run():
+        global g_process
+        g_process = Process(target=MaxCapacitanceRoute.tune)
+        g_process.start()
 
-        g_thread = threading.Thread(target=MaxCapacitanceRoute.run)
-        g_thread.start()
-        print("thread start")
         return {"data": "start"}
 
-    def callback(event):
-        global g_queue
-        if g_queue is None:
-            g_queue = SSEQueue()
-        g_queue.setInfo(MODULE_NAME, event)
 
-    def run():
-        print("thread run")
+    def tune():
         global g_tutor
 
         tc = TouchcommManager().getInstance()
-        g_tutor = MaxCapacitance(tc, MaxCapacitanceRoute.callback)
+        g_tutor = MaxCapacitance(tc)
 
-        data = g_tutor.run()
-        MaxCapacitanceRoute.callback({"state": "stop", "data": data})
-
-        print("thread finished!!!")
+        g_tutor.init()
+        t_max_prev = 0
+        t_cum_max_prev = 0
+        while True:
+            t_max, t_cum_max = g_tutor.run()
+            if t_max != t_max_prev or t_cum_max != t_cum_max_prev:
+                EventQueue().push({"state": "run", "value": {"max": int(t_max), "cum_max": int(t_cum_max)}})
+            t_max_prev = t_max
+            t_cum_max_prev = t_cum_max

@@ -3,13 +3,12 @@ import logging
 import math
 
 
-class LogHandler(logging.Handler):
+class ProgressHandler(logging.Handler):
     def emit(self, record):
         progress = math.floor(float(record.getMessage()))
-        SSEQueue().send_event({"state": "run", "progress": progress})
+        EventQueue().push({"state": "run", "progress": progress})
 
-
-class SSEQueue():
+class EventQueue():
     _module = ""
     _instance = None
     _queue = None
@@ -18,19 +17,19 @@ class SSEQueue():
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._queue = Queue()
-            logging.getLogger('tuningProgress').addHandler(LogHandler())
+            logging.getLogger('tuningProgress').addHandler(ProgressHandler())
         return cls._instance
 
     def set_module_name(self, name):
         self._module = name
   
-    def send_event(self, info):
+    def push(self, info):
         self._queue.put([self._module, info])
 
-    def setInfo(self, name, info):
-        self._queue.put([name, info])
+    def close(self):
+        self._queue.put({"state": "terminate"})
 
-    def getQueue(self):
+    def pop(self):
         try:
             result = self._queue.get(True, 1)
         except:

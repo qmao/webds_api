@@ -2,7 +2,7 @@ import threading
 import time
 import math
 from statistics import mean
-from ..tutor_utils import SSEQueue
+from ..tutor_utils import EventQueue
 from ...touchcomm.touchcomm_manager import TouchcommManager
 
 debug = True
@@ -59,7 +59,7 @@ class IntegrationDuration(object):
         self._stop_event = False
         self._tc = None
         self._tcm = None
-        self._queue = SSEQueue()
+        self._queue = EventQueue()
         self._static_config = {}
         self._dynamic_config = {}
         self._inited = False
@@ -90,7 +90,7 @@ class IntegrationDuration(object):
             self._tcm = None
 
     def _update_progress(self, progress):
-        self._queue.setInfo(SSE_EVENT, {"state": "running", "progress": progress})
+        self._queue.push({"state": "running", "progress": progress})
 
     def _set_static_config(self):
         self._tc.setStaticConfig(self._static_config)
@@ -232,7 +232,7 @@ class IntegrationDuration(object):
                     count = 0
                     while True:
                         if self._stop_event:
-                            self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
+                            self._queue.close()
                             return
                         report = self._tc.getReport()
                         if report[0] == "raw":
@@ -264,12 +264,12 @@ class IntegrationDuration(object):
                     break
             if not valid_baseline:
                 raise RuntimeError("no valid baseline found")
-            self._queue.setInfo(SSE_EVENT, {"state": "stop"})
+            self._queue.push({"state": "stop"})
             log("Collected baseline data")
             return
         except Exception as e:
             print("IntegrationDuration error executing collect_baseline_data: {}".format(e))
-            self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
+            self._queue.close()
             self._disconnect_tc()
             self._inited = False
             raise e
@@ -303,7 +303,7 @@ class IntegrationDuration(object):
                 count = 0
                 while True:
                     if self._stop_event:
-                        self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
+                        self._queue.close()
                         return
                     report = self._tc.getReport()
                     if report[0] == "raw":
@@ -323,12 +323,12 @@ class IntegrationDuration(object):
                 log("Max = {}".format(self._test_pixel_signal_max[level][-1]))
                 log("Min = {}".format(self._test_pixel_signal_min[level][-1]))
                 log("Mean = {}".format(self._test_pixel_signal_mean[level][-1]))
-            self._queue.setInfo(SSE_EVENT, {"state": "stop"})
+            self._queue.push({"state": "stop"})
             log("Collected test pixel {} data".format(pixel))
             return
         except Exception as e:
             print("IntegrationDuration error executing collect_test_pixel_data: {}".format(e))
-            self._queue.setInfo(SSE_EVENT, {"state": "terminate"})
+            self._queue.close()
             self._disconnect_tc()
             self._inited = False
             raise e

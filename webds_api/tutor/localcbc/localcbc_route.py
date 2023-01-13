@@ -2,7 +2,7 @@ import logging
 
 from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
-from ..tutor_utils import SSEQueue
+from ..tutor_utils import EventQueue
 from .localcbc import LocalCBC
 
 g_process = None
@@ -21,11 +21,11 @@ class LocalCBCRoute():
             frame_count = input_data["settings"]["frameCount"]
             return LocalCBCRoute.run(frame_count)
         elif task == "terminate":
-            SSEQueue().send_event({"state": "terminate"})
             if g_process is not None:
                 g_process.kill()
                 g_process.join()
-                SSEQueue().send_event({"data": "cancel"})
+                EventQueue().push({"data": "cancel"})
+            EventQueue().close()
             return
         else:
             raise Exception('Unsupport parameters: ', input_data)
@@ -38,11 +38,11 @@ class LocalCBCRoute():
         return {"data": "start"}
 
     def done(result):
-        SSEQueue().send_event({"state": "stop", "data": result})
+        EventQueue().push({"state": "stop", "data": result})
 
     def tune(params):
         tc = TouchcommManager().getInstance()
         tutor = LocalCBC(tc)
         result = tutor.run(params)
 
-        SSEQueue().send_event({"state": "stop", "data": result})
+        EventQueue().push({"state": "stop", "data": result})
