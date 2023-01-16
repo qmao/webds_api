@@ -2,7 +2,6 @@ import sys
 import re
 import time
 import numpy as np
-import logging
 
 REPORT_ID = 18
 
@@ -50,10 +49,6 @@ class MaxCapacitance():
             now = time.time()
             print("[ TIME ]", tag, "--- %s seconds ---" % (now - self._start))
             self._start = now
-
-    def update_info(self, data, state = "run"):
-        self._callback({"state": state, "value": data})
-        logging.getLogger('tuningProgress').info(progress)
 
     def run(self):
         try:

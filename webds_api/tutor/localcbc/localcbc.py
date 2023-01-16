@@ -1,7 +1,6 @@
 import sys
 import re
 import time
-import logging
 
 CBC_POLARITY = 0x20
 REPORT_ID = 31  ###195
@@ -264,9 +263,6 @@ class LocalCBC():
             arr.append(value)
         return arr
 
-    def update_progress(self, progress):
-        logging.getLogger('tuningProgress').info(progress)
-
     def run(self, samples_limit):
         self._terminated = self._terminate
         self.init()
@@ -323,7 +319,7 @@ class LocalCBC():
                 break
 
             currentPercent = step * samples_limit * step_percentage;
-            self.update_progress(currentPercent)
+            yield currentPercent
 
             samples = []
             # start data collecting
@@ -338,7 +334,7 @@ class LocalCBC():
 
                 samples.append(data)
                 progress = currentPercent + (samples_collected * step_percentage)
-                self.update_progress(progress)
+                yield progress
 
             # stop data collecting
             status = self.set_report(False, REPORT_ID)
@@ -414,7 +410,7 @@ class LocalCBC():
 
         self.after_run()
         self.update_image_cbcs(best_values)
-        self.update_progress(100)
+        yield 100
         return self.convert_cbcs_value(best_values, CBC_AVAILABLE_VALUES)
 
     def terminate(self):
