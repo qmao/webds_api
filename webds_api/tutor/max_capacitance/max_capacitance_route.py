@@ -1,4 +1,3 @@
-import time
 from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import EventQueue
@@ -47,7 +46,6 @@ class MaxCapacitanceRoute():
 
         return {"data": "start"}
 
-
     def tune():
         global g_tutor
 
@@ -59,7 +57,6 @@ class MaxCapacitanceRoute():
         t_cum_max_prev = 0
         while True:
             t_max, t_cum_max = g_tutor.run()
-            if t_max != t_max_prev or t_cum_max != t_cum_max_prev:
-                EventQueue().push({"state": "run", "value": {"max": int(t_max), "cum_max": int(t_cum_max)}})
+            EventQueue().push({"state": "run", "value": {"max": int(t_max), "cum_max": int(t_cum_max)}})
             t_max_prev = t_max
             t_cum_max_prev = t_cum_max

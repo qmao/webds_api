@@ -26,7 +26,7 @@ class LocalCBCRoute():
                 g_process.join()
                 EventQueue().push({"data": "cancel"})
             EventQueue().close()
-            return
+            return {"state": "done"}
         else:
             raise Exception('Unsupport parameters: ', input_data)
 
@@ -36,9 +36,6 @@ class LocalCBCRoute():
         g_process.start()
 
         return {"data": "start"}
-
-    def done(result):
-        EventQueue().push({"state": "stop", "data": result})
 
     def tune(params):
         tc = TouchcommManager().getInstance()
