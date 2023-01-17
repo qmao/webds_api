@@ -54,3 +54,4 @@ class LocalCBCRoute():
                 EventQueue().push({"state": "run", "progress": progress})
 
         EventQueue().push({"state": "stop", "data": result})
+        EventQueue().close()

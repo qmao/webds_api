@@ -43,10 +43,12 @@ class TutorHandler(APIHandler):
         queue.reset()
 
         try:
-            while queue.is_alive():
+            while True:
                 name, info = queue.pop()
                 if info is not None:
                     yield self.publish(name, json.dumps(info))
+                if not queue.is_alive():
+                    break
                 yield tornado.gen.sleep(0.0001)
 
         except StreamClosedError:
