@@ -4,7 +4,7 @@ import math
 from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import EventQueue
-from .localcbc import LocalCBC
+from .local_cbc import LocalCBC
 
 g_thread = None
 g_cancel = False
