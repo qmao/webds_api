@@ -20,7 +20,7 @@ ensured_targets = [
     str(lab_path / "static/style.js")
 ]
 
-labext_name = "@webds/webds_api"
+labext_name = "@webds/api"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path.relative_to(HERE)), "**"),
