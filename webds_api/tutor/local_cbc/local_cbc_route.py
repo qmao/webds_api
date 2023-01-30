@@ -40,7 +40,7 @@ class LocalCBCRoute():
         TutorWrapper = get_tutor(LocalCBC)
         LocalCBCRoute._tutor = TutorWrapper(tc)
 
-        LocalCBCRoute._tutor.start_thread(LocalCBCRoute._tutor.run, kwargs={'samples_limit': params})
+        LocalCBCRoute._tutor.start_thread(LocalCBCRoute._tutor.run, args=(params, ))
         result = LocalCBCRoute._tutor.join_thread()
 
         EventQueue().push({"state": "stop", "data": result})

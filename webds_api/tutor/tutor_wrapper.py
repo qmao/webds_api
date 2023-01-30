@@ -32,8 +32,7 @@ class Logger(object):
                 self._condition.notify()
                 self._condition.release()
                 sys.exit()
-        except Exception as e: 
-            self._terminal.write(str(e))
+        except Exception as e:
             pass
 
         self._terminal.write(message)
@@ -86,10 +85,10 @@ def get_tutor(base):
                 self._thread = None
             self._lock.release()
 
-        def start_thread(self, f, kwargs=None):
+        def start_thread(self, f, args=None):
             self._logger = Logger(self._condition)
             self._log_thread = threading.Thread(target=self.track_thread)
-            self._thread = ReturnValueThread(target=f, kwargs=kwargs)
+            self._thread = ReturnValueThread(target=f, args=args)
             self._thread.start()
             self._log_thread.start()
 
