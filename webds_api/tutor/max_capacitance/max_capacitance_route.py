@@ -56,10 +56,6 @@ class MaxCapacitanceRoute():
 
         tutor.init()
 
-        t_max_prev = 0
-        t_cum_max_prev = 0
         while True:
             t_max, t_cum_max = tutor.run()
             EventQueue().push({"state": "run", "value": {"max": int(t_max), "cum_max": int(t_cum_max)}})
-            t_max_prev = t_max
-            t_cum_max_prev = t_cum_max
