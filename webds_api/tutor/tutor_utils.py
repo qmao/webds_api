@@ -28,7 +28,7 @@ class EventQueue():
     def push(self, info):
         self._queue.put([self._module, info])
         if self._queue.qsize() >= 2:
-            time. sleep(0.05)
+            time.sleep(0.05)
 
     def close(self):
         self._alive = False
@@ -38,6 +38,7 @@ class EventQueue():
             result = self._queue.get(True, 1)
         except:
             return [None, None]
+
         return result
 
     def is_alive(self):

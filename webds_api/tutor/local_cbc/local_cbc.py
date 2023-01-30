@@ -1,6 +1,7 @@
 import sys
 import re
 import time
+import json
 
 CBC_POLARITY = 0x20
 REPORT_ID = 31  ###195
@@ -319,7 +320,7 @@ class LocalCBC():
                 break
 
             currentPercent = step * samples_limit * step_percentage;
-            yield currentPercent
+            print(json.dumps({"state": "run", "progress": currentPercent}))
 
             samples = []
             # start data collecting
@@ -334,7 +335,7 @@ class LocalCBC():
 
                 samples.append(data)
                 progress = currentPercent + (samples_collected * step_percentage)
-                yield progress
+                print(json.dumps({"state": "run", "progress": progress}))
 
             # stop data collecting
             status = self.set_report(False, REPORT_ID)
@@ -410,7 +411,8 @@ class LocalCBC():
 
         self.after_run()
         self.update_image_cbcs(best_values)
-        yield 100
+
+        print(json.dumps({"state": "run", "progress": 100}))
         return self.convert_cbcs_value(best_values, CBC_AVAILABLE_VALUES)
 
     def terminate(self):

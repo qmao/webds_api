@@ -5,11 +5,12 @@ from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import EventQueue
 from .local_cbc import LocalCBC
+from ..tutor_wrapper import *
 
-g_thread = None
-g_cancel = False
 
 class LocalCBCRoute():
+    _tutor = None
+
     def get(handle):
         raise Exception('Unsupport function:', __class__, __name__)
 
@@ -23,35 +24,24 @@ class LocalCBCRoute():
             frame_count = input_data["settings"]["frameCount"]
             return LocalCBCRoute.run(frame_count)
         elif task == "terminate":
-            global g_cancel
-            if g_thread is not None:
-                g_cancel = True
+            LocalCBCRoute._tutor.terminate_thread()
             return {"state": "done"}
         else:
             raise Exception('Unsupport parameters: ', input_data)
 
     def run(params):
-        global g_cancel
-        global g_thread
-        g_cancel = False
-        g_thread = threading.Thread(target=LocalCBCRoute.tune, args=(params, ))
-        g_thread.start()
+        thread = threading.Thread(target=LocalCBCRoute.tune, args=(params, ))
+        thread.start()
 
         return {"data": "start"}
 
     def tune(params):
         tc = TouchcommManager().getInstance()
-        tutor = LocalCBC(tc)
+        TutorWrapper = get_tutor(LocalCBC)
+        LocalCBCRoute._tutor = TutorWrapper(tc)
 
-        generator = tutor.run(params)
-        for progress in generator:
-            if g_cancel:
-                EventQueue().push({"state": "terminate"})
-                EventQueue().close()
-                return
-            else:
-                progress = math.floor(progress)
-                EventQueue().push({"state": "run", "progress": progress})
+        LocalCBCRoute._tutor.start_thread(LocalCBCRoute._tutor.run, kwargs={'samples_limit': params})
+        result = LocalCBCRoute._tutor.join_thread()
 
         EventQueue().push({"state": "stop", "data": result})
         EventQueue().close()

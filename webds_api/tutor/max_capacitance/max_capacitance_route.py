@@ -2,11 +2,13 @@ from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import EventQueue
 from .max_capacitance import MaxCapacitance
+from ..tutor_wrapper import *
 
-g_process = None
-g_tutor = None
 
 class MaxCapacitanceRoute():
+    _tutor = None
+    _process = None
+
     def get(handle):
         try:
             data = MaxCapacitanceRoute().run()
@@ -25,13 +27,13 @@ class MaxCapacitanceRoute():
             if task == "run":
                 return MaxCapacitanceRoute.run()
             elif task == "reset":
-                if g_tutor is not None:
-                    g_tutor.reset()
+                if MaxCapacitanceRoute._tutor is not None:
+                    MaxCapacitanceRoute._tutor.reset()
                 return {"state": "done"}
             elif task == "terminate":                
-                if g_process is not None:
-                    g_process.kill()
-                    g_process.join()
+                if MaxCapacitanceRoute._process is not None:
+                    MaxCapacitanceRoute._process.kill()
+                    MaxCapacitanceRoute._process.join()
                 EventQueue().close()
                 return {"state": "done"}
             else:
@@ -40,23 +42,24 @@ class MaxCapacitanceRoute():
             raise Exception('MaxCapacitance Manager Post error: ', str(e))
 
     def run():
-        global g_process
-        g_process = Process(target=MaxCapacitanceRoute.tune)
-        g_process.start()
+        MaxCapacitanceRoute._process = Process(target=MaxCapacitanceRoute.tune)
+        MaxCapacitanceRoute._process.start()
 
         return {"data": "start"}
 
     def tune():
-        global g_tutor
+        tutor = MaxCapacitanceRoute._tutor
 
         tc = TouchcommManager().getInstance()
-        g_tutor = MaxCapacitance(tc)
+        TutorWrapper = get_tutor(MaxCapacitance)
+        tutor = TutorWrapper(tc)
 
-        g_tutor.init()
+        tutor.init()
+
         t_max_prev = 0
         t_cum_max_prev = 0
         while True:
-            t_max, t_cum_max = g_tutor.run()
+            t_max, t_cum_max = tutor.run()
             EventQueue().push({"state": "run", "value": {"max": int(t_max), "cum_max": int(t_cum_max)}})
             t_max_prev = t_max
             t_cum_max_prev = t_cum_max
