@@ -10,7 +10,6 @@ from ..tutor_thread import TutorThread
 
 class LocalCBCRoute():
     _tutor = None
-    _thread = None
 
     def get(handle):
         raise Exception('Unsupport function:', __class__, __name__)
@@ -25,8 +24,7 @@ class LocalCBCRoute():
             frame_count = input_data["settings"]["frameCount"]
             return LocalCBCRoute.run(frame_count)
         elif task == "terminate":
-            if LocalCBCRoute._thread is not None:
-                LocalCBCRoute._thread.terminate()
+            TutorThread.terminate()
             return {"state": "done"}
         else:
             raise Exception('Unsupport parameters: ', input_data)
@@ -35,9 +33,8 @@ class LocalCBCRoute():
         tc = TouchcommManager().getInstance()
         LocalCBCRoute._tutor = LocalCBC(tc)
 
-        LocalCBCRoute._thread = TutorThread()
-        LocalCBCRoute._thread.register_event(LocalCBCRoute.tune_callback)
-        LocalCBCRoute._thread.start(LocalCBCRoute._tutor.run, args=(params, ))
+        TutorThread.register_event(LocalCBCRoute.tune_callback)
+        TutorThread.start(LocalCBCRoute._tutor.run, args=(params, ))
 
         return {"data": "start"}
 

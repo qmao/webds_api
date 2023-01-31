@@ -73,39 +73,44 @@ class TutorThread():
     _condition = Condition()
     _callback = None
 
-    def terminate(self):
-        self._lock.acquire()
-        if self._logger:
-            self._logger.terminate()
-            self._condition.acquire()
-            self._condition.wait()
-            self._condition.release()
-            self._logger = None
-        if self._thread:
-            self._thread.join()
-            self._thread = None
-        self._lock.release()
+    @classmethod
+    def terminate(cls):
+        cls._lock.acquire()
+        if cls._logger:
+            cls._logger.terminate()
+            cls._condition.acquire()
+            cls._condition.wait()
+            cls._condition.release()
+            cls._logger = None
+        if cls._thread:
+            cls._thread.join()
+            cls._thread = None
+        cls._lock.release()
 
-    def start(self, f, args=None):
-        self._logger = Logger(self._condition)
-        self._log_thread = threading.Thread(target=self.track_thread)
-        self._thread = ReturnValueThread(target=f, args=args)
-        self._thread.start()
-        self._log_thread.start()
+    @classmethod
+    def start(cls, f, args=None):
+        cls._logger = Logger(cls._condition)
+        cls._log_thread = threading.Thread(target=cls.track_thread)
+        cls._thread = ReturnValueThread(target=f, args=args)
+        cls._thread.start()
+        cls._log_thread.start()
 
-    def join(self):
-        if self._thread:
-            return self._thread.join()
+    @classmethod
+    def join(cls):
+        if cls._thread:
+            return cls._thread.join()
 
-    def track_thread(self):
-        data = self._thread.join()
-        self._lock.acquire()
-        if self._logger:
-            self._logger.restore()
-            self._logger = None
-        self._lock.release()
-        if self._callback:
-            self._callback(data)
+    @classmethod
+    def track_thread(cls):
+        data = cls._thread.join()
+        cls._lock.acquire()
+        if cls._logger:
+            cls._logger.restore()
+            cls._logger = None
+        cls._lock.release()
+        if cls._callback:
+            cls._callback(data)
 
-    def register_event(self, cb):
-        self._callback = cb
+    @classmethod
+    def register_event(cls, cb):
+        cls._callback = cb
