@@ -24,9 +24,8 @@ class SampleModuleRoute():
             if SampleModuleRoute._tutor is None:
                 tc = TouchcommManager().getInstance()
                 SampleModuleRoute._tutor = SampleModule(tc)
-                thread = TutorThread()
-                thread.register_event(SampleModuleRoute.tune_done)
-                thread.start(SampleModuleRoute._tutor.collect, args=(count, ))
+                TutorThread.register_event(SampleModuleRoute.tune_done)
+                TutorThread.start(SampleModuleRoute._tutor.collect, args=(count, ))
 
                 return {"status": "start"}
             else:
@@ -40,4 +39,5 @@ class SampleModuleRoute():
         SampleModuleRoute._tutor.tune()
         EventQueue().push({"data": SampleModuleRoute._tutor._max})
         EventQueue().close()
+        TutorThread.register_event(None)
         SampleModuleRoute._tutor = None

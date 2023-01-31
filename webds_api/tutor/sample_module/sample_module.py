@@ -12,6 +12,7 @@ class SampleModule():
 
     def collect(self, count):
         self._count = count
+        self._tc.reset()
         self._tc.disableReport(17)
         self._tc.enableReport(18)
 
