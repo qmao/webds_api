@@ -2,8 +2,6 @@ from multiprocessing import Process
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from ..tutor_utils import EventQueue
 from .max_capacitance import MaxCapacitance
-from ..tutor_wrapper import *
-
 
 class MaxCapacitanceRoute():
     _tutor = None
@@ -51,8 +49,7 @@ class MaxCapacitanceRoute():
         tutor = MaxCapacitanceRoute._tutor
 
         tc = TouchcommManager().getInstance()
-        TutorWrapper = get_tutor(MaxCapacitance)
-        tutor = TutorWrapper(tc)
+        tutor = MaxCapacitance(tc)
 
         tutor.init()
 

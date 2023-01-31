@@ -66,51 +66,46 @@ class ReturnValueThread(threading.Thread):
         super().join(*args, **kwargs)
         return self.result
 
-def get_tutor(base):
-    class TutorWrapper(base):
-        _logger = None
-        _lock = Lock()
-        _condition = Condition()
-        _callback = None
 
-        def __new__(cls, value, *args, **kwargs):
-            return base.__new__(base, value, *args, **kwargs)
+class TutorThread():
+    _logger = None
+    _lock = Lock()
+    _condition = Condition()
+    _callback = None
 
-        def terminate_thread(self):
-            self._lock.acquire()
-            if self._logger:
-                self._logger.terminate()
-                self._condition.acquire()
-                self._condition.wait()
-                self._condition.release()
-                self._logger = None
-            if self._thread:
-                self._thread.join()
-                self._thread = None
-            self._lock.release()
+    def terminate(self):
+        self._lock.acquire()
+        if self._logger:
+            self._logger.terminate()
+            self._condition.acquire()
+            self._condition.wait()
+            self._condition.release()
+            self._logger = None
+        if self._thread:
+            self._thread.join()
+            self._thread = None
+        self._lock.release()
 
-        def start_thread(self, f, args=None):
-            self._logger = Logger(self._condition)
-            self._log_thread = threading.Thread(target=self.track_thread)
-            self._thread = ReturnValueThread(target=f, args=args)
-            self._thread.start()
-            self._log_thread.start()
+    def start(self, f, args=None):
+        self._logger = Logger(self._condition)
+        self._log_thread = threading.Thread(target=self.track_thread)
+        self._thread = ReturnValueThread(target=f, args=args)
+        self._thread.start()
+        self._log_thread.start()
 
-        def join_thread(self):
-            if self._thread:
-                return self._thread.join()
+    def join(self):
+        if self._thread:
+            return self._thread.join()
 
-        def track_thread(self):
-            data = self._thread.join()
-            self._lock.acquire()
-            if self._logger:
-                self._logger.restore()
-                self._logger = None
-            self._lock.release()
-            if self._callback:
-                self._callback(data)
+    def track_thread(self):
+        data = self._thread.join()
+        self._lock.acquire()
+        if self._logger:
+            self._logger.restore()
+            self._logger = None
+        self._lock.release()
+        if self._callback:
+            self._callback(data)
 
-        def register_thread_event(self, cb):
-            self._callback = cb
-
-    return TutorWrapper
+    def register_event(self, cb):
+        self._callback = cb
