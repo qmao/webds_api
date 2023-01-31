@@ -30,18 +30,16 @@ class LocalCBCRoute():
             raise Exception('Unsupport parameters: ', input_data)
 
     def run(params):
-        thread = threading.Thread(target=LocalCBCRoute.tune, args=(params, ))
-        thread.start()
+        tc = TouchcommManager().getInstance()
+        TutorWrapper = get_tutor(LocalCBC)
+
+        LocalCBCRoute._tutor = TutorWrapper(tc)
+
+        LocalCBCRoute._tutor.register_thread_event(LocalCBCRoute.tune_callback)
+        LocalCBCRoute._tutor.start_thread(LocalCBCRoute._tutor.run, args=(params, ))
 
         return {"data": "start"}
 
-    def tune(params):
-        tc = TouchcommManager().getInstance()
-        TutorWrapper = get_tutor(LocalCBC)
-        LocalCBCRoute._tutor = TutorWrapper(tc)
-
-        LocalCBCRoute._tutor.start_thread(LocalCBCRoute._tutor.run, args=(params, ))
-        result = LocalCBCRoute._tutor.join_thread()
-
-        EventQueue().push({"state": "stop", "data": result})
+    def tune_callback(data):
+        EventQueue().push({"state": "stop", "data": data})
         EventQueue().close()

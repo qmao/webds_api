@@ -71,6 +71,7 @@ def get_tutor(base):
         _logger = None
         _lock = Lock()
         _condition = Condition()
+        _callback = None
 
         def terminate_thread(self):
             self._lock.acquire()
@@ -95,14 +96,18 @@ def get_tutor(base):
         def join_thread(self):
             if self._thread:
                 return self._thread.join()
-                
 
         def track_thread(self):
-            self._thread.join()
+            data = self._thread.join()
             self._lock.acquire()
             if self._logger:
                 self._logger.restore()
                 self._logger = None
             self._lock.release()
+            if self._callback:
+                self._callback(data)
+
+        def register_thread_event(self, cb):
+            self._callback = cb
 
     return TutorWrapper
