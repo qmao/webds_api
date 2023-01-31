@@ -1,21 +1,43 @@
+import tornado
 from ...touchcomm.touchcomm_manager import TouchcommManager
 from .sample_module import SampleModule
+from ..tutor_thread import TutorThread
+from ..tutor_utils import EventQueue
 
 class SampleModuleRoute():
-    def get(handle):
+    _tutor = None
 
+    def get(handle):
         tc = TouchcommManager().getInstance()
         tutor = SampleModule(tc)
 
-        tutor.collect()
+        tutor.collect(1)
         tutor.tune()
 
         print(tutor._max)
         return {"data": tutor._max}
 
     def post(handle, input_data):
-        task = input_data["task"]
+        count = input_data["count"]
 
-        print("Hello SampleModuleRoute post request", task)
+        try:
+            if SampleModuleRoute._tutor is None:
+                tc = TouchcommManager().getInstance()
+                SampleModuleRoute._tutor = SampleModule(tc)
+                thread = TutorThread()
+                thread.register_event(SampleModuleRoute.tune_done)
+                thread.start(SampleModuleRoute._tutor.collect, args=(count, ))
 
-        return {"status": "post alive"}
+                return {"status": "start"}
+            else:
+                return {"status": "previous tutor is still alive"}
+        except Exception as e:
+            print(e)
+            message=str(e)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+
+    def tune_done(data):
+        SampleModuleRoute._tutor.tune()
+        EventQueue().push({"data": SampleModuleRoute._tutor._max})
+        EventQueue().close()
+        SampleModuleRoute._tutor = None
