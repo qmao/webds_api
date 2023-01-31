@@ -108,7 +108,7 @@ class TutorThread():
             cls._logger.restore()
             cls._logger = None
         cls._lock.release()
-        if cls._callback:
+        if cls._callback is not None and cls._thread is not None:
             cls._callback(data)
 
     @classmethod

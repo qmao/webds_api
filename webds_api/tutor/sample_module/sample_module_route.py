@@ -18,22 +18,33 @@ class SampleModuleRoute():
         return {"data": tutor._max}
 
     def post(handle, input_data):
-        count = input_data["count"]
+        print(input_data)
 
-        try:
-            if SampleModuleRoute._tutor is None:
-                tc = TouchcommManager().getInstance()
-                SampleModuleRoute._tutor = SampleModule(tc)
-                TutorThread.register_event(SampleModuleRoute.tune_done)
-                TutorThread.start(SampleModuleRoute._tutor.collect, args=(count, ))
+        if "count" in input_data:
+            #### {"count": 500}
+            count = input_data["count"]
+            try:
+                if SampleModuleRoute._tutor is None:
+                    tc = TouchcommManager().getInstance()
+                    SampleModuleRoute._tutor = SampleModule(tc)
+                    TutorThread.register_event(SampleModuleRoute.tune_done)
+                    TutorThread.start(SampleModuleRoute._tutor.collect, args=(count, ))
 
-                return {"status": "start"}
-            else:
-                return {"status": "previous tutor is still alive"}
-        except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    return {"status": "start"}
+                else:
+                    return {"status": "previous tutor is still alive"}
+            except Exception as e:
+                print(e)
+                message=str(e)
+                raise tornado.web.HTTPError(status_code=400, log_message=message)
+        elif "action" in input_data:
+            #### {"action": "terminate"}
+            action = input_data["action"]
+            if action == "terminate":
+                TutorThread.terminate()
+                return {"status": "terminated"}
+        else:
+            raise tornado.web.HTTPError(status_code=400, log_message="unsupported request")
 
     def tune_done(data):
         SampleModuleRoute._tutor.tune()
