@@ -73,6 +73,9 @@ def get_tutor(base):
         _condition = Condition()
         _callback = None
 
+        def __new__(cls, value, *args, **kwargs):
+            return base.__new__(base, value, *args, **kwargs)
+
         def terminate_thread(self):
             self._lock.acquire()
             if self._logger:
