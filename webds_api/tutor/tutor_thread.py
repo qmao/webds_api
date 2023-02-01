@@ -72,6 +72,7 @@ class TutorThread():
     _lock = Lock()
     _condition = Condition()
     _callback = None
+    _thread = None
 
     @classmethod
     def terminate(cls):

@@ -42,6 +42,7 @@ class SampleModuleRoute():
             action = input_data["action"]
             if action == "terminate":
                 TutorThread.terminate()
+                SampleModuleRoute._tutor = None
                 return {"status": "terminated"}
         else:
             raise tornado.web.HTTPError(status_code=400, log_message="unsupported request")
