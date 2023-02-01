@@ -3,6 +3,7 @@ from ...touchcomm.touchcomm_manager import TouchcommManager
 from .sample_module import SampleModule
 from ..tutor_thread import TutorThread
 from ..tutor_utils import EventQueue
+from ...configuration.config_handler import ConfigHandler
 
 class SampleModuleRoute():
     _tutor = None
@@ -24,15 +25,16 @@ class SampleModuleRoute():
             #### {"count": 500}
             count = input_data["count"]
             try:
-                if SampleModuleRoute._tutor is None:
-                    tc = TouchcommManager().getInstance()
-                    SampleModuleRoute._tutor = SampleModule(tc)
-                    TutorThread.register_event(SampleModuleRoute.tune_done)
-                    TutorThread.start(SampleModuleRoute._tutor.collect, args=(count, ))
+                if TutorThread.is_alive():
+                    return {"status": "previous thread is still running"}
 
-                    return {"status": "start"}
-                else:
-                    return {"status": "previous tutor is still alive"}
+                tc = TouchcommManager().getInstance()
+                ConfigHandler.init(tc)
+                SampleModuleRoute._tutor = SampleModule(tc)
+                TutorThread.register_event(SampleModuleRoute.tune_done)
+                TutorThread.start(SampleModuleRoute._tutor.collect, args=(count, ))
+
+                return {"status": "start"}
             except Exception as e:
                 print(e)
                 message=str(e)
@@ -44,12 +46,22 @@ class SampleModuleRoute():
                 TutorThread.terminate()
                 SampleModuleRoute._tutor = None
                 return {"status": "terminated"}
+            elif action == "commit":
+                ConfigHandler.commit_config()
+                return {"status": "committed"}
+            elif action == "apply":
+                config = SampleModuleRoute._tutor.get_configuration()
+                ConfigHandler.update_static_config(config)
+                return {"status": "applied"}
+            elif action == "cancel":
+                ConfigHandler.restore()
+                return {"status": "canceled"}
         else:
             raise tornado.web.HTTPError(status_code=400, log_message="unsupported request")
 
     def tune_done(data):
         SampleModuleRoute._tutor.tune()
-        EventQueue().push({"data": SampleModuleRoute._tutor._max})
+        config = SampleModuleRoute._tutor.get_configuration()
+        EventQueue().push({"data": config})
         EventQueue().close()
         TutorThread.register_event(None)
-        SampleModuleRoute._tutor = None

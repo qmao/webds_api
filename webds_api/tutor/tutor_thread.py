@@ -90,6 +90,8 @@ class TutorThread():
 
     @classmethod
     def start(cls, f, args=None):
+        if cls._thread is not None:
+            raise Exception("Sorry, previous thread is still running")
         cls._logger = Logger(cls._condition)
         cls._log_thread = threading.Thread(target=cls.track_thread)
         cls._thread = ReturnValueThread(target=f, args=args)
@@ -115,3 +117,7 @@ class TutorThread():
     @classmethod
     def register_event(cls, cb):
         cls._callback = cb
+
+    @classmethod
+    def is_alive(cls):
+        return cls._thread is not None

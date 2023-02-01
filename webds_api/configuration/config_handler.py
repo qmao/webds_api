@@ -2,9 +2,6 @@ import json
 import time
 import sys
 
-sys.path.append('/usr/local/lib/python3.7/dist-packages/webds_api/touchcomm')
-from touchcomm_manager import TouchcommManager
-
 
 class ConfigHandler():
     _static_config = {}
@@ -13,36 +10,53 @@ class ConfigHandler():
     _app_info = {}
     _tc = None
 
-    def __init__(self, tc):
-        self._app_info = tc.getInstance().getAppInfo()
-        self._tc = tc
+    @classmethod
+    def init(cls, tc):
+        cls._tc = tc
+        cls._app_info = tc.getAppInfo()
+        cls._static_config = cls.get_static_config()
+        cls._dynamic_config = cls.get_dynamic_config()
 
-    def getStaticConfig(self):
-        if not self._static_config:
-            self._static_config = self._tc.getInstance().getStaticConfig()
-            ### print("[Static Config]", self._static_config)
-            ### v = self._tc.getInstance().decoder.encodeStaticConfig(self._static_config)
+    @classmethod
+    def commit_config(cls):
+        return cls._tc.commitConfig()
+
+    @classmethod
+    def get_static_config(cls):
+        if not cls._static_config:
+            cls._static_config = cls._tc.getStaticConfig()
+            ### print("[Static Config]", cls._static_config)
+            ### v = cls._tc.decoder.encodeStaticConfig(cls._static_config)
             ### print("[Static Config hex]", ''.join('{:02x}'.format(x) for x in v))
-        return self._static_config
+        return cls._static_config
 
-    def getDynamicConfig(self):
-        if not self._dynamic_config:
-            self._dynamic_config = self._tc.getInstance().getDynamicConfig()
-            ### print("[Dynamic Config]", self._dynamic_config)
-            ### v = self._tc.getInstance().decoder.encodeDynamicConfig(self._dynamic_config)
+    @classmethod
+    def get_dynamic_config(cls):
+        if not cls._dynamic_config:
+            cls._dynamic_config = cls._tc.getDynamicConfig()
+            ### print("[Dynamic Config]", cls._dynamic_config)
+            ### v = cls._tc.decoder.encodeDynamicConfig(cls._dynamic_config)
             ### print("[Dynamic Config hex]", ''.join('{:02x}'.format(x) for x in v))
-        return self._dynamic_config
+        return cls._dynamic_config
 
-    def getTouchInfo(self):
-        if not self._touch_info:
-            self._touch_info = self._tc.getInstance().getTouchInfo()
-        return self._touch_info
+    @classmethod
+    def get_touch_info(cls):
+        if not cls._touch_info:
+            cls._touch_info = cls._tc.getTouchInfo()
+        return cls._touch_info
 
-    def getAppInfo(self):
-        return self._app_info
+    @classmethod
+    def get_app_info(cls):
+        return cls._app_info
 
-    def setStaticConfig(self, config):
-        tc = self._tc.getInstance()
+    @classmethod
+    def restore(cls):
+        cls.set_static_config(cls._static_config)
+        cls.set_dynamic_config(cls._dynamic_config)
+
+    @classmethod
+    def set_static_config(cls, config):
+        tc = cls._tc
         v = tc.decoder.encodeStaticConfig(config)
         try:
             tc.sendCommand(34, v)
@@ -61,39 +75,42 @@ class ConfigHandler():
             tc.getResponse()
             time.sleep(0.1)
 
-    def setDynamicConfig(self, config):
-        self._tc.getInstance().setDynamicConfig(config)
+    @classmethod
+    def set_dynamic_config(cls, config):
+        cls._tc.setDynamicConfig(config)
 
-    def update_static_config(self, configToSet):
+    @classmethod
+    def update_static_config(cls, configToSet):
         try:
             for key in configToSet:
                 config_value = configToSet[key]
                 print(key, '->', config_value)
                 if isinstance(config_value, list):
                     for idx, x in enumerate(config_value):
-                        self._static_config[key][idx] = int(x)
+                        cls._static_config[key][idx] = int(x)
                 else:
-                    self._static_config[key] = int(config_value)
+                    cls._static_config[key] = int(config_value)
 
-            self.setStaticConfig(self._static_config)
+            cls.set_static_config(cls._static_config)
 
         except Exception as e:
             raise Exception(str(e))
-        return self._static_config
+        return cls._static_config
 
-    def update_dynamic_config(self, configToSet):
+    @classmethod
+    def update_dynamic_config(cls, configToSet):
         try:
             for key in configToSet:
                 config_value = configToSet[key]
                 print(key, '->', config_value)
                 if isinstance(config_value, list):
                     for idx, x in enumerate(config_value):
-                        self._dynamic_config[key][idx] = int(x)
+                        cls._dynamic_config[key][idx] = int(x)
                 else:
-                    self._dynamic_config[key] = int(config_value)
+                    cls._dynamic_config[key] = int(config_value)
 
-            self.setDynamicConfig(self._dynamic_config)
+            cls.set_dynamicConfig(cls._dynamic_config)
 
         except Exception as e:
             raise Exception(str(e))
-        return self._dynamic_config
+        return cls._dynamic_config
