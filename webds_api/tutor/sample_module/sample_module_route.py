@@ -14,9 +14,9 @@ class SampleModuleRoute():
 
         tutor.collect(1)
         tutor.tune()
-
-        print(tutor._max)
-        return {"data": tutor._max}
+        config = tutor.get_configuration()
+        print(config)
+        return {"data": config}
 
     def post(handle, input_data):
         print(input_data)

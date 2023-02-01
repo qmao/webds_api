@@ -110,9 +110,10 @@ class TutorThread():
         if cls._logger:
             cls._logger.restore()
             cls._logger = None
-        cls._lock.release()
         if cls._callback is not None and cls._thread is not None:
             cls._callback(data)
+        cls._thread = None
+        cls._lock.release()
 
     @classmethod
     def register_event(cls, cb):
