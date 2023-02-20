@@ -89,12 +89,12 @@ class TutorThread():
         cls._lock.release()
 
     @classmethod
-    def start(cls, f, args=None):
+    def start(cls, f, args=(), kwargs={}):
         if cls.is_alive():
             raise Exception("Sorry, previous thread is still running")
         cls._logger = Logger(cls._condition)
         cls._log_thread = threading.Thread(target=cls.track_thread)
-        cls._thread = ReturnValueThread(target=f, args=args)
+        cls._thread = ReturnValueThread(target=f, args=args, kwargs=kwargs)
         cls._thread.start()
         cls._log_thread.start()
 
