@@ -110,7 +110,3 @@ class ProgrammerManager(object):
                 AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
         finally:
             tc.lock(False)
-
-            tc = TouchcommManager()
-            id = tc.identify()
-            print(id)
