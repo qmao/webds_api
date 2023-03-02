@@ -20,6 +20,7 @@ from .route.route_software_update  import SoftwareUpdateHandler
 from .route.route_tutor            import TutorHandler
 from .route.route_data_collection  import DataCollectionHandler
 from .route.route_testrail         import TestrailHandler
+from .route.route_register         import RegisterHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -58,6 +59,8 @@ def setup_handlers(web_app):
 
     testrail_pattern = url_path_join(base_url, "webds", "testrail/suites" + '(.*)')
 
+    register_pattern = url_path_join(base_url, "webds", "register")
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -74,7 +77,8 @@ def setup_handlers(web_app):
                 (reflash_pattern, ReflashHandler),
                 (tutor_pattern, TutorHandler),
                 (data_collection_pattern, DataCollectionHandler),
-                (testrail_pattern, TestrailHandler)
+                (testrail_pattern, TestrailHandler),
+                (register_pattern, RegisterHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)
