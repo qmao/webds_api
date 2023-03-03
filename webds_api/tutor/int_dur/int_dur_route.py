@@ -1,9 +1,7 @@
-import inspect
-import math
-import threading
 import time
 
 from ...touchcomm.touchcomm_manager import TouchcommManager
+from ..tutor_thread import TutorThread
 from ..tutor_utils import EventQueue
 from .int_dur import IntDurTuner
 
@@ -12,28 +10,11 @@ class IntDurRoute():
     _tutor = None
     _cancel = False
 
-    def _run_generator_thread(tutor_function, args):
-        try:
-            if args is None:
-                generator = tutor_function()
-            else:
-                generator = tutor_function(*args)
-
-            for progress in generator:
-                if IntDurRoute._cancel:
-                    EventQueue().push({"state": "terminated"})
-                    EventQueue().close()
-                    return
-                else:
-                    progress = math.floor(progress * 100)
-                    EventQueue().push({"state": "running", "progress": progress})
-
-            time.sleep(0.5)
-            EventQueue().push({"state": "completed"})
-        except:
-            EventQueue().push({"state": "terminated"})
-        finally:
-            EventQueue().close()
+    def _thread_completed(data):
+        time.sleep(0.5)
+        EventQueue().push({"state": "completed"})
+        EventQueue().close()
+        TutorThread.register_event(None)
 
     def post(handle, input_data):
         request = input_data["request"]
@@ -49,16 +30,18 @@ class IntDurRoute():
             raise Exception("No request specified: ", input_data)
 
         if request == "cancel":
-            IntDurRoute._cancel = True
+            TutorThread.terminate()
             return None
 
         retval = None
         try:
             tutor_function = getattr(IntDurRoute._tutor, request)
-            if inspect.isgeneratorfunction(tutor_function):
-                IntDurRoute._cancel = False
-                thread = threading.Thread(target=IntDurRoute._run_generator_thread, args=(tutor_function, args))
-                thread.start()
+            if "collect" in request:
+                TutorThread.register_event(IntDurRoute._thread_completed)
+                if args is None:
+                    TutorThread.start(tutor_function, args=())
+                else:
+                    TutorThread.start(tutor_function, args=args)
             else:
                 if args is None:
                     retval = tutor_function()

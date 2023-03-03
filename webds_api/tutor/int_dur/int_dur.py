@@ -1,3 +1,4 @@
+import json
 import math
 import threading
 import time
@@ -211,7 +212,7 @@ class IntDurTuner(object):
                         if report[0] == "raw":
                             count += 1
                             progress += 1
-                            yield progress / total
+                            print(json.dumps({"state": "running", "progress": math.floor(progress / total * 100)}))
                             report = report[1]["image"]
                             for pixel, data in enumerate(self._test_pixels):
                                 r = data["pixel"][self._row]
@@ -274,7 +275,7 @@ class IntDurTuner(object):
                     if report[0] == "raw":
                         count += 1
                         progress += 1
-                        yield progress / total
+                        print(json.dumps({"state": "running", "progress": math.floor(progress / total * 100)}))
                         report = report[1]["image"]
                         r = self._test_pixels[pixel]["pixel"][self._row]
                         c = self._test_pixels[pixel]["pixel"][self._col]
