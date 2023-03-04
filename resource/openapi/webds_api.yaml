@@ -58,6 +58,9 @@ tags:
 - name: "Tutor"
   description: "tutor endpoints"
 
+- name: "Register"
+  description: "register endpoints"
+
 paths:
   /packrat:
     get:
@@ -739,6 +742,33 @@ paths:
         '200':
           description: result
 
+  /register:
+    get:
+      tags:
+      - "Register"
+      summary: "SSE"
+      description: "Client requests register sse"
+      operationId: "get-register"
+      responses:
+        '200':
+          description: "JSON containing progress data of register command process"
+
+    post:
+      tags:
+      - "Register"
+      summary: "JSON containing path to .hex file in packrat cache to use for reprogram process"
+      description: "Client requests register Post"
+      operationId: "post-register"
+      requestBody:
+        description: "json content"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Register"
+      responses:
+        '201':
+          description: Created
 
 components:
   schemas:
@@ -926,6 +956,28 @@ components:
           items:
             type: string
             default: 'ResetPinTest'
+
+    Register:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+          - "read"
+          - "write"
+          default: "read"
+        sse:
+          type: boolean
+          enum:
+          - true
+          - false
+          default: true
+        data:
+          type: array
+          items:
+            type: integer
+            format: int32
+          default: [0x20000000, 0x2000000C]
 
 externalDocs:
   description: "Find out more about Swagger"
