@@ -7,26 +7,31 @@ from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 import threading
-from multiprocessing import Queue
+from multiprocessing import Queue, Value
+import queue
 import sys
 import time
 
 
 REGISTER_FOLDER = '/var/cache/syna/register/sb7900'
 REGISTER_FILE = 'regs_sb7900_riscv.json'
-g_thread = None
-g_queue = None
-g_terminate = False
 
 class RegisterHandler(APIHandler):
 
+    _thread = None
+    _queue = None
+    _terminate = False
+    _sse_terminate = Value('i', 0)
+
     def resetQueue():
-        global g_queue
-        if g_queue is None:
-            g_queue = Queue()
+        RegisterHandler._sse_terminate.value = 0
+        if RegisterHandler._queue is None:
+            RegisterHandler._queue = Queue()
         else:
-            while not g_queue.empty():
-                g_queue.get()
+            while not RegisterHandler._queue.empty():
+                RegisterHandler._queue.get()
+
+        print("RESET QUEUE DONE")
 
     def read_register_file(src):
         try:
@@ -40,6 +45,9 @@ class RegisterHandler(APIHandler):
         start_time = time.time()
 
         values = []
+
+        if len(address) == 0:
+            raise tornado.web.HTTPError(status_code=400, log_message="empty array")
 
         for r in address:
             try:
@@ -73,41 +81,73 @@ class RegisterHandler(APIHandler):
                 print(id['mode'])
 
         except Exception as e:
+            print("CHECK FW MODE EXCEPTION", str(e))
             raise e
+
+    def terminate_sse():
+        print("SEND SIGNAL TO TERMINATE QUEUE")
+        RegisterHandler._queue.put({"status": "terminate"})
+        RegisterHandler._sse_terminate.value = 1
+        print("WAIT QUEUE TO STOP")
+        for i in range(200):
+            if RegisterHandler._queue.empty():
+                break
+            time.sleep(0.01)
+
+        if RegisterHandler._queue.empty() == False:
+            print("[ERROR] SSE NOT CLOSE PROPERLY!!!")
 
     @tornado.web.authenticated
     def get(self):
         return self.getSSE()
 
     def sse_command(self, command, data):
-        print("sse command", command, data)
-        global g_queue
-        global g_terminate
-        tc = TouchcommManager().getInstance()
+        print("sse command", command)
+
+        try:
+            tc = TouchcommManager().getInstance()
+        except Exception as e:
+            RegisterHandler._terminate = True
+            print(str(e))
+            print("THREAD EXCEPTION TERMINATED")
+            return
+
         for idx, r in enumerate(data):
-            if g_terminate:
+            if RegisterHandler._terminate:
                 print("detect terminate flag")
                 break
             try:
                 if command == "read":
                     v = tc.readRegister(r)
-                    g_queue.put({"status": "run", "address": r, "value": v, "index": idx, "total": len(data)})
+                    message = {"status": "run", "address": r, "value": v, "index": idx, "total": len(data)}
                 elif command == "write":
                     v = tc.writeRegister(r["address"], r["value"])
-                    g_queue.put({"status": "run", "address": r["address"], "value": r["value"], "index": idx, "total": len(data)})
+                    if r["value"] == None:
+                        raise "value is None"
+                    message = {"status": "run", "address": r["address"], "value": r["value"], "index": idx, "total": len(data)}
             except Exception as e:
+                ### rw failed
                 print(e, r)
                 if command == "read":
-                    g_queue.put({"status": "run", "address": r, "value": None, "index": idx, "total": len(data)})
-                else:
-                    g_queue.put({"status": "run", "address": r["address"], "value": None, "index": idx, "total": len(data)})
+                    RegisterHandler._queue.put({"status": "run", "address": r, "value": None, "index": idx, "total": len(data)})
+                elif command == "write":
+                    message = {"status": "run", "address": r["address"], "value": None, "index": idx, "total": len(data)}
                 pass
 
-        if g_terminate:
-            g_queue.put({"status": "terminate"})
+            try:
+                RegisterHandler._queue.put(message)
+            except Exception as e:
+                ### user directly close jupyterlab
+                ### queue has been terminated
+                print(e, r)
+                print("THREAD EXCEPTION TERMINATED")
+                return
+
+        if RegisterHandler._terminate:
+            RegisterHandler.terminate_sse()
         else:
-            g_queue.put({"status": "done"})
-        print("thread will be terminated")
+            RegisterHandler._queue.put({"status": "done"})
+        print("THREAD NORMAL TERMINATED")
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
@@ -129,44 +169,58 @@ class RegisterHandler(APIHandler):
     def getSSE(self):
         print("SSE LOOP")
         name="Register"
-        global g_queue
-        try:
-            while True:
-                if g_queue is None:
+
+        while True:
+            try:
+                if RegisterHandler._queue is None:
                     yield tornado.gen.sleep(0.1)
                     continue
 
-                token = g_queue.get()
+                token = RegisterHandler._queue.get()
                 if token is not None:
+                    ### print("----**** SSE", token)
                     yield self.publish(name, json.dumps(token))
 
                 if token['status'] == 'done' or token['status'] == 'terminate':
-                    print("terminate token", token)
+                    print("sse terminate token", token)
                     break
+
+                if RegisterHandler._sse_terminate.value == 1:
+                    print("sse terminate value detect")
+                    break
+
                 yield tornado.gen.sleep(0.1)
 
-        except StreamClosedError:
-            print("Stream Closed!")
-            pass
+            except StreamClosedError:
+                print("Stream Closed!")
+                break
 
-        except Exception as e:
-            ### TypeError
-            ### BrokenPipeError
-            print("Oops! get report", e.__class__, "occurred.")
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            except Exception as e:
+                ### TypeError
+                ### BrokenPipeError
+                print("Oops! get report", e.__class__, "occurred.")
+                print(e)
 
-        finally:
-            print("terminate")
+        RegisterHandler._terminate = True
+        while not RegisterHandler._queue.empty():
+            RegisterHandler._queue.get()
+
+        print("SSE TERMINATED")
+
+
+    def check_thread_status():
+        if RegisterHandler._thread is not None and RegisterHandler._thread.is_alive():
+            RegisterHandler._terminate = True
+            RegisterHandler._thread.join()
+        print("THREAD IS INACTIVE")
+
+        RegisterHandler._terminate = False
+        print("THREAD STATUS CHECK PASS")
 
     @tornado.web.authenticated
     def post(self):
         data = self.get_json_body()
-        print(data)
         response = {}
-        global g_terminate
-        global g_thread
 
         if "command" in data:
             command = data["command"]
@@ -186,18 +240,20 @@ class RegisterHandler(APIHandler):
 
             elif command == "terminate":
                 print("terminate")
-                g_terminate = True
-                g_thread.join()
+                RegisterHandler._terminate = True
+                RegisterHandler._thread.join()
+                RegisterHandler.terminate_sse()
                 self.finish(json.dumps({"status": "terminate"}))
                 return
 
             elif command == "check_mode":
+                RegisterHandler.check_thread_status()
                 try:
                     RegisterHandler.check_mode()
                     self.finish(json.dumps({"status": "done"}))
                 except Exception as e:
                     print(str(e))
-                    self.finish(json.dumps({"status": "failed", "error": str(e)}))
+                    raise tornado.web.HTTPError(status_code=400, log_message=str(e))
                 return
 
             if "sse" in data:
@@ -206,10 +262,11 @@ class RegisterHandler(APIHandler):
                 sse = False
 
             if sse:
+                RegisterHandler.check_thread_status()
                 RegisterHandler.resetQueue()
-                g_terminate = False
-                g_thread = threading.Thread(target=self.sse_command, args=(command, data["data"]))
-                g_thread.start()
+                print("QUEUE RESET")
+                RegisterHandler._thread = threading.Thread(target=self.sse_command, args=(command, data["data"]))
+                RegisterHandler._thread.start()
 
                 self.finish(json.dumps({
                   "status": "start",
@@ -232,6 +289,9 @@ class RegisterHandler(APIHandler):
                 address = data["data"]
                 value = []
                 alist = []
+
+                if len(address) == 0:
+                    raise tornado.web.HTTPError(status_code=400, log_message="empty array")
 
                 for r in address:
                     try:
