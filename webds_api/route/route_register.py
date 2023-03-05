@@ -12,7 +12,8 @@ import sys
 import time
 
 
-REGISTER_FOLDER = '/home/dsdkuser/jupyter/workspace/'
+REGISTER_FOLDER = '/var/cache/syna/register/sb7900'
+REGISTER_FILE = 'regs_sb7900_riscv.json'
 g_thread = None
 g_queue = None
 g_terminate = False
@@ -32,9 +33,8 @@ class RegisterHandler(APIHandler):
             with open (src, 'r' ) as f:
                 content = f.read()
                 return content
-        except:
-            print('[ERROR ] ', dst, " not created!!!!!")
-            return None
+        except Exception as e:
+            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
 
     def read_registers(tc, address):
         start_time = time.time()
@@ -73,8 +73,7 @@ class RegisterHandler(APIHandler):
                 print(id['mode'])
 
         except Exception as e:
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise e
 
     @tornado.web.authenticated
     def get(self):
@@ -174,12 +173,14 @@ class RegisterHandler(APIHandler):
 
             print(command)
             if command == "init":
-                ### mode check
-                RegisterHandler.check_mode()
-
                 ### read register file
-                fname = os.path.join(REGISTER_FOLDER, 'regs_sb7900_riscv.json')
-                content = RegisterHandler.read_register_file(fname)
+                try:
+                    fname = os.path.join(REGISTER_FOLDER, REGISTER_FILE)
+                    content = RegisterHandler.read_register_file(fname)
+                except Exception as e:
+                    print(str(e))
+                    raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+
                 self.finish(json.dumps(content))
                 return
 
@@ -188,6 +189,15 @@ class RegisterHandler(APIHandler):
                 g_terminate = True
                 g_thread.join()
                 self.finish(json.dumps({"status": "terminate"}))
+                return
+
+            elif command == "check_mode":
+                try:
+                    RegisterHandler.check_mode()
+                    self.finish(json.dumps({"status": "done"}))
+                except Exception as e:
+                    print(str(e))
+                    self.finish(json.dumps({"status": "failed", "error": str(e)}))
                 return
 
             if "sse" in data:
