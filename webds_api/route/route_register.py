@@ -297,10 +297,11 @@ class RegisterHandler(APIHandler):
                     try:
                         ###print("write", hex(r["address"]),  r["value"])
                         v = tc.writeRegister(r["address"], r["value"])
+                        alist.append(r["value"])
                     except Exception as e:
                         status.append({"address": hex(r["address"]), "error": str(e) })
+                        alist.append(None)
                         pass
-                    alist.append(r["value"])
 
                 self.finish(json.dumps({
                   "data": alist,
