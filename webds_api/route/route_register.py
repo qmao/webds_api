@@ -13,7 +13,7 @@ import sys
 import time
 
 
-REGISTER_FOLDER = '/var/cache/syna/register/sb7900'
+REGISTER_FOLDER = '/var/cache/syna/register_map/sb7900'
 REGISTER_FILE = 'regs_sb7900_riscv.json'
 
 class RegisterHandler(APIHandler):
