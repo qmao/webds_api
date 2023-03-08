@@ -70,15 +70,17 @@ class RegisterHandler(APIHandler):
                 print("In RomBoot Mode")
             elif id['mode'] == 'application':
                 print("In Application Mode")
-                ###tc.unlockPrivate()
+                tc.unlockPrivate()
 
-                print("Force jump to RomBoot Mode")
-                tc.enterRomBootloaderMode()
-                id = tc.identify()
-                print(id['mode'])
-                print("Jump to RomBoot Mode done")
+                ###print("Force jump to RomBoot Mode")
+                ###tc.enterRomBootloaderMode()
+                ###id = tc.identify()
+                ###print(id['mode'])
+                ###print("Jump to RomBoot Mode done")
             else:
                 print(id['mode'])
+
+            return id['mode']
 
         except Exception as e:
             print("CHECK FW MODE EXCEPTION", str(e))
@@ -249,8 +251,8 @@ class RegisterHandler(APIHandler):
             elif command == "check_mode":
                 RegisterHandler.check_thread_status()
                 try:
-                    RegisterHandler.check_mode()
-                    self.finish(json.dumps({"status": "done"}))
+                    mode = RegisterHandler.check_mode()
+                    self.finish(json.dumps({"status": "done", "mode": mode}))
                 except Exception as e:
                     print(str(e))
                     raise tornado.web.HTTPError(status_code=400, log_message=str(e))
