@@ -42,8 +42,8 @@ class ConnectionSettings:
     def deleteObject(obj):
         with open(webds.CONNECTION_SETTINGS_FILE) as json_file:
             data = json.load(json_file)
-        if obj in data:
-            del data[obj]
+        if obj in data['custom']:
+            del data['custom'][obj]
             ConnectionSettings.updateConnectionJsonFile(data)
         else:
             print(obj, " not exist");
@@ -133,7 +133,9 @@ class SettingsHandler(APIHandler):
             action = input_data["action"]
             print(action)
             if action == "reset":
-                ConnectionSettings.deleteObject('custom')
+                dic = ConnectionSettings.getValue('custom')
+                for key in dic:
+                    ConnectionSettings.deleteObject(key)
             elif action == "update":
                 ConnectionSettings.setValue('custom', input_data["value"])
 
