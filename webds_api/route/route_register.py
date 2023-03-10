@@ -112,6 +112,7 @@ class RegisterHandler(APIHandler):
             RegisterHandler._terminate = True
             print(str(e))
             print("THREAD EXCEPTION TERMINATED")
+            RegisterHandler.terminate_sse()
             return
 
         for idx, r in enumerate(data):
@@ -143,6 +144,7 @@ class RegisterHandler(APIHandler):
                 ### queue has been terminated
                 print(e, r)
                 print("THREAD EXCEPTION TERMINATED")
+                RegisterHandler.terminate_sse()
                 return
 
         if RegisterHandler._terminate:
