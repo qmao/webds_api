@@ -180,7 +180,7 @@ class RegisterHandler(APIHandler):
                     yield tornado.gen.sleep(0.1)
                     continue
 
-                token = RegisterHandler._queue.get()
+                token = RegisterHandler._queue.get(False)
                 if token is not None:
                     ### print("----**** SSE", token)
                     yield self.publish(name, json.dumps(token))
@@ -193,6 +193,9 @@ class RegisterHandler(APIHandler):
                     print("sse terminate value detect")
                     break
 
+                yield tornado.gen.sleep(0.1)
+
+            except Queue.Empty:
                 yield tornado.gen.sleep(0.1)
 
             except StreamClosedError:
