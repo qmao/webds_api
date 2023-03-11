@@ -7,8 +7,7 @@ from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 import threading
-from multiprocessing import Queue, Value
-import queue
+from multiprocessing import Queue, Lock
 import sys
 import time
 
@@ -21,10 +20,14 @@ class RegisterHandler(APIHandler):
     _thread = None
     _queue = None
     _terminate = False
-    _sse_terminate = Value('i', 0)
+    _sse_lock = Lock()
 
     def resetQueue():
-        RegisterHandler._sse_terminate.value = 0
+        if RegisterHandler._sse_lock.acquire(False):
+            RegisterHandler._sse_lock.release()
+        else:
+            RegisterHandler._sse_lock.release()
+
         if RegisterHandler._queue is None:
             RegisterHandler._queue = Queue()
         else:
@@ -86,18 +89,18 @@ class RegisterHandler(APIHandler):
             print("CHECK FW MODE EXCEPTION", str(e))
             raise e
 
+    def check_sse_terminated():
+        print("CHECK SSE THREAD TERMINATE...")
+        for i in range(200):
+            if RegisterHandler._sse_lock.acquire(False):
+                return
+            time.sleep(0.01)
+        print("[ERROR] SSE THREAD TEMINATED PROPERLY!!!")
+
     def terminate_sse():
         print("SEND SIGNAL TO TERMINATE QUEUE")
-        RegisterHandler._queue.put({"status": "terminate"})
-        RegisterHandler._sse_terminate.value = 1
-        print("WAIT QUEUE TO STOP")
-        for i in range(200):
-            if RegisterHandler._queue.empty():
-                break
-            time.sleep(0.01)
-
-        if RegisterHandler._queue.empty() == False:
-            print("[ERROR] SSE NOT CLOSE PROPERLY!!!")
+        if RegisterHandler._queue:
+            RegisterHandler._queue.put({"status": "terminate"})
 
     @tornado.web.authenticated
     def get(self):
@@ -139,6 +142,7 @@ class RegisterHandler(APIHandler):
 
             try:
                 RegisterHandler._queue.put(message)
+                ###print("DEBUG:", {"status": "run", "address": r, "value": None, "index": idx, "total": len(data)})
             except Exception as e:
                 ### user directly close jupyterlab
                 ### queue has been terminated
@@ -174,44 +178,38 @@ class RegisterHandler(APIHandler):
         print("SSE LOOP")
         name="Register"
 
-        while True:
-            try:
+        RegisterHandler._sse_lock.acquire()
+        try:
+            while True:
                 if RegisterHandler._queue is None:
-                    yield tornado.gen.sleep(0.1)
                     continue
 
-                token = RegisterHandler._queue.get(False)
+                token = RegisterHandler._queue.get()
                 if token is not None:
-                    print("----**** SSE", token)
                     yield self.publish(name, json.dumps(token))
 
                 if token['status'] == 'done' or token['status'] == 'terminate':
                     print("sse terminate token", token)
                     break
 
-                if RegisterHandler._sse_terminate.value == 1:
-                    print("sse terminate value detect")
-                    break
-
                 yield tornado.gen.sleep(0.1)
 
-            except queue.Empty:
-                yield tornado.gen.sleep(0.1)
+        except StreamClosedError:
+            print("Stream Closed!")
+            pass
 
-            except StreamClosedError:
-                print("Stream Closed!")
-                break
-
-            except Exception as e:
-                ### TypeError
-                ### BrokenPipeError
-                print("Oops! get report", e.__class__, "occurred.")
-                print(e)
+        except Exception as e:
+            ### TypeError
+            ### BrokenPipeError
+            print("Oops! get report", e.__class__, "occurred.")
+            print(e)
+            pass
 
         RegisterHandler._terminate = True
         while not RegisterHandler._queue.empty():
             RegisterHandler._queue.get()
 
+        RegisterHandler._sse_lock.release()
         print("SSE TERMINATED")
 
 
@@ -246,10 +244,9 @@ class RegisterHandler(APIHandler):
                 return
 
             elif command == "terminate":
-                print("terminate")
+                print("terminate request")
                 RegisterHandler._terminate = True
                 RegisterHandler._thread.join()
-                RegisterHandler.terminate_sse()
                 self.finish(json.dumps({"status": "terminate"}))
                 return
 
