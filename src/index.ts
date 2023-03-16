@@ -7,8 +7,6 @@ import { ICommandPalette } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-import { requestAPI } from './handler';
-
 declare global {
     var source: EventSource;
 }
