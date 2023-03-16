@@ -27,18 +27,6 @@ const extension: JupyterFrontEndPlugin<void> = {
     launcher: ILauncher | null
   ) => {
     console.log('JupyterLab extension server-extension is activated!');
-
-
-    // GET request
-    try {
-      const data = await requestAPI<any>('general');
-      console.log(data);
-    } catch (reason) {
-      console.error(`Error on GET /webds_api/general.\n${reason}`);
-    }
-	
-	
-
 	},
 };
 
