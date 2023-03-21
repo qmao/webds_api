@@ -61,6 +61,9 @@ tags:
 - name: "Register"
   description: "register endpoints"
 
+- name: "Passthrough"
+  description: "passthrough endpoints"
+
 paths:
   /packrat:
     get:
@@ -770,6 +773,58 @@ paths:
         '201':
           description: Created
 
+  /passthrough/{file}:
+    get:
+      tags:
+      - "Passthrough"
+      summary: "Client requests passthrough get"
+      operationId: "get-passthrough-module"
+      parameters:
+      - name: file
+        in: path
+        required: true
+        schema:
+          type: string
+          default: "demo"
+      - name: function
+        in: query
+        description: "Function name"
+        schema:
+          type: string
+          default: "demo_get_with_param"
+      - name: param
+        in: query
+        description: "Function parameters"
+        schema:
+          default: 1
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+    post:
+      tags:
+      - "Passthrough"
+      summary: "JSON containing passthrough post"
+      operationId: "post-passthrough-module"
+      parameters:
+      - name: file
+        in: path
+        required: true
+        schema:
+          type: string
+          default: "demo"
+      requestBody:
+        description: "passthrough json"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PassthroughParam"
+      responses:
+        '200':
+          description: result
+
 components:
   schemas:
     SettingsConnection:
@@ -978,6 +1033,15 @@ components:
             type: integer
             format: int32
           default: [0x20000000, 0x2000000C]
+
+    PassthroughParam:
+      type: object
+      properties:
+        function:
+          type: string
+          default: "demo_post"
+        param:
+          default: [1,2,3]
 
 externalDocs:
   description: "Find out more about Swagger"

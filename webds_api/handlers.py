@@ -21,6 +21,7 @@ from .route.route_tutor            import TutorHandler
 from .route.route_data_collection  import DataCollectionHandler
 from .route.route_testrail         import TestrailHandler
 from .route.route_register         import RegisterHandler
+from .route.route_passthrough      import PassthroughHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -61,6 +62,9 @@ def setup_handlers(web_app):
 
     register_pattern = url_path_join(base_url, "webds", "register")
 
+    passthrough_pattern = url_path_join(base_url, "webds", "passthrough/" + '(.*)')
+
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -78,7 +82,8 @@ def setup_handlers(web_app):
                 (tutor_pattern, TutorHandler),
                 (data_collection_pattern, DataCollectionHandler),
                 (testrail_pattern, TestrailHandler),
-                (register_pattern, RegisterHandler)
+                (register_pattern, RegisterHandler),
+                (passthrough_pattern, PassthroughHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)
