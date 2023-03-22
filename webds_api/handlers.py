@@ -14,7 +14,6 @@ from .route.route_command          import CommandHandler
 from .route.route_report           import ReportHandler
 from .route.route_settings         import SettingsHandler
 from .route.route_production_tests import ProductionTestsHandler
-from .route.route_gear_selection   import GearSelectionHandler
 from .route.route_config           import ConfigHandler
 from .route.route_software_update  import SoftwareUpdateHandler
 from .route.route_tutor            import TutorHandler
@@ -48,8 +47,6 @@ def setup_handlers(web_app):
 
     production_tests_pattern = url_path_join(base_url, "webds", "production-tests" + '(.*)')
 
-    gear_selection_pattern = url_path_join(base_url, "webds", "gear-selection")
-
     config_pattern = url_path_join(base_url, "webds", "config/" + '(.*)')
 
     software_update_pattern = url_path_join(base_url, "webds", "software-update")
@@ -75,7 +72,6 @@ def setup_handlers(web_app):
                 (report_pattern, ReportHandler),
                 (settings_pattern, SettingsHandler),
                 (production_tests_pattern, ProductionTestsHandler),
-                (gear_selection_pattern, GearSelectionHandler),
                 (config_pattern, ConfigHandler),
                 (software_update_pattern, SoftwareUpdateHandler),
                 (reflash_pattern, ReflashHandler),
