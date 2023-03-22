@@ -21,6 +21,7 @@ class RegisterHandler(APIHandler):
     _queue = None
     _terminate = False
     _sse_lock = Lock()
+    _app_mode = None
 
     def resetQueue():
         if RegisterHandler._sse_lock.acquire(False):
@@ -54,7 +55,7 @@ class RegisterHandler(APIHandler):
 
         for r in address:
             try:
-                v = tc.readRegister(r)
+                v = tc.readRegister(r, RegisterHandler._app_mode)
                 values.append(v)
             except Exception as e:
                 print(e, hex(r))
@@ -71,9 +72,11 @@ class RegisterHandler(APIHandler):
 
             if id['mode'] == 'rombootloader':
                 print("In RomBoot Mode")
+                RegisterHandler._app_mode = False
             elif id['mode'] == 'application':
                 print("In Application Mode")
                 tc.unlockPrivate()
+                RegisterHandler._app_mode = True
 
                 ###print("Force jump to RomBoot Mode")
                 ###tc.enterRomBootloaderMode()
@@ -124,10 +127,10 @@ class RegisterHandler(APIHandler):
                 break
             try:
                 if command == "read":
-                    v = tc.readRegister(r)
+                    v = tc.readRegister(r, RegisterHandler._app_mode)
                     message = {"status": "run", "address": r, "value": v, "index": idx, "total": len(data)}
                 elif command == "write":
-                    v = tc.writeRegister(r["address"], r["value"])
+                    v = tc.writeRegister(r["address"], r["value"], RegisterHandler._app_mode)
                     if r["value"] == None:
                         raise "value is None"
                     message = {"status": "run", "address": r["address"], "value": r["value"], "index": idx, "total": len(data)}
@@ -300,7 +303,7 @@ class RegisterHandler(APIHandler):
                 for r in address:
                     try:
                         ###print("write", hex(r["address"]),  r["value"])
-                        v = tc.writeRegister(r["address"], r["value"])
+                        v = tc.writeRegister(r["address"], r["value"], RegisterHandler._app_mode)
                         alist.append(r["value"])
                     except Exception as e:
                         status.append({"address": hex(r["address"]), "error": str(e) })
