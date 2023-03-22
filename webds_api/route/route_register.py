@@ -122,6 +122,7 @@ class RegisterHandler(APIHandler):
             return
 
         for idx, r in enumerate(data):
+            ##start_time = time.time()
             if RegisterHandler._terminate:
                 print("detect terminate flag")
                 break
@@ -153,6 +154,7 @@ class RegisterHandler(APIHandler):
                 print("THREAD EXCEPTION TERMINATED")
                 RegisterHandler.terminate_sse()
                 return
+            ##print("--- %s seconds ---" % (time.time() - start_time))
 
         if RegisterHandler._terminate:
             RegisterHandler.terminate_sse()
@@ -195,7 +197,7 @@ class RegisterHandler(APIHandler):
                     print("sse terminate token", token)
                     break
 
-                yield tornado.gen.sleep(0.1)
+                yield tornado.gen.sleep(0.001)
 
         except StreamClosedError:
             print("Stream Closed!")
