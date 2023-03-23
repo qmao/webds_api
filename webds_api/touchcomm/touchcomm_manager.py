@@ -28,7 +28,7 @@ class TouchcommManager(object):
         try:
             if self._tc is not None:
                 version = self._tc.comm.send_and_check("version")
-            if self._tc is None or version['content'] == 'disconnect':
+            if self._tc is None or version['content'] == 'disconnect' or version['content'] == 'power-off':
                 self._tc = TouchComm.make(
                                 protocols='report_streamer',
                                 server='127.0.0.1',
