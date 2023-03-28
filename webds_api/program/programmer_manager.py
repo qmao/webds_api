@@ -34,35 +34,32 @@ class ProgrammerManager(object):
         if id['mode'] == 'application':
             if id['partNumber'][0:2] == 'SB':
                 return {"is_multi": False, "is_smart_bridge": True}
-            feature = tc.getInstance().getFeatures()
+            feature = tc.function("getFeatures")
             if feature['separateChip']:
                 return {"is_multi": True, "is_smart_bridge": False}
             else:
                 return {"is_multi": False, "is_smart_bridge": False}
 
-            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE)
+            tc.function("sendCommand", tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE)
             id = tc.identify()
             print(id)
 
         if id['mode'] == 'tddi_bootloader':
-            tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
+            tc.function("sendCommand" , tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
             id = tc.identify()
             print(id)
 
         if (id['mode'] == 'tddi_slave_bootloader'):
             return True
-            ##tc.getInstance().sendCommand(tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
-            ##id = tc.identify()
-            ##print(id)
 
         if (id['mode'] == 'rombootloader'):
             try:
                 if id['partNumber'][0:2] == 'SB':
                     is_smart_bridge = True
                 else:
-                    rom_id = tc.getInstance().romIdentify()
+                    rom_id = tc.function("romIdentify")
                     print(rom_id)
-                    info = tc.getInstance().getRomBootInfo()
+                    info = tc.function("getRomBootInfo")
                     print(info)
                     is_multi = True
             except Exception as e:

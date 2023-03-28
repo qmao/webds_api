@@ -196,7 +196,7 @@ class ProgramHandler(APIHandler):
             else:
                 print("Erase and program done.")
 
-                TouchcommManager().getInstance()
+                ##print(TouchcommManager().identify())
                 handler.set_message("Programmed with " + filename)
                 handler.set_status("success")
 
