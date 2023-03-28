@@ -40,12 +40,12 @@ class ProgrammerManager(object):
             else:
                 return {"is_multi": False, "is_smart_bridge": False}
 
-            tc.function("sendCommand", tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE)
+            tc.function("sendCommand", args = [tc.getInstance().TOUCHCOMM_CMD_ENTER_BOOTLOADER_MODE])
             id = tc.identify()
             print(id)
 
         if id['mode'] == 'tddi_bootloader':
-            tc.function("sendCommand" , tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE)
+            tc.function("sendCommand" , args = [tc.getInstance().TOUCHCOMM_CMD_ENTER_ROM_BOOTLOADER_MODE])
             id = tc.identify()
             print(id)
 

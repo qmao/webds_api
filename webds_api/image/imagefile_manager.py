@@ -20,7 +20,7 @@ def int2le(foo, num_bytes):
 
 class ImageFileHandler(APIHandler):
     def _update_config(body):
-        tc = TouchcommManager().getInstance()
+        tc = TouchcommManager()
         num_areas = le2int(body[4:8])
         config_offset = 0
         for i in range(num_areas):
@@ -35,22 +35,22 @@ class ImageFileHandler(APIHandler):
 
         config_size = le2int(body[config_offset+28:config_offset+32])
 
-        identify = tc.identify()
+        identify = tc.function("identify")
         if le2int(body[config_offset+36+14:config_offset+36+18]) != identify["buildID"]:
             raise RuntimeError("Mismatching build IDs.")
 
-        app_info = tc.getAppInfo()
-        tc.enterBootloaderMode()
-        boot_info = tc.getBootInfo()
+        app_info = tc.function("getAppInfo")
+        tc.function("enterBootloaderMode")
+        boot_info = tc.function("getBootInfo")
 
         first_word = app_info["appConfigBlock"] * boot_info["writeBlockWords"]
         num_words = config_size / 2
 
-        config_words = tc.readFlash(first_word, num_words)
+        config_words = tc.function("readFlash", args = [first_word, num_words])
         config_bytes = []
         for x in config_words:
             config_bytes += int2le(x, 2)
-        tc.runApplicationFirmware()
+        tc.function("runApplicationFirmware")
 
         body[config_offset+36:config_offset+36+config_size] = config_bytes
 
