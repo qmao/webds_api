@@ -11,24 +11,24 @@ from ..touchcomm.touchcomm_manager import TouchcommManager
 class ConfigHandler(APIHandler):
 
     def _set_static_config(static):
-        _tc = TouchcommManager().getInstance()
-        _tc.getAppInfo()
+        tc = TouchcommManager()
+        tc.function("getAppInfo")
 
-        arg = _tc.decoder.encodeStaticConfig(static)
+        arg = tc.getInstance().decoder.encodeStaticConfig(static)
 
         try:
-            _tc.sendCommand(34, arg)
-            _tc.getResponse()
+            tc.function("sendCommand", args = [34, arg])
+            tc.function("getResponse")
         except:
             try:
-                _tc.sendCommand(56)
-                _tc.getResponse()
+                tc.function("sendCommand", args = [56])
+                tc.function("getResponse")
 
-                _tc.sendCommand(57, arg)
-                _tc.getResponse()
+                tc.function("sendCommand", args = [57, arg])
+                tc.function("getResponse")
 
-                _tc.sendCommand(55)
-                _tc.getResponse()
+                tc.function("sendCommand", args = [55])
+                tc.function("getResponse")
                 time.sleep(0.1)
             except Exception as e:
                 print("Set static config failed:", str(e))

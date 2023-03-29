@@ -196,7 +196,6 @@ class ReflashHandler(APIHandler):
                 handler.set_progress(-1)
                 handler.set_status("error")
             else:
-                TouchcommManager().getInstance()
                 handler.set_message("Reflash with " + filename)
                 handler.set_status("success")
 
