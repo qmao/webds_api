@@ -55,7 +55,7 @@ class RegisterHandler(APIHandler):
 
         for r in address:
             try:
-                v = tc.readRegister(r, RegisterHandler._app_mode)
+                v = tc.function("readRegister", args = [r, RegisterHandler._app_mode])
                 values.append(v)
             except Exception as e:
                 print(e, hex(r))
@@ -67,15 +67,15 @@ class RegisterHandler(APIHandler):
 
     def check_mode():
         try:
-            tc = TouchcommManager().getInstance()
-            id = tc.identify()
+            tc = TouchcommManager()
+            id = tc.function("identify")
 
             if id['mode'] == 'rombootloader':
                 print("In RomBoot Mode")
                 RegisterHandler._app_mode = False
             elif id['mode'] == 'application':
                 print("In Application Mode")
-                tc.unlockPrivate()
+                tc.function("unlockPrivate")
                 RegisterHandler._app_mode = True
 
                 ###print("Force jump to RomBoot Mode")
@@ -113,7 +113,7 @@ class RegisterHandler(APIHandler):
         print("sse command", command)
 
         try:
-            tc = TouchcommManager().getInstance()
+            tc = TouchcommManager()
         except Exception as e:
             RegisterHandler._terminate = True
             print(str(e))
@@ -128,10 +128,10 @@ class RegisterHandler(APIHandler):
                 break
             try:
                 if command == "read":
-                    v = tc.readRegister(r, RegisterHandler._app_mode)
+                    v = tc.function("readRegister", args = [r, RegisterHandler._app_mode])
                     message = {"status": "run", "address": r, "value": v, "index": idx, "total": len(data)}
                 elif command == "write":
-                    v = tc.writeRegister(r["address"], r["value"], RegisterHandler._app_mode)
+                    v = tc.function("writeRegister", args = [r["address"], r["value"], RegisterHandler._app_mode])
                     if r["value"] == None:
                         raise "value is None"
                     message = {"status": "run", "address": r["address"], "value": r["value"], "index": idx, "total": len(data)}
@@ -284,7 +284,7 @@ class RegisterHandler(APIHandler):
 
             elif command == "read":
                 alist = data["data"]
-                tc = TouchcommManager().getInstance()
+                tc = TouchcommManager()
                 value = RegisterHandler.read_registers(tc, alist)
 
                 self.finish(json.dumps({
@@ -294,7 +294,7 @@ class RegisterHandler(APIHandler):
 
             elif command == "write":
                 status = []
-                tc = TouchcommManager().getInstance()
+                tc = TouchcommManager()
                 address = data["data"]
                 value = []
                 alist = []
@@ -305,7 +305,7 @@ class RegisterHandler(APIHandler):
                 for r in address:
                     try:
                         ###print("write", hex(r["address"]),  r["value"])
-                        v = tc.writeRegister(r["address"], r["value"], RegisterHandler._app_mode)
+                        v = tc.function("writeRegister", [r["address"], r["value"], RegisterHandler._app_mode])
                         alist.append(r["value"])
                     except Exception as e:
                         status.append({"address": hex(r["address"]), "error": str(e) })
