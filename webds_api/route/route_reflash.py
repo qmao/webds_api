@@ -185,9 +185,9 @@ class ReflashHandler(APIHandler):
         try:
             handler.set_status("start")
 
-            tc = TouchcommManager().getInstance()
-            tc.reflashImageFile(filename)
-            id = tc.runApplicationFirmware()
+            tc = TouchcommManager()
+            tc.function("reflashImageFile", args = [filename])
+            id = tc.function("runApplicationFirmware")
             print(id)
 
             if handler.get_progress() != 100:
