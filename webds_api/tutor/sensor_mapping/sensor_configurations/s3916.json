@@ -109,17 +109,15 @@
             "6:20"
          ],
          "configs":{
-            "tchCbcGlobalConfigCtl1[0].cbcGlobalConn":1,
-            "tchCbcGlobalConfigCtl1[1].cbcGlobalConn":0,
-            "tchCbcGlobalConfigCtl1[2].cbcGlobalConn":0,
-            "tchCbcGlobalConfigCtl1[3].cbcGlobalConn":1,
+            "tchCbcGlobalConfigCtl1[4].cbcGlobalConn":9,
             "cbcGlobalConn121":[
                0,
                0,
                0,
                0,
                0,
-               0
+               0,
+			   0
             ]
          }
       },
@@ -129,17 +127,15 @@
             "6:21"
          ],
          "configs":{
-            "tchCbcGlobalConfigCtl1[0].cbcGlobalConn":1,
-            "tchCbcGlobalConfigCtl1[1].cbcGlobalConn":0,
-            "tchCbcGlobalConfigCtl1[2].cbcGlobalConn":0,
-            "tchCbcGlobalConfigCtl1[3].cbcGlobalConn":1,
+            "tchCbcGlobalConfigCtl1[4].cbcGlobalConn":9,
             "cbcGlobalConn121":[
                0,
                0,
                0,
                0,
                1,
-               0
+               0,
+			   0
             ]
          }
       }
