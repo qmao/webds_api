@@ -105,7 +105,7 @@ class ProductionTestsManager():
             if "from Comm2Functions import *" in content:
                 namespace = ""
             else:
-                namespace = "Comm2Functions"
+                namespace = "Comm2Functions."
 
             assertStr = '\n\ndef test_main():\n    ' + namespace + 'Init("' + test.group() + '")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         except:
