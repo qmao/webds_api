@@ -101,9 +101,15 @@ class ProductionTestsManager():
         try:
             regex = re.compile('(?<=metadata name=\")(\w+([-]?)([\s*]?))+')
             test = regex.search(content)
-            assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("' + test.group() + '")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+
+            if "from Comm2Functions import *" in content:
+                namespace = ""
+            else:
+                namespace = "Comm2Functions"
+
+            assertStr = '\n\ndef test_main():\n    ' + namespace + 'Init("' + test.group() + '")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         except:
-            assertStr = '\n\ndef test_main():\n    Comm2Functions.Init("")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
+            assertStr = '\n\ndef test_main():\n    ' + namespace + 'Init("")\n    main()\n    assert Comm2Functions.GetTestResult() == True, \'Test failed\''
         finalContent = content + assertStr
         finalContent = finalContent.replace("\\\\TestStudio\\\\", "/run/")
 
