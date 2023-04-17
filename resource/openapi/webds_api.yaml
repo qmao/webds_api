@@ -438,6 +438,7 @@ paths:
           enum:
           - "default"
           - "custom"
+          - "comm"
       responses:
         "200":
           description: "successful operation"

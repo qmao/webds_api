@@ -58,6 +58,33 @@ class ConnectionSettings:
 
 
 class SettingsHandler(APIHandler):
+    def getComm():
+        data = json.loads("{}")
+        try:
+            tc = TouchcommManager()
+            obj = tc.getInstance()
+
+            protocol = obj.comm.get_interface()
+            data["interface"] = protocol
+            if protocol == "i2c":
+                data["i2cAddr"] = obj.comm.i2cAddr
+                data["speed"] = obj.comm.speed
+            elif protocol == "spi":
+                data["spiMode"] = obj.comm.spiMode
+                data["speed"] = obj.comm.speed
+
+            data["useAttn"] = obj.comm.useAttn
+            data["vdd"] = obj.comm.vdd
+            data["vddtx"] = obj.comm.vddtx
+            data["vled"] = obj.comm.vled
+            data["vpu"] = obj.comm.vpu
+            data["streaming"] = obj.comm.streaming
+
+            return data
+        except Exception as error:
+            print(error)
+            raise error
+
     @tornado.web.authenticated
     def get(self, subpath: str = "", cluster_id: str = ""):
         print(self.request)
@@ -84,8 +111,13 @@ class SettingsHandler(APIHandler):
             print(argument)
             if argument == 'default':
                 data = ConnectionSettings.getValue('default')
-            if argument == 'custom':
+            elif argument == 'custom':
                 data = ConnectionSettings.getValue('custom')
+            elif argument == 'comm':
+                try:
+                    data = SettingsHandler.getComm()
+                except Exception as error:
+                    raise tornado.web.HTTPError(status_code=400, log_message=str(error))
 
         elif paths[0] == 'wifi':
             data = WifiManager.getList()
@@ -144,29 +176,9 @@ class SettingsHandler(APIHandler):
                     tc = TouchcommManager()
                     tc.disconnect()
                     tc.connect()
-                    obj = tc.getInstance()
-
-                    protocol = obj.comm.get_interface()
-                    data["interface"] = protocol
-                    if protocol == "i2c":
-                        data["i2cAddr"] = obj.comm.i2cAddr
-                        data["speed"] = obj.comm.speed
-                    elif protocol == "spi":
-                        data["spiMode"] = obj.comm.spiMode
-                        data["speed"] = obj.comm.speed
-
-                    data["useAttn"] = obj.comm.useAttn
-                    data["vdd"] = obj.comm.vdd
-                    data["vddtx"] = obj.comm.vddtx
-                    data["vled"] = obj.comm.vled
-                    data["vpu"] = obj.comm.vpu
-                    data["streaming"] = obj.comm.streaming
-
-                    print(data)
+                    data = SettingsHandler.getComm()
                 except Exception as error:
-                    print(error)
-                    message=str(error)
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    raise tornado.web.HTTPError(status_code=400, log_message=str(error))
 
         elif subpath == 'wifi':
             input_data = self.get_json_body()
