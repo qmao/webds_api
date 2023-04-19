@@ -74,7 +74,6 @@ class SettingsHandler(APIHandler):
             try:
                 tc.disconnect()
                 tc.connect()
-                tc.function("identify")
             except Exception as error:
                 print(error)
                 raise error
