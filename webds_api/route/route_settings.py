@@ -60,20 +60,18 @@ class ConnectionSettings:
 class SettingsHandler(APIHandler):
     def getComm():
         err = None
+        tc = None
         data = json.loads("{}")
         try:
             tc = TouchcommManager()
             tc.function("identify")
 
         except Exception as error:
-            tc = TouchcommManager()
-            tc.function("identify")
             err = error
             pass
 
         if err:
             try:
-                tc = TouchcommManager()
                 tc.disconnect()
                 tc.connect()
                 tc.function("identify")
