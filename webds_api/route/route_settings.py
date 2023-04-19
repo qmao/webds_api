@@ -59,31 +59,45 @@ class ConnectionSettings:
 
 class SettingsHandler(APIHandler):
     def getComm():
+        err = None
         data = json.loads("{}")
         try:
             tc = TouchcommManager()
-            obj = tc.getInstance()
+            tc.function("identify")
 
-            protocol = obj.comm.get_interface()
-            data["interface"] = protocol
-            if protocol == "i2c":
-                data["i2cAddr"] = obj.comm.i2cAddr
-                data["speed"] = obj.comm.speed
-            elif protocol == "spi":
-                data["spiMode"] = obj.comm.spiMode
-                data["speed"] = obj.comm.speed
-
-            data["useAttn"] = obj.comm.useAttn
-            data["vdd"] = obj.comm.vdd
-            data["vddtx"] = obj.comm.vddtx
-            data["vled"] = obj.comm.vled
-            data["vpu"] = obj.comm.vpu
-            data["streaming"] = obj.comm.streaming
-
-            return data
         except Exception as error:
-            print(error)
-            raise error
+            tc = TouchcommManager()
+            tc.function("identify")
+            pass
+
+        if err:
+            try:
+                tc = TouchcommManager()
+                tc.disconnect()
+                tc.connect()
+                tc.function("identify")
+            except Exception as error:
+                print(error)
+                raise error
+
+        obj = tc.getInstance()
+        protocol = obj.comm.get_interface()
+        data["interface"] = protocol
+        if protocol == "i2c":
+            data["i2cAddr"] = obj.comm.i2cAddr
+            data["speed"] = obj.comm.speed
+        elif protocol == "spi":
+            data["spiMode"] = obj.comm.spiMode
+            data["speed"] = obj.comm.speed
+
+        data["useAttn"] = obj.comm.useAttn
+        data["vdd"] = obj.comm.vdd
+        data["vddtx"] = obj.comm.vddtx
+        data["vled"] = obj.comm.vled
+        data["vpu"] = obj.comm.vpu
+        data["streaming"] = obj.comm.streaming
+        return data
+
 
     @tornado.web.authenticated
     def get(self, subpath: str = "", cluster_id: str = ""):
