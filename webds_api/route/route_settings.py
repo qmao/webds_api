@@ -68,6 +68,7 @@ class SettingsHandler(APIHandler):
         except Exception as error:
             tc = TouchcommManager()
             tc.function("identify")
+            err = error
             pass
 
         if err:
