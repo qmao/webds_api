@@ -22,11 +22,11 @@ class Logger(object):
 
     def write(self, message):
         try:
-            if len(message) > 1:
-                jmessage = json.loads(message)
+            jmessage = json.loads(message)
+            if len(message) > 1 and type(jmessage) == dict:
                 EventQueue().push(jmessage)
 
-            if self._terminate:
+            if self._terminate or EventQueue().is_terminate():
                 self.restore()
                 self._condition.acquire()
                 self._condition.notify()

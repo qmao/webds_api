@@ -65,6 +65,7 @@ class TutorHandler(APIHandler):
 
         finally:
             print("terminate")
+            queue.terminate()
 
     @tornado.web.authenticated
     def get(self, subpath: str = "", cluster_id: str = ""):

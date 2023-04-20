@@ -14,6 +14,7 @@ class EventQueue():
     _instance = None
     _queue = None
     _alive = True
+    _terminate = False
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -44,8 +45,15 @@ class EventQueue():
     def is_alive(self):
         return self._alive
 
+    def is_terminate(self):
+        return self._terminate
+
+    def terminate(self):
+        self._terminate = True
+
     def reset(self):
         print("Queue reset")
+        self._terminate = False
         try:
             while not self._queue.empty():
                 self._queue.get()
@@ -53,3 +61,4 @@ class EventQueue():
         except Exception as e:
             print(e)
             pass
+        ##print("Queue reset Done")
