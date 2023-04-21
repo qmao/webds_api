@@ -10,6 +10,7 @@ import sys
 import time
 import re
 from ..tutor.tutor_utils import EventQueue
+from ..errors import HttpBrokenPipe, HttpNotFound
 
 ### auto import tutor routes from webds_api
 for folder in os.scandir("/usr/local/lib/python3.7/dist-packages/webds_api/tutor"):
@@ -56,12 +57,7 @@ class TutorHandler(APIHandler):
             pass
 
         except Exception as e:
-            ### TypeError
-            ### BrokenPipeError
-            print("Oops! get report", e.__class__, "occurred.")
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpBrokenPipe(str(e))
 
         finally:
             print("terminate")
@@ -86,11 +82,11 @@ class TutorHandler(APIHandler):
                     function = getattr(cls, 'get')
                     data = function(self)
             else:
-                print("TBC")
+                raise HttpNotFound(message)
         except Exception as e:
             print(e)
             message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpNotFound(message)
 
         self.finish(json.dumps(data))
 
@@ -112,7 +108,7 @@ class TutorHandler(APIHandler):
         except Exception as e:
             print(e)
             message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise BadRequest(message)
 
         print("--- %s seconds ---" % (time.time() - start_time))
 

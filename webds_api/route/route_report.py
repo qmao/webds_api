@@ -7,6 +7,7 @@ from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
 from ..report.report_manager import ReportManager
+from ..errors import HttpBrokenPipe, HttpStreamClosed, HttpServerError
 import time
 from copy import deepcopy
 
@@ -72,9 +73,7 @@ class ReportHandler(APIHandler):
             data = {'data': 'done'}
 
         except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(str(e))
 
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
@@ -131,12 +130,7 @@ class ReportHandler(APIHandler):
             pass
 
         except Exception as e:
-            ### TypeError
-            ### BrokenPipeError
-            print("Oops! get report", e.__class__, "occurred.")
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise BrokenPipe(str(e))
 
         finally:
             if manager:
@@ -185,7 +179,7 @@ class ReportHandler(APIHandler):
         if "report" not in send:
             print("[ERROR]", data)
             message="report not found"
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(message)
         else:
             return send
 

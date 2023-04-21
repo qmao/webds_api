@@ -2,8 +2,10 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from ..utils import SystemHandler
 from uuid import uuid4
+
+from ..utils import SystemHandler
+from ..errors import HttpServerError
 
 
 rand_token = str(uuid4())
@@ -45,7 +47,7 @@ class GeneralHandler(APIHandler):
                             return
                         else:
                             print("token not matched")
-                            raise tornado.web.HTTPError(status_code=400, log_message="token not matched")
+                            raise HttpServerError("token not matched")
                     else:
                         rand_token = str(uuid4())
                         print(rand_token)
@@ -56,4 +58,4 @@ class GeneralHandler(APIHandler):
         else:
             print("command not set")
 
-        raise tornado.web.HTTPError(status_code=400, log_message="unsupported action")
+        raise HttpServerError("unsupported action")

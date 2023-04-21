@@ -4,11 +4,12 @@ import os
 import json
 import subprocess
 import re
+from os.path import exists
 
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
-from os.path import exists
+from ..errors import HttpServerError, HttpNotFound
 
 from ..wifi.wifi_manager import WifiManager
 
@@ -109,15 +110,12 @@ class SettingsHandler(APIHandler):
 
         paths = subpath.split("/")
         if len(paths) < 1:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
 
         if paths[0] == 'connection':
             ### check json file exists
             if not exists(webds.CONNECTION_SETTINGS_FILE):
-                error = str(webds.CONNECTION_SETTINGS_FILE) +  ' not found'
-                print(error)
-                message=str(error)
-                raise tornado.web.HTTPError(status_code=400, log_message=message)
+                raise HttpServerError(str(webds.CONNECTION_SETTINGS_FILE) +  ' not found')
 
             argument = self.get_argument('query', None)
             print(argument)
@@ -129,7 +127,7 @@ class SettingsHandler(APIHandler):
                 try:
                     data = SettingsHandler.getComm()
                 except Exception as error:
-                    raise tornado.web.HTTPError(status_code=400, log_message=str(error))
+                    raise HttpServerError(str(error))
 
         elif paths[0] == 'wifi':
             data = WifiManager.getList()
@@ -153,7 +151,7 @@ class SettingsHandler(APIHandler):
                     data = {"connect": "USB"}
 
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
 
         self.finish(json.dumps(data))
 
@@ -166,10 +164,7 @@ class SettingsHandler(APIHandler):
         if subpath == 'connection':
             ### check json file exists
             if not exists(webds.CONNECTION_SETTINGS_FILE):
-                error = str(webds.CONNECTION_SETTINGS_FILE) +  'not found'
-                print(error)
-                message=str(error)
-                raise tornado.web.HTTPError(status_code=400, log_message=message)
+                raise HttpServerError(str(webds.CONNECTION_SETTINGS_FILE) +  'not found')
 
             input_data = self.get_json_body()
             print(input_data)
@@ -190,7 +185,7 @@ class SettingsHandler(APIHandler):
                     tc.connect()
                     data = SettingsHandler.getComm()
                 except Exception as error:
-                    raise tornado.web.HTTPError(status_code=400, log_message=str(error))
+                    raise HttpServerError(str(error))
 
         elif subpath == 'wifi':
             input_data = self.get_json_body()
@@ -205,7 +200,7 @@ class SettingsHandler(APIHandler):
                         status = WifiManager.connect(input_data["network"], input_data["password"])
                         data = {"status": status}
                     else:
-                        raise tornado.web.HTTPError(status_code=405, log_message="network and password not in json body")
+                        raise HttpServerError("network and password not in json body")
                 elif input_data["action"] == 'disconnect':
                     print("disconnect")
                     status = WifiManager.disconnect()
@@ -231,9 +226,9 @@ class SettingsHandler(APIHandler):
                     status = WifiManager.getMode()
                     data = {"mode": status}
                 else:
-                    raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+                    raise HttpNotFound()
             else:
-                raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+                raise HttpNotFound()
 
         elif subpath == 'adb':
             input_data = self.get_json_body()
@@ -283,9 +278,9 @@ class SettingsHandler(APIHandler):
                         return
 
                     else:
-                        raise tornado.web.HTTPError(status_code=405, log_message="Invalid input params for adb connect")
+                        raise HttpServerError("Invalid input params for adb connect")
 
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
 
         self.finish(json.dumps(data))

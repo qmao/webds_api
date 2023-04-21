@@ -3,6 +3,7 @@ import tornado
 sys.path.append("/usr/local/syna/lib/python")
 from programmer import AsicProgrammer
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..errors import HttpServerError
 
 class ProgrammerManager(object):
     _instance = None
@@ -28,8 +29,7 @@ class ProgrammerManager(object):
             pass
 
         if id['mode'] is None:
-            message = "Identify failed"
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError("Identify failed")
 
         if id['mode'] == 'application':
             if id['partNumber'][0:2] == 'SB':
@@ -67,8 +67,7 @@ class ProgrammerManager(object):
                 pass
 
         if is_multi is None and not is_smart_bridge:
-            message = "Cannot determine device type"
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError("Cannot determine device type")
 
         return {"is_multi": is_multi, "is_smart_bridge": is_smart_bridge}
 

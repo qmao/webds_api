@@ -19,6 +19,8 @@ from queue import Queue
 
 from ..touchcomm.touchcomm_manager import TouchcommManager
 
+from ..errors import HttpServerError
+
 
 PT_ROOT = '/usr/local/syna/lib/python/production_tests/'
 PT_LIB_ROOT = os.path.join(PT_ROOT, "lib")
@@ -152,7 +154,8 @@ class ProductionTestsManager():
             elif val in lib:
                 src = join(ppath, val + '.py')
             else:
-                raise tornado.web.HTTPError(status_code=400, log_message='unknown script: {}'.format(pyName))
+                raise HttpServerError('unknown script: {}'.format(pyName))
+
 
             dst = join(PT_RUN, pyName)
             ProductionTestsManager.__updatePyTest(src, dst)
@@ -210,7 +213,7 @@ class ProductionTestsManager():
                     tc.function("reflashImageFile", [dst_img])
                 except Exception as e:
                     print('Reflash exception:{}'.format(e))
-                    raise tornado.web.HTTPError(status_code=400, log_message='Reflash exception:{}'.format(e))
+                    raise HttpServerError('Reflash exception:{}'.format(e))
             else:
                 print("reflash disable")
         else:
@@ -229,7 +232,7 @@ class ProductionTestsManager():
                 item = [x for x in sets if x["id"] == id]
                 tests = item[0]["tests"]
             except:
-                raise tornado.web.HTTPError(status_code=400, log_message='production test run {} :{} not found'.format(partNumber, id))
+                raise HttpServerError('production test run {} :{} not found'.format(partNumber, id))
         return tests
 
     def preRun(partNumber, id = None):
@@ -239,7 +242,7 @@ class ProductionTestsManager():
         ProductionTestsManager.setup(partNumber, tests)
         print(tests)
         if len(tests) is 0:
-            raise tornado.web.HTTPError(status_code=400, log_message='production test {} :{} no tests'.format(partNumber, id))
+            raise HttpServerError('production test {} :{} no tests'.format(partNumber, id))
 
     def run(self):
         TestBridge().reset()
@@ -316,14 +319,14 @@ class ProductionTestsManager():
     def getChipLib(partNumber):
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, PT_LIB_SCRIPT_SUBDIR)
         if not exists(chip_lib):
-            raise tornado.web.HTTPError(status_code=400, log_message='production test {} lib not found'.format(partNumber))
+            raise HttpServerError('production test {} lib not found'.format(partNumber))
         return ProductionTestsManager.getSupportedList(ProductionTestsManager.getTestList(chip_lib)), chip_lib
 
     def getTests(partNumber):
         data = json.loads("{}")
         chip_lib = os.path.join(PT_LIB_ROOT, partNumber, "TestStudio/Scripts/")
         if not exists(chip_lib):
-            raise tornado.web.HTTPError(status_code=400, log_message='production test {} not found'.format(chip_lib))
+            raise HttpServerError('production test {} not found'.format(chip_lib))
 
         chip_scripts, path = ProductionTestsManager.getChipLib(partNumber)
         common_scripts, path = ProductionTestsManager.getCommon()

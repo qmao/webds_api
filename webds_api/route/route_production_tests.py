@@ -4,10 +4,10 @@ from tornado import gen
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-
+import threading
 import time
 from ..production_test.production_test_manager import ProductionTestsManager
-import threading
+from ..errors import HttpStreamClosed, HttpServerError
 
 g_production_test_thread = None
 
@@ -73,10 +73,9 @@ class ProductionTestsHandler(APIHandler):
                     yield gen.sleep(0.0001)
 
                 except StreamClosedError:
-                    message="stream closed"
-                    print(message)
                     pt.stopTests()
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    raise HttpStreamClosed()
+
         else:
             partNumber = subpath[1:]
             print(partNumber)
@@ -108,7 +107,7 @@ class ProductionTestsHandler(APIHandler):
                 print("run test: ", test)
                 self.run(partNumber, test)
         else:
-            raise tornado.web.HTTPError(status_code=400, log_message=str('partnumber not found'))
+            raise HttpServerError(str('partnumber not found'))
 
         self.finish(data)
 
@@ -134,7 +133,7 @@ class ProductionTestsHandler(APIHandler):
 
             data = { "message": str(sets_file) }
         else:
-            raise tornado.web.HTTPError(status_code=400, log_message=str('partnumber not found'))
+            raise HttpServerError(str('partnumber not found'))
 
         self.finish(data)
 

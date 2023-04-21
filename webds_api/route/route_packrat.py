@@ -7,6 +7,7 @@ from .. import webds
 from ..utils import HexFile, SystemHandler
 from ..file.file_manager import FileManager
 from ..image.imagefile_manager import ImageFileHandler
+from ..errors import HttpServerError, HttpNotFound
 
 class PackratHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -22,7 +23,7 @@ class PackratHandler(APIHandler):
         data = {}
 
         if len(param) > 3:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         if len(param) > 1:
             packrat_id = param[1]
         if len(param) > 2:
@@ -44,11 +45,10 @@ class PackratHandler(APIHandler):
                     await FileManager.download(self, filename)
                     data = None
             except Exception as e:
-                print(e)
-                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                raise HttpServerError(str(e))
         elif packrat_id is not None:
             ###/packrat/{packrat_id}
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         else:
             ###/packrat?extension=json
             extension = self.get_argument('extension', None)
@@ -58,7 +58,7 @@ class PackratHandler(APIHandler):
                 filelist = FileManager.GetFileList(extension)
                 data = filelist
             else:
-                raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+                raise HttpNotFound()
         self.finish(data)
 
     @tornado.web.authenticated
@@ -82,7 +82,7 @@ class PackratHandler(APIHandler):
         data = {}
 
         if len(param) > 3:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         if len(param) > 1:
             packrat_id = param[1]
         if len(param) > 2:
@@ -94,12 +94,12 @@ class PackratHandler(APIHandler):
             SystemHandler.UpdateWorkspace()
             self.finish(json.dumps("{data: done}"))
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not support")
+            raise HttpNotFound()
 
     def save_file(self, packrat_id=None):
         if len(self.request.files.items()) is 0:
             message = "request.files.items len=0"
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(message)
 
         for field_name, files in self.request.files.items():
             for f in files:
@@ -117,11 +117,11 @@ class PackratHandler(APIHandler):
                         print("new file name:" + filename)
                     except:
                         message = filename + " PACKRAT_ID parse failed"
-                        raise tornado.web.HTTPError(status_code=400, log_message=message)
+                        raise HttpServerError(message)
                         return
                     if packrat_id is None:
                         message = filename + " PACKRAT_ID not found"
-                        raise tornado.web.HTTPError(status_code=400, log_message=message)
+                        raise HttpServerError(message)
                         return
 
                 # save temp hex file in worksapce
@@ -143,5 +143,4 @@ class PackratHandler(APIHandler):
                     self.finish(json.dumps(data))
                 except FileExistsError:
                     message = file_path + " exists."
-                    print(message)
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    raise HttpServerError(message)

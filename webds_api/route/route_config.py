@@ -6,6 +6,7 @@ import time
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..errors import HttpServerError, HttpNotFound
 
 
 class ConfigHandler(APIHandler):
@@ -51,7 +52,7 @@ class ConfigHandler(APIHandler):
         except Exception as e:
             print(e)
             message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(message)
         return config
 
     # The following decorator should be present on all verb methods (head, get, post,
@@ -65,9 +66,9 @@ class ConfigHandler(APIHandler):
         if config_type == 'static':
             config = ConfigHandler._update_static_config(configToSet)
         elif config_type == 'dynamic':
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not support")
+            raise HttpNotFound()
 
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(config))
@@ -89,7 +90,7 @@ class ConfigHandler(APIHandler):
                 self.finish(json.dumps(config))
                 return
             else:
-                raise tornado.web.HTTPError(status_code=405, log_message="Not support")
+                raise HttpNotFound()
 
         except Exception as e:
             print("Exception...", e)

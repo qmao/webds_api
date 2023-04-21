@@ -6,6 +6,7 @@ import json
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..errors import HttpBrokenPipe, HttpServerError, HttpBadRequest, HttpNotFound
 import threading
 from multiprocessing import Queue, Lock
 import sys
@@ -43,7 +44,7 @@ class RegisterHandler(APIHandler):
                 content = f.read()
                 return content
         except Exception as e:
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise HttpServerError(str(e))
 
     def read_registers(tc, address):
         start_time = time.time()
@@ -51,7 +52,7 @@ class RegisterHandler(APIHandler):
         values = []
 
         if len(address) == 0:
-            raise tornado.web.HTTPError(status_code=400, log_message="empty array")
+            raise HttpServerError("empty array")
 
         for r in address:
             try:
@@ -201,21 +202,18 @@ class RegisterHandler(APIHandler):
 
         except StreamClosedError:
             print("Stream Closed!")
-            pass
 
         except Exception as e:
-            ### TypeError
             ### BrokenPipeError
-            print("Oops! get report", e.__class__, "occurred.")
-            print(e)
-            pass
+            print("Broken Pipe Error")
 
-        RegisterHandler._terminate = True
-        while not RegisterHandler._queue.empty():
-            RegisterHandler._queue.get()
+        finally:
+            RegisterHandler._terminate = True
+            while not RegisterHandler._queue.empty():
+                RegisterHandler._queue.get()
 
-        RegisterHandler._sse_lock.release()
-        print("SSE TERMINATED")
+            RegisterHandler._sse_lock.release()
+            print("SSE TERMINATED")
 
 
     def check_thread_status():
@@ -242,8 +240,7 @@ class RegisterHandler(APIHandler):
                     fname = os.path.join(REGISTER_FOLDER, REGISTER_FILE)
                     content = RegisterHandler.read_register_file(fname)
                 except Exception as e:
-                    print(str(e))
-                    raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                    raise HttpServerError(str(e))
 
                 self.finish(json.dumps(content))
                 return
@@ -261,8 +258,7 @@ class RegisterHandler(APIHandler):
                     mode = RegisterHandler.check_mode()
                     self.finish(json.dumps({"status": "done", "mode": mode}))
                 except Exception as e:
-                    print(str(e))
-                    raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                    raise HttpServerError(str(e))
                 return
 
             if "sse" in data:
@@ -300,7 +296,7 @@ class RegisterHandler(APIHandler):
                 alist = []
 
                 if len(address) == 0:
-                    raise tornado.web.HTTPError(status_code=400, log_message="empty array")
+                    raise HttpServerError("empty array")
 
                 for r in address:
                     try:
@@ -318,6 +314,6 @@ class RegisterHandler(APIHandler):
                 }))
                 return
         else:
-            print("command not set")
+            raise HttpBadRequest("command not set")
 
-        raise tornado.web.HTTPError(status_code=400, log_message="unsupported action")
+        raise HttpNotFound()

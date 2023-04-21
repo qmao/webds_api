@@ -6,6 +6,7 @@ import json
 from .. import webds
 from ..program.programmer_manager import ProgrammerManager
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..errors import HttpServerError
 
 import threading
 from queue import Queue
@@ -122,8 +123,7 @@ class ProgramHandler(APIHandler):
 
         except StreamClosedError:
             message="stream closed"
-            print(message)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(message)
 
         print("request progress finished")
 
@@ -146,7 +146,7 @@ class ProgramHandler(APIHandler):
 
             if not os.path.isfile(filename):
                 message = "HEX file not found: " + filename
-                raise tornado.web.HTTPError(status_code=400, log_message=message)
+                raise HttpServerError(message)
 
             if g_program_thread is not None and g_program_thread.is_alive():
                 print("erase and program thread is still running...")

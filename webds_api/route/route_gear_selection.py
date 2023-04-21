@@ -4,6 +4,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 
 from ..tuning.gear_selection_manager import GearSelectionManager
+from ..errors import HttpServerError
 
 class GearSelectionHandler(APIHandler):
     @tornado.web.authenticated
@@ -25,7 +26,7 @@ class GearSelectionHandler(APIHandler):
             return
         except Exception as e:
             print("GearSelectionHandler POST Exception")
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise HttpServerError(str(e))
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
@@ -73,6 +74,6 @@ class GearSelectionHandler(APIHandler):
             pass
         except Exception as e:
             print("GearSelectionHandler GET Exception")
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise HttpServerError(str(e))
         finally:
             gsm.reset_progress()

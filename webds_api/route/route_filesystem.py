@@ -5,6 +5,7 @@ import json
 from .. import webds
 from ..utils import SystemHandler
 from ..file.file_manager import FileManager
+from ..errors import HttpServerError
 
 
 def save(files, location):
@@ -65,7 +66,7 @@ class FilesystemHandler(APIHandler):
                 SystemHandler.UpdatePackratLink()
                 data = FileManager.GetTree(folder)
             except Exception as e:
-                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                raise HttpServerError(str(e))
         else:
             data = json.loads("{}")
         self.finish(data)

@@ -5,6 +5,7 @@ import os
 import os.path
 import re
 import json
+from ..errors import HttpBrokenPipe
 
 class UpdateMonitor(object):
     _stamp = 0
@@ -72,9 +73,4 @@ class SoftwareUpdateHandler(APIHandler):
             pass
 
         except Exception as e:
-            ### TypeError
-            ### BrokenPipeError
-            print("Oops! get report", e.__class__, "occurred.")
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpBrokenPipe(str(e))

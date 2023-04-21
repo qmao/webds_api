@@ -5,6 +5,7 @@ import json
 from .. import webds
 from ..utils import SystemHandler
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..errors import HttpServerError
 
 
 class CommandHandler(APIHandler):
@@ -16,22 +17,20 @@ class CommandHandler(APIHandler):
         input_data = self.get_json_body()
         print(input_data)
 
-        command = input_data["command"]
-        if "payload" in input_data:
-            payload = input_data["payload"]
-        else:
-            payload = None
-
-        print(command)
-        print(payload)
-
         try:
+            command = input_data["command"]
+            if "payload" in input_data:
+                payload = input_data["payload"]
+            else:
+                payload = None
+
+            print(command)
+            print(payload)
+
             tc = TouchcommManager()
             response = tc.function(command, payload)
         except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(str(e))
 
         self.finish(json.dumps(response))
 
@@ -54,9 +53,7 @@ class CommandHandler(APIHandler):
                 return
 
         except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(str(e))
 
         data = json.loads("{}")
         self.finish(data)

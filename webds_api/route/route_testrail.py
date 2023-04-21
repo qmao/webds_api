@@ -6,6 +6,7 @@ import json
 from .. import webds
 from ..utils import SystemHandler
 from ..file.file_manager import FileManager
+from ..errors import HttpServerError, HttpNotFound
 
 class TestrailHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -21,7 +22,7 @@ class TestrailHandler(APIHandler):
         data = {}
 
         if len(param) > 3:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         if len(param) > 1:
             suite_id = param[1]
         if len(param) > 2:
@@ -35,13 +36,12 @@ class TestrailHandler(APIHandler):
                 await FileManager.download(self, filename)
                 data = None
             except Exception as e:
-                print(e)
-                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                raise HttpServerError(str(e))
         elif suite_id is not None:
             ###/testrail/suite/{suite_id}
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="Not implement")
+            raise HttpNotFound()
         self.finish(data)
 
     @tornado.web.authenticated
@@ -53,13 +53,12 @@ class TestrailHandler(APIHandler):
             print(sid)
             self.save_file(sid)
         else:
-            raise tornado.web.HTTPError(status_code=405, log_message="unknown suite id")
-
+            raise HttpServerError("unknown suite id")
 
     def save_file(self, suite_id):
         if len(self.request.files.items()) is 0:
             message = "request.files.items len=0"
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(message)
 
         for field_name, files in self.request.files.items():
             for f in files:
@@ -88,5 +87,4 @@ class TestrailHandler(APIHandler):
                     self.finish(json.dumps(data))
                 except FileExistsError:
                     message = file_path + " exists."
-                    print(message)
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    raise HttpServerError(message)

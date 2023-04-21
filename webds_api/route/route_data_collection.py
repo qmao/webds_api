@@ -5,6 +5,8 @@ import json
 import gzip
 from os.path import exists
 from ..utils import SystemHandler
+from ..errors import HttpServerError
+
 
 DATA_COLLECTION_STASH = "/var/spool/syna/data_collection/testrail/stash"
 DATA_COLLECTION_TEMP = "/home/dsdkuser/jupyter/workspace/.cache/stash.cache"
@@ -23,7 +25,7 @@ class DataCollectionHandler(APIHandler):
             pass
         except Exception as e:
             print("DataCollectionHandler GET Exception\n{}".format(str(e)))
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise HttpServerError(str(e))
 
         self.finish(json.dumps(stash))
 
@@ -46,21 +48,21 @@ class DataCollectionHandler(APIHandler):
                 pass
             except Exception as e:
                 print("DataCollectionHandler POST Exception\n{}".format(str(e)))
-                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                raise HttpServerError(str(e))
             stash["stash"].append(data)
         elif request == "overwrite":
             try:
                 data = input_data["data"]
             except Exception as e:
                 print("DataCollectionHandler POST Exception\n{}".format(str(e)))
-                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+                raise HttpServerError(str(e))
             stash = data
         elif request == "flush":
             pass
         else:
             e = "invalid request: {}".format(request)
             print("DataCollectionHandler POST Exception\n{}".format(e))
-            raise tornado.web.HTTPError(status_code=400, log_message=e)
+            raise HttpServerError(e)
 
         try:
             with gzip.open(temp_file, "wt", encoding="utf-8") as zip_file:
@@ -69,6 +71,6 @@ class DataCollectionHandler(APIHandler):
             SystemHandler.CallSysCommandFulfil("chown root:root " + stash_file)
         except Exception as e:
             print("DataCollectionHandler POST Exception\n{}".format(str(e)))
-            raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+            raise HttpServerError(str(e))
 
         self.finish()

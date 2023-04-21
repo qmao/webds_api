@@ -3,6 +3,7 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 
+from ..errors import HttpBrokenPipe, HttpStreamClosed, HttpServerError
 from .. import webds
 from ..touchcomm.touchcomm_manager import TouchcommManager
 
@@ -35,8 +36,7 @@ class StatusHandler(Queue):
                     self._progress = int(m.group(0), base=10)
             sys.__stdout__.write(msg)
         except Exception as e:
-            print("Oops StatusHandler write!", e.__class__, "occurred.")
-            pass
+            raise BrokenPipe(str(e))
 
     def flush(self):
         sys.__stdout__.flush()
@@ -121,9 +121,7 @@ class ReflashHandler(APIHandler):
                     yield gen.sleep(1)
 
         except StreamClosedError:
-            message="stream closed"
-            print(message)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpStreamClosed()
 
         print("request progress finished")
 
@@ -146,7 +144,7 @@ class ReflashHandler(APIHandler):
 
             if not os.path.isfile(filename):
                 message = "file not found: " + filename
-                raise tornado.web.HTTPError(status_code=400, log_message=message)
+                raise HttpServerError(message)
 
             if g_thread is not None and g_thread.is_alive():
                 print("thread is still running...")

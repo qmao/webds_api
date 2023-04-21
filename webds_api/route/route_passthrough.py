@@ -3,11 +3,13 @@ from tornado.iostream import StreamClosedError
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from .. import webds
 import sys
 from importlib import import_module
 import importlib.util
 import time
+
+from .. import webds
+from ..errors import HttpNotFound, HttpServerError
 
 class PassthroughHandler(APIHandler):
     @tornado.web.authenticated
@@ -38,11 +40,9 @@ class PassthroughHandler(APIHandler):
                     data = mymethod()
                 print("ret", data)
             else:
-                raise tornado.web.HTTPError(status_code=400, log_message="not implement")
+                raise HttpNotFound()
         except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(str(e))
 
         self.finish(json.dumps(data))
 
@@ -78,11 +78,9 @@ class PassthroughHandler(APIHandler):
                     data = mymethod()
                 print("ret", data)
             else:
-                raise tornado.web.HTTPError(status_code=400, log_message="not implement")
+                raise HttpNotFound()
         except Exception as e:
-            print(e)
-            message=str(e)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            raise HttpServerError(str(e))
 
 
         print("--- %s seconds ---" % (time.time() - start_time))
