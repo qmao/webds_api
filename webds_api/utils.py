@@ -7,7 +7,7 @@ from threading import Lock
 
 from .obfuscate.goalkeeper import Goalkeeper
 
-_lock = Lock()
+global_lock = Lock()
 
 class SystemHandler():
 
@@ -24,7 +24,7 @@ class SystemHandler():
         os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)
 
     def UpdatePackratLink():
-        _lock.acquire()
+        global_lock.acquire()
 
         if os.path.exists(webds.WORKSPACE_PACKRAT_CACHE_DIR):
             try:
@@ -55,7 +55,7 @@ class SystemHandler():
             print(ws_path + " -> " + cache_path)
             os.symlink(cache_path, ws_path)
 
-        _lock.release()
+        global_lock.release()
 
     def UpdateWorkspace():
         SystemHandler.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
