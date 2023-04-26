@@ -3,8 +3,11 @@ import re
 import json
 from . import webds
 import sys
+from threading import Lock
 
 from .obfuscate.goalkeeper import Goalkeeper
+
+_lock = Lock()
 
 class SystemHandler():
 
@@ -21,6 +24,8 @@ class SystemHandler():
         os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)
 
     def UpdatePackratLink():
+        _lock.acquire()
+
         if os.path.exists(webds.WORKSPACE_PACKRAT_CACHE_DIR):
             try:
                 print(webds.WORKSPACE_PACKRAT_CACHE_DIR)
@@ -49,6 +54,8 @@ class SystemHandler():
             ws_path = os.path.join(webds.WORKSPACE_PACKRAT_CACHE_DIR, packrat)
             print(ws_path + " -> " + cache_path)
             os.symlink(cache_path, ws_path)
+
+        _lock.release()
 
     def UpdateWorkspace():
         SystemHandler.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
