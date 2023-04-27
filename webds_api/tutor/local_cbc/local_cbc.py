@@ -167,8 +167,15 @@ class LocalCBC():
             self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": self._static_config["adnsEnabled"]})
 
     def before_run(self):
-        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": 5})
+        ### low power mode
+        if "requestedNoiseMode" in self._dynamic_config:
+            self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": 5})
+        else:
+            print("requestedNoiseMode not found")
+
         self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"noLowPower": 1})
+
+        ### turn off analog-display noise suppression
         if "adnsEnabled" in self._static_config:
             self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": 0})
 
@@ -181,7 +188,13 @@ class LocalCBC():
 
     def get_signal_clarity_enable(self):
         if "signalClarityOrder" in self._touch_info:
-            value = self._static_config["signalClarityEnable"]
+            if "signalClarityEnable" in self._static_config:
+                value = self._static_config["signalClarityEnable"]
+            elif "signalClarityIndex" in self._static_config:
+                ##SWDS6-3176
+                value = (self._static_config["signalClarityIndex"] != 0)
+            else:
+                raise Exception("signalClarityEnable config not found")
             return value
         return False
 
@@ -274,8 +287,14 @@ class LocalCBC():
         tx_count = self._static_config["txCount"]
         rx_count = self._static_config["rxCount"]
         num_buttons = self._app_info["numButtons"]
-        signal_clarity_enable = self.get_signal_clarity_enable()
-        cdm_order = self.get_signal_clarity_type()
+
+        try:
+            signal_clarity_enable = self.get_signal_clarity_enable()
+            cdm_order = self.get_signal_clarity_type()
+        except Exception as e:
+            self._terminated = True
+            self.after_run()
+            return {"data": e}
 
         if "imageBurstsPerCluster" in self._static_config:
             bursts_per_cluster = self._static_config["imageBurstsPerCluster"]
