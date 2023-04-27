@@ -30,3 +30,5 @@ recursive-include webds_api/ *.py
 # obfuscate
 include webds_api/obfuscate/pytransform/_pytransform.so
 
+# tutor
+include webds_api/webds_api/tutor/*.json
