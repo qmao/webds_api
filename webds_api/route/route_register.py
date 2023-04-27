@@ -76,14 +76,7 @@ class RegisterHandler(APIHandler):
                 RegisterHandler._app_mode = False
             elif id['mode'] == 'application':
                 print("In Application Mode")
-                tc.function("unlockPrivate")
                 RegisterHandler._app_mode = True
-
-                ###print("Force jump to RomBoot Mode")
-                ###tc.enterRomBootloaderMode()
-                ###id = tc.identify()
-                ###print(id['mode'])
-                ###print("Jump to RomBoot Mode done")
             else:
                 print(id['mode'])
 
