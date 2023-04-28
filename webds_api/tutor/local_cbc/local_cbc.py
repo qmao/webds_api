@@ -161,7 +161,8 @@ class LocalCBC():
         self._terminated = False
 
     def after_run(self):
-        self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": self._dynamic_config["requestedNoiseMode"]})
+        if "requestedNoiseMode" in self._dynamic_config:
+            self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"requestedNoiseMode": self._dynamic_config["requestedNoiseMode"]})
         self._dynamic_config = update_dynamic_config(self._handle, self._dynamic_config, {"noLowPower": self._dynamic_config["noLowPower"]})
         if "adnsEnabled" in self._static_config:
             self._static_config = update_static_config(self._handle, self._static_config, {"adnsEnabled": self._static_config["adnsEnabled"]})
