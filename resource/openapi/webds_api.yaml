@@ -52,7 +52,7 @@ tags:
 - name: "Reprogram"
   description: "reporgram endpoints"
 
-- name: Settings
+- name: "Settings"
   description: "settings endpoints"
 
 - name: "Tutor"
@@ -63,6 +63,9 @@ tags:
 
 - name: "Passthrough"
   description: "passthrough endpoints"
+
+- name: "Production Tests v2"
+  description: "production tests endpoints"
 
 paths:
   /packrat:
@@ -825,6 +828,192 @@ paths:
       responses:
         '200':
           description: result
+  /pt2:
+    get:
+      tags:
+      - "Production Tests v2"
+      summary: "SSE"
+      description: "JSON containing test progress and result"
+      operationId: "get-production-tests-sse"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+
+  /pt2/partnumber/{part-number}/{plan}:
+    get:
+      tags:
+      - "Production Tests v2"
+      summary: "Get Partnumber Plan"
+      description: "Client requests content of plan"
+      operationId: "get-production-tests-partumber-plan"
+      parameters:
+      - in: path
+        name: part-number
+        required: true
+        description: "The Part Number"
+        schema:
+          type: string
+          default: "S3908-15.0.0"
+      - in: path
+        name: plan
+        required: true
+        description: "The Test Plan"
+        schema:
+          type: string
+          default: "a"
+
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    post:
+      tags:
+      - "Production Tests v2"
+      summary: "start a test by given partnumber and plan"
+      description: "JSON containing task status"
+      operationId: "post-production-tests-run-plan" 
+      requestBody:
+        description: "run test"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductionTestsV2PartnumberPlan"
+      parameters:
+      - in: path
+        name: part-number
+        required: true
+        schema:
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+      - in: path
+        name: plan
+        required: true
+        schema:
+          type: string
+          default: "a"
+        description: "The Test Plan"
+
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+  ###// GET /webds/production_test/S3908-15.0.0
+  /pt2/partnumber/{part-number}:
+    get:
+      tags:
+      - "Production Tests v2"
+      summary: "Get Partnumber List"
+      description: "Client requests list of plans or list of library scripts."
+      operationId: "get-production-tests-query-partumber"
+      parameters:
+      - in: query
+        name: query
+        description: "Extension values that need to be considered for filter"
+        schema:
+          type: string
+          enum: ["plans", "lib"]
+          default: "plans"
+      - in: path
+        name: part-number
+        required: true
+        schema:
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+
+  ###// GET /webds/production_test/S3908-15.0.0/planA/caseA
+  /pt2/partnumber/{part-number}/{plan}/{case}:
+    post:
+      tags:
+      - "Production Tests v2"
+      summary: "update test case"
+      description: "JSON containing case content"
+      operationId: "post-production-tests-update-case" 
+      requestBody:
+        description: "update case"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductionTestsV2Case"
+      parameters:
+      - in: path
+        name: part-number
+        required: true
+        schema:
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+      - in: path
+        name: plan
+        required: true
+        schema:
+          type: string
+          default: "a"
+        description: "The Test Plan"
+      - in: path
+        name: case
+        required: true
+        schema:
+          type: string
+          default: "My Case"
+        description: "The Test Case"
+
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    delete:
+      tags:
+      - "Production Tests v2"
+      summary: "delete test case"
+      operationId: "delete-production-tests-case" 
+      parameters:
+      - in: path
+        name: part-number
+        required: true
+        schema:
+          type: string
+          default: "S3908-15.0.0"
+        description: "The Part Number"
+      - in: path
+        name: plan
+        required: true
+        schema:
+          type: string
+          default: "a"
+        description: "The Test Plan"
+      - in: path
+        name: case
+        required: true
+        schema:
+          type: string
+          default: "My Case"
+        description: "The Test Case"
+
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
 
 components:
   schemas:
@@ -1043,6 +1232,58 @@ components:
           default: "demo_post"
         param:
           default: [1,2,3]
+
+    ProductionTestsV2PartnumberPlan:
+      type: object
+      properties:
+        task:
+          type: string
+          default: "run"
+
+    ProductionTestsV2Case:
+      type: object
+      properties:
+        name:
+          type: string
+          default: "My Case"
+        limits:
+          type: string
+          default: "limitsA"
+        settings:
+          type: object
+          properties:
+            protocol:
+              type: object
+              properties:
+                i2c:
+                  type: string
+                  default: "0x2C"
+            power:
+              type: object
+              properties:
+                vdd:
+                  type: integer
+                  default: 3300
+                vio:
+                  type: integer
+                  default: 3300
+                vled:
+                  type: integer
+                  default: 3300
+                vbus:
+                  type: integer
+                  default: 3300
+        scripts:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                default: 'Reflash'
+              time:
+                type: string
+                default: '00.00.00'
 
 externalDocs:
   description: "Find out more about Swagger"
