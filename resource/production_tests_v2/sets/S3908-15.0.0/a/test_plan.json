@@ -1,0 +1,1 @@
+{"cases": [{"name": "General Tests A", "limits": "limits2", "settings": {"protocol": {"spi": 0, "speed": 5000}, "power": {"vdd": 1800, "vio": 3300, "vled": 3300, "vbud": 3300}}, "scripts": [{"name": "NoiseTest", "time": "???"}, {"name": "SensorSpeedTest", "time": "???"}]}]}
