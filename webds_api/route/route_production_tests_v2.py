@@ -176,8 +176,12 @@ class ProductionTestsV2Handler(APIHandler):
 
             elif params["target"] == "case":
                 print("@@@CASE", params["plan"], body)
-                data = ProductionTestsManager.setCase(partNumber, params["plan"], body)
-                print("QQQQQQQQQQQQQQQ", data)
+                if body["name"] == params["case"]:
+                    data = ProductionTestsManager.setCase(partNumber, params["plan"], body)
+                else:
+                    print("RENAME!!!!")
+                    data = ProductionTestsManager.deleteCase(partNumber, params["plan"], params["case"])
+                    data = ProductionTestsManager.setCase(partNumber, params["plan"], body)
 
         self.finish(data)
 
