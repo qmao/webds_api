@@ -3,14 +3,21 @@ from tornado.iostream import StreamClosedError
 from tornado import gen
 from jupyter_server.base.handlers import APIHandler
 import os
+from os import listdir
 import json
 import threading
 import time
 from ..production_test_v2.production_test_manager import ProductionTestsManager
 from ..errors import HttpStreamClosed, HttpServerError
-import os
+from ..file.file_manager import FileManager
+import tarfile
+from io import BytesIO
+from .. import webds
+from ..utils import SystemHandler
+from ..production_test_v2.production_test_result import TestResult
 
 g_production_test_thread = None
+g_production_test_log_id = 123456
 
 class ProductionTestsV2Handler(APIHandler):
     
@@ -81,6 +88,7 @@ class ProductionTestsV2Handler(APIHandler):
         data = json.loads("{}")
 
         params = ProductionTestsV2Handler.get_params(subpath)
+        ###test_results = TestResult(g_production_test_log_id)
 
         if params["target"] is None:
             print("SSE LOOP!!!")
@@ -97,14 +105,17 @@ class ProductionTestsV2Handler(APIHandler):
                                 "name" :  name,
                                 "status" : status
                             }
+                            time.sleep(0.3)
                             yield self.publish(json.dumps(send))
                         elif status == 'done':
                             send = {
                                 "index" : index,
                                 "name"  :  name,
                                 "status" : status,
-                                "result" : outcome
+                                ###"result" : outcome
+                                "result" : 'pass'
                             }
+                            ###test_results.add_result(send)
                             yield self.publish(json.dumps(send))
                         else:
                             print("unknown status: ", )
@@ -123,7 +134,9 @@ class ProductionTestsV2Handler(APIHandler):
                 except StreamClosedError:
                     pt.stopTests()
                     raise HttpStreamClosed()
-            
+                ###finally:
+                ###    test_results.save_results_to_json('/home/dsdkuser/test.log')
+
         elif params["target"] == 'log':
             print("GET LOG")
         else:
@@ -134,6 +147,7 @@ class ProductionTestsV2Handler(APIHandler):
                 if query == 'lib':
                     data = ProductionTestsManager.getLib(partNumber)
                 elif query == 'plans':
+                    ProductionTestsV2Handler.check_import_folder()
                     plans = ProductionTestsManager.getPlanList(partNumber)
                     data = { 'plans': plans }
                 else:
@@ -150,10 +164,18 @@ class ProductionTestsV2Handler(APIHandler):
             self.finish(data)
     
     @tornado.web.authenticated
-    def post(self, subpath: str = "", cluster_id: str = ""):
+    async def post(self, subpath: str = "", cluster_id: str = ""):
         print(self.request)
 
         params = ProductionTestsV2Handler.get_params(subpath)
+
+        if params["target"] == "upload":
+            ###import
+            print("import")
+            data = self.save_file("S3908-15.0.0")
+            self.finish(data)
+            return
+
         body = self.get_json_body()
         print(body)
 
@@ -169,17 +191,37 @@ class ProductionTestsV2Handler(APIHandler):
                 print("@@@LIB")
 
             elif params["target"] == "plan":
-                if body["task"] == 'run':
+                if body["task"] == 'create':
+                    print("create test")
+                    ProductionTestsManager.createPlan(partNumber, params["plan"])
+                elif body["task"] == 'run':
                     print("run test")
-                    self.run(partNumber, params["plan"])
-                print("@@@PLAN")
+                    pid = self.run(partNumber, params["plan"])
+                    self.finish({"id": pid})
+                    return
+
+                elif body["task"] == 'export':
+                    print("export test")
+
+                    tar_buffer = BytesIO()
+                    with tarfile.open(fileobj=tar_buffer, mode="w") as tar:
+                        folder = ProductionTestsManager.getPlanFolder(partNumber, params["plan"])
+                        tar.add(folder, arcname=os.path.basename(folder))
+
+                    # Set the appropriate headers
+                    self.set_header('Content-Type', 'application/x-tar')
+                    self.set_header('Content-Disposition', 'attachment; filename="archive.tar"')
+
+                    # Write the tar buffer contents as the response body
+                    self.write(tar_buffer.getvalue())
+
+                    return data
 
             elif params["target"] == "case":
-                print("@@@CASE", params["plan"], body)
                 if body["name"] == params["case"]:
                     data = ProductionTestsManager.setCase(partNumber, params["plan"], body)
                 else:
-                    print("RENAME!!!!")
+                    print("@@RENAME")
                     data = ProductionTestsManager.deleteCase(partNumber, params["plan"], params["case"])
                     data = ProductionTestsManager.setCase(partNumber, params["plan"], body)
 
@@ -203,17 +245,19 @@ class ProductionTestsV2Handler(APIHandler):
                 print("@@@LIB")
 
             elif params["target"] == "plan":
-                print("@@@PLAN")
+                data = ProductionTestsManager.deletePlan(partNumber, params["plan"])
 
             elif params["target"] == "case":
                 data = ProductionTestsManager.deleteCase(partNumber, params["plan"], params["case"])
-                print("QQQQQQQQQQQQQQQ", data)
 
         self.finish(data)
         
-        
-        
+
     def run(self, partNumber, plan):
+        global g_production_test_log_id
+        g_production_test_log_id = g_production_test_log_id + 1
+        print("Test Log ID:", g_production_test_log_id)
+
         ProductionTestsManager.preRun(partNumber, plan)
         pt = ProductionTestsManager()
         global g_production_test_thread
@@ -223,4 +267,50 @@ class ProductionTestsV2Handler(APIHandler):
 
         g_production_test_thread = threading.Thread(target=pt.run)
         g_production_test_thread.start()
+
         print("production test thread start")
+        return g_production_test_log_id
+
+    def check_import_folder():
+        data = {}
+        temp_folder = os.path.join(webds.PRODUCTION_TEST_IMPORT_FOLDER, 'temp')
+        print("CHECK FOLDER ", webds.PRODUCTION_TEST_IMPORT_FOLDER)
+        for tar in listdir(webds.PRODUCTION_TEST_IMPORT_FOLDER):
+            # un-tar
+            tar_file = os.path.join(webds.PRODUCTION_TEST_IMPORT_FOLDER, tar)
+            print("TAR FILE:", tar_file)
+            SystemHandler.CallSysCommand(['mkdir', temp_folder])
+            SystemHandler.CallSysCommand(['tar','-xf', tar_file, '-C', temp_folder])
+
+            try:
+                for f in listdir(temp_folder):
+                    print("TAR UNTAR plan name:", f)
+                    path = os.path.join(temp_folder, f)
+                    data = ProductionTestsManager.importTestPlan(path)
+            except Exception as e:
+                print("exception!!!", e)
+                #### raise HttpServerError(str(e))
+                #### error handling fixme
+            finally:
+                SystemHandler.CallSysCommand(['rm', '-rf', tar_file])
+                SystemHandler.CallSysCommand(['rm', '-rf', temp_folder])
+            return data
+
+    def save_file(self, partnumber):
+        data = json.loads("{}")
+
+        if len(self.request.files.items()) is 0:
+            message = "request.files.items len=0"
+            raise HttpServerError(message)
+
+        for field_name, files in self.request.files.items():
+            for f in files:
+                filename, content_type = f["filename"], f["content_type"]
+                body = f["body"]
+
+                fname =  os.path.join(webds.PRODUCTION_TEST_IMPORT_FOLDER, filename)
+                # save temp hex file in worksapce
+                with open(fname, 'wb') as f:
+                    f.write(body)
+
+        return ProductionTestsV2Handler.check_import_folder()

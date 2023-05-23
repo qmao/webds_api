@@ -12,6 +12,7 @@ WORKSPACE_PACKRAT_CACHE_DIR = os.path.join(WORKSPACE_PACKRAT_DIR, 'Cache')
 WORKSPACE_CACHE_DIR = os.path.join(WORKSPACE, '.cache')
 WORKSPACE_TEMP_FILE = os.path.join(WORKSPACE_CACHE_DIR, 'temp.cache')
 
+
 # connection settings
 CONNECTION_SETTINGS_FILE = '/usr/local/syna/lib/python/touchcomm/connection_params.json'
 CONNECTION_SETTINGS_FILE_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'connection_params.json')
@@ -24,6 +25,8 @@ PRODUCTION_TEST_JSON_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.json.cache'
 PRODUCTION_TEST_PY_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.py.cache')
 PRODUCTION_TEST_LOG_FILE = '/var/log/syna/production_tests.log'
 PRODUCTION_TEST_LOG_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.log.cache')
+
+PRODUCTION_TEST_IMPORT_FOLDER = os.path.join(WORKSPACE_CACHE_DIR, 'temp.pt.tar.folder')
 
 # testrail
 TESTRAIL_CACHE = '/var/cache/syna/testrail/suites'

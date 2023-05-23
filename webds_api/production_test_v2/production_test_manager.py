@@ -1,5 +1,4 @@
 from jupyter_server.base.handlers import APIHandler
-import tornado
 import json
 import re
 import os
@@ -10,6 +9,8 @@ from os.path import isfile, join, exists
 from .. import webds
 from ..utils import SystemHandler
 import threading
+import io
+import zipfile
 
 import time
 import sys
@@ -17,6 +18,8 @@ import pytest
 import logging
 from queue import Queue
 from TestBridge import TestBridge
+import tarfile
+from ..utils import SystemHandler
 
 from ..touchcomm.touchcomm_manager import TouchcommManager
 
@@ -71,7 +74,18 @@ class ProductionTestsManager():
         with open(f) as json_file:
             content = json.load(json_file)
         return content
-        
+
+    def importTestPlan(fpath):
+        with open(os.path.join(fpath, PT_TEST_PLAN_NAME), 'rb') as f:
+            content = json.load(f)
+            print(content)
+            partnumber = content["partnumber"]
+        target = os.path.join(PT_SETS, partnumber)
+        if os.path.exists(os.path.join(PT_SETS, partnumber, os.path.basename(fpath))):
+            raise Exception("plan exist")
+        SystemHandler.CallSysCommand(['mv', fpath, target])
+        return {"partnumber" : partnumber, "plan" : os.path.basename(fpath)}
+
     def writeFile(f, data):
         if not exists(f):
             raise HttpServerError(str('file not found'))
@@ -81,6 +95,43 @@ class ProductionTestsManager():
         dstFile = open(temp_file, "w")
         dstFile.write(data)
         ProductionTestsManager.__copyRootFile(temp_file, f)
+
+    def exportPlan(partnumber, plan):
+        path = os.path.join(PT_SETS, partnumber, plan)
+        return ProductionTestsManager.create_tar(path, '/home/dsdkuser')
+
+    def createPlan(partnumber, plan):
+        path = os.path.join(PT_SETS, partnumber, plan)
+        if os.path.exists(path):
+            raise HttpServerError(str('plan exist'))
+        else:
+            SystemHandler.CallSysCommand(['mkdir', path])
+            default = os.path.join(PT_SETS, 'template')
+            SystemHandler.CallSysCommand(['cp', default + "/*", path + "/"])
+
+            plan_file = os.path.join(path, PT_TEST_PLAN_NAME)
+            with open(plan_file, 'r') as f:
+                data = json.load(f)
+            data['partnumber'] = partnumber
+
+            with open(webds.WORKSPACE_TEMP_FILE, 'w') as f:
+                json.dump(data, f, indent=4)
+
+            SystemHandler.CallSysCommand(['mv', plan_file, path + "/"])
+            return {"data": data}
+
+        raise HttpServerError(str('case not found'))
+
+    def deletePlan(partnumber, plan):
+        path = os.path.join(PT_SETS, partnumber, plan)
+        if os.path.exists(path):
+            SystemHandler.CallSysCommand(['rm', path, '-rf'])
+
+            plist = ProductionTestsManager.getPlanList(partnumber)
+            return {"data": plist}
+        else:
+            raise HttpServerError(str('plan not found'))
+        raise HttpServerError(str('case not found'))
 
     def setCase(partnumber, plan, data):
         path = os.path.join(PT_SETS, partnumber, plan, PT_TEST_PLAN_NAME)
@@ -122,7 +173,6 @@ class ProductionTestsManager():
             raise HttpServerError(str('plan not found'))
         raise HttpServerError(str('case not found'))
 
-
     def getCase(partnumber, plan, case):
         path = os.path.join(PT_SETS, partnumber, plan, PT_TEST_PLAN_NAME)
         content = ProductionTestsManager.readFile(path)
@@ -140,6 +190,10 @@ class ProductionTestsManager():
         plist = sorted([f for f in listdir(path)])
 
         return plist
+
+    def getPlanFolder(partnumber, plan):
+        path = os.path.join(PT_SETS, partnumber, plan)
+        return path
 
     def getScriptList(partnumber, plan):
         tests = []
