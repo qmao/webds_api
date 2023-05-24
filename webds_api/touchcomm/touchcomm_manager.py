@@ -118,11 +118,14 @@ class TouchcommManager(object):
                 data = getattr(self._tc, fn)()
             else:
                 data = getattr(self._tc, fn)(*args)
+            self._lock.release()
         except Exception as e:
             print('Touchcomm {} exception:{}'.format(fn, e))
-            raise e
-        finally:
             self._lock.release()
+            if fn == 'identify':
+                self.disconnect()
+            raise e
+
         return data
 
     def lock(self, lock):
