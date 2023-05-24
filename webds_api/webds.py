@@ -26,6 +26,7 @@ PRODUCTION_TEST_PY_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.py.cache')
 PRODUCTION_TEST_LOG_FILE = '/var/log/syna/production_tests.log'
 PRODUCTION_TEST_LOG_TEMP = os.path.join(WORKSPACE_CACHE_DIR, 'ptset.log.cache')
 
+PRODUCTION_TEST_LOG_FOLDER = '/usr/local/syna/lib/python/production_tests_v2/log'
 PRODUCTION_TEST_IMPORT_FOLDER = os.path.join(WORKSPACE_CACHE_DIR, 'temp.pt.tar.folder')
 
 # testrail

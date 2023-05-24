@@ -7,6 +7,7 @@ from os import listdir
 import json
 import threading
 import time
+import datetime
 from ..production_test_v2.production_test_manager import ProductionTestsManager
 from ..errors import HttpStreamClosed, HttpServerError
 from ..file.file_manager import FileManager
@@ -15,6 +16,7 @@ from io import BytesIO
 from .. import webds
 from ..utils import SystemHandler
 from ..production_test_v2.production_test_result import TestResult
+
 
 g_production_test_thread = None
 g_production_test_log_id = 123456
@@ -76,7 +78,7 @@ class ProductionTestsV2Handler(APIHandler):
         print(self.request)
         print("subpath:", subpath)
         ###print(cluster_id)
-        
+
         try:
             query = self.get_query_argument("query")
         except:
@@ -88,7 +90,8 @@ class ProductionTestsV2Handler(APIHandler):
         data = json.loads("{}")
 
         params = ProductionTestsV2Handler.get_params(subpath)
-        ###test_results = TestResult(g_production_test_log_id)
+        test_results = TestResult(g_production_test_log_id)
+        start_time = datetime.datetime.now()
 
         if params["target"] is None:
             print("SSE LOOP!!!")
@@ -115,7 +118,7 @@ class ProductionTestsV2Handler(APIHandler):
                                 ###"result" : outcome
                                 "result" : 'pass'
                             }
-                            ###test_results.add_result(send)
+                            test_results.add_result(send)
                             yield self.publish(json.dumps(send))
                         else:
                             print("unknown status: ", )
@@ -132,13 +135,16 @@ class ProductionTestsV2Handler(APIHandler):
                     yield gen.sleep(0.0001)
     
                 except StreamClosedError:
+                    self.save_log(test_results, start_time)
                     pt.stopTests()
                     raise HttpStreamClosed()
-                ###finally:
-                ###    test_results.save_results_to_json('/home/dsdkuser/test.log')
+
+            self.save_log(test_results, start_time)
 
         elif params["target"] == 'log':
-            print("GET LOG")
+            if query == 'list':
+                data = FileManager.GetTree(webds.PRODUCTION_TEST_LOG_FOLDER)
+                self.finish(data)
         else:
             partNumber = params["partnumber"]
             print(partNumber)
@@ -171,8 +177,10 @@ class ProductionTestsV2Handler(APIHandler):
 
         if params["target"] == "upload":
             ###import
-            print("import")
-            data = self.save_file("S3908-15.0.0")
+            data = self.save_file()
+            print("import", data)
+            plans = ProductionTestsManager.getPlanList(data["partnumber"])
+            data = { 'plans': plans }
             self.finish(data)
             return
 
@@ -194,11 +202,13 @@ class ProductionTestsV2Handler(APIHandler):
                 if body["task"] == 'create':
                     print("create test")
                     ProductionTestsManager.createPlan(partNumber, params["plan"])
+                    plans = ProductionTestsManager.getPlanList(partNumber)
+                    data = { 'plans': plans }
+
                 elif body["task"] == 'run':
                     print("run test")
                     pid = self.run(partNumber, params["plan"])
-                    self.finish({"id": pid})
-                    return
+                    data = {"id": pid}
 
                 elif body["task"] == 'export':
                     print("export test")
@@ -296,7 +306,7 @@ class ProductionTestsV2Handler(APIHandler):
                 SystemHandler.CallSysCommand(['rm', '-rf', temp_folder])
             return data
 
-    def save_file(self, partnumber):
+    def save_file(self):
         data = json.loads("{}")
 
         if len(self.request.files.items()) is 0:
@@ -314,3 +324,11 @@ class ProductionTestsV2Handler(APIHandler):
                     f.write(body)
 
         return ProductionTestsV2Handler.check_import_folder()
+
+    def save_log(self, test_results, start_time):
+        end_time = datetime.datetime.now()
+        time_spent = end_time - start_time
+        test_results.add_time({"start": start_time.strftime("%m/%d/%Y, %H:%M:%S"), "end": end_time.strftime("%m/%d/%Y, %H:%M:%S"), "total": str(time_spent)})
+        fname = os.path.join(webds.PRODUCTION_TEST_LOG_FOLDER, str(test_results.get_info()) +  ".log")
+        test_results.save_results_to_json(webds.PRODUCTION_TEST_LOG_TEMP)
+        SystemHandler.CallSysCommand(['mv', webds.PRODUCTION_TEST_LOG_TEMP, fname])

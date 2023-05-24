@@ -3,26 +3,24 @@ import json
 import re
 import os
 import py
-from pathlib import Path
-from os import listdir
-from os.path import isfile, join, exists
-from .. import webds
-from ..utils import SystemHandler
-import threading
-import io
-import zipfile
-
 import time
 import sys
 import pytest
 import logging
+import io
+import threading
+import tarfile
+
+
+from pathlib import Path
+from os import listdir
+from os.path import isfile, join, exists
 from queue import Queue
 from TestBridge import TestBridge
-import tarfile
+
+from .. import webds
 from ..utils import SystemHandler
-
 from ..touchcomm.touchcomm_manager import TouchcommManager
-
 from ..errors import HttpServerError
 
 
@@ -117,7 +115,7 @@ class ProductionTestsManager():
             with open(webds.WORKSPACE_TEMP_FILE, 'w') as f:
                 json.dump(data, f, indent=4)
 
-            SystemHandler.CallSysCommand(['mv', plan_file, path + "/"])
+            SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, plan_file])
             return {"data": data}
 
         raise HttpServerError(str('case not found'))
