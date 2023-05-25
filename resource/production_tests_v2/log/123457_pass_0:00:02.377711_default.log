@@ -1,0 +1,798 @@
+{
+    "id": 123457,
+    "results": [
+        {
+            "index": "001",
+            "name": "test_001_Configuration",
+            "result": "pass",
+            "status": "done"
+        },
+        {
+            "index": "002",
+            "name": "test_002_AbsRawCapTest",
+            "result": "pass",
+            "status": "done"
+        },
+        {
+            "index": "003",
+            "name": "test_003_AdcRangeTest",
+            "result": "pass",
+            "status": "done"
+        }
+    ],
+    "time": {
+        "end": "05/23/2023, 06:01:29",
+        "start": "05/23/2023, 06:01:27",
+        "total": "0:00:02.377711"
+    }
+}2023-05-23 06:02:40,538 [INFO ]  ['Configuration', 'AbsRawCapTest', 'AdcRangeTest']
+2023-05-23 06:02:40,539 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:40,539 [INFO ]  TestBridge reset
+2023-05-23 06:02:40,540 [INFO ]  production test thread start
+2023-05-23 06:02:40,580 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:02:40,601 [INFO ]  subpath:
+2023-05-23 06:02:40,602 [INFO ]   
+2023-05-23 06:02:40,603 [INFO ]  
+2023-05-23 06:02:40,604 [INFO ]  query:
+2023-05-23 06:02:40,605 [INFO ]   
+2023-05-23 06:02:40,606 [INFO ]  None
+2023-05-23 06:02:40,607 [INFO ]  arguments:
+2023-05-23 06:02:40,608 [INFO ]   
+2023-05-23 06:02:40,609 [INFO ]  {}
+2023-05-23 06:02:40,611 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:02:40,611 [INFO ]  SSE LOOP!!!
+2023-05-23 06:02:40,612 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:40,759 [INFO ]  start session: 
+2023-05-23 06:02:40,759 [INFO ]   
+2023-05-23 06:02:40,760 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:02:40,775 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:02:40,775 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:02:40,792 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:02:40,792 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:02:40,819 [INFO ]  collected 3 items
+2023-05-23 06:02:40,821 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py 
+2023-05-23 06:02:40,824 [INFO ]  F
+2023-05-23 06:02:40,827 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:02:40,830 [INFO ]  F
+2023-05-23 06:02:40,832 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:02:40,836 [INFO ]  F
+2023-05-23 06:02:40,840 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:02:40,841 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py::test_main
+2023-05-23 06:02:40,841 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:02:40,842 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:02:40,842 [INFO ]  ======================== 3 failed, 7 warnings in 0.07s =========================
+2023-05-23 06:02:40,843 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:45,414 [INFO ]  ['Configuration', 'AbsRawCapTest', 'AdcRangeTest']
+2023-05-23 06:02:45,415 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:45,416 [INFO ]  TestBridge reset
+2023-05-23 06:02:45,416 [INFO ]  production test thread start
+2023-05-23 06:02:45,469 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:02:45,470 [INFO ]  subpath:
+2023-05-23 06:02:45,471 [INFO ]   
+2023-05-23 06:02:45,472 [INFO ]  
+2023-05-23 06:02:45,473 [INFO ]  query:
+2023-05-23 06:02:45,474 [INFO ]   
+2023-05-23 06:02:45,475 [INFO ]  None
+2023-05-23 06:02:45,475 [INFO ]  arguments:
+2023-05-23 06:02:45,476 [INFO ]   
+2023-05-23 06:02:45,477 [INFO ]  {}
+2023-05-23 06:02:45,478 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:02:45,478 [INFO ]  SSE LOOP!!!
+2023-05-23 06:02:45,479 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:45,604 [INFO ]  start session: 
+2023-05-23 06:02:45,605 [INFO ]   
+2023-05-23 06:02:45,605 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:02:45,620 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:02:45,621 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:02:45,638 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:02:45,639 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:02:45,666 [INFO ]  collected 3 items
+2023-05-23 06:02:45,668 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py 
+2023-05-23 06:02:45,673 [INFO ]  F
+2023-05-23 06:02:45,676 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:02:45,679 [INFO ]  F
+2023-05-23 06:02:45,681 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:02:45,685 [INFO ]  F
+2023-05-23 06:02:45,690 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:02:45,691 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py::test_main
+2023-05-23 06:02:45,691 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:02:45,691 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:02:45,692 [INFO ]  ======================== 3 failed, 7 warnings in 0.07s =========================
+2023-05-23 06:02:45,693 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:50,899 [INFO ]  ['Configuration', 'AbsRawCapTest', 'AdcRangeTest']
+2023-05-23 06:02:50,900 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:50,901 [INFO ]  TestBridge reset
+2023-05-23 06:02:50,902 [INFO ]  production test thread start
+2023-05-23 06:02:50,953 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:02:50,954 [INFO ]  subpath:
+2023-05-23 06:02:50,955 [INFO ]   
+2023-05-23 06:02:50,956 [INFO ]  
+2023-05-23 06:02:50,957 [INFO ]  query:
+2023-05-23 06:02:50,958 [INFO ]   
+2023-05-23 06:02:50,959 [INFO ]  None
+2023-05-23 06:02:50,960 [INFO ]  arguments:
+2023-05-23 06:02:50,961 [INFO ]   
+2023-05-23 06:02:50,962 [INFO ]  {}
+2023-05-23 06:02:50,963 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:02:50,964 [INFO ]  SSE LOOP!!!
+2023-05-23 06:02:50,965 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:51,088 [INFO ]  start session: 
+2023-05-23 06:02:51,088 [INFO ]   
+2023-05-23 06:02:51,089 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:02:51,111 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:02:51,112 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:02:51,137 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:02:51,138 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:02:51,174 [INFO ]  collected 3 items
+2023-05-23 06:02:51,177 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py 
+2023-05-23 06:02:51,183 [INFO ]  F
+2023-05-23 06:02:51,186 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:02:51,194 [INFO ]  F
+2023-05-23 06:02:51,197 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:02:51,200 [INFO ]  F
+2023-05-23 06:02:51,205 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:02:51,205 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py::test_main
+2023-05-23 06:02:51,206 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:02:51,206 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:02:51,207 [INFO ]  ======================== 3 failed, 7 warnings in 0.10s =========================
+2023-05-23 06:02:51,208 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:55,921 [INFO ]  ['Configuration', 'AbsRawCapTest', 'AdcRangeTest']
+2023-05-23 06:02:55,922 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:55,923 [INFO ]  TestBridge reset
+2023-05-23 06:02:55,924 [INFO ]  production test thread start
+2023-05-23 06:02:55,957 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:02:55,976 [INFO ]  subpath:
+2023-05-23 06:02:55,977 [INFO ]   
+2023-05-23 06:02:55,978 [INFO ]  
+2023-05-23 06:02:55,979 [INFO ]  query:
+2023-05-23 06:02:55,980 [INFO ]   
+2023-05-23 06:02:55,982 [INFO ]  None
+2023-05-23 06:02:55,983 [INFO ]  arguments:
+2023-05-23 06:02:55,984 [INFO ]   
+2023-05-23 06:02:55,985 [INFO ]  {}
+2023-05-23 06:02:55,986 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:02:55,987 [INFO ]  SSE LOOP!!!
+2023-05-23 06:02:55,988 [INFO ]  ProductionTestsManager init
+2023-05-23 06:02:56,112 [INFO ]  start session: 
+2023-05-23 06:02:56,113 [INFO ]   
+2023-05-23 06:02:56,114 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:02:56,128 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:02:56,129 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:02:56,146 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:02:56,147 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:02:56,174 [INFO ]  collected 3 items
+2023-05-23 06:02:56,176 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py 
+2023-05-23 06:02:56,180 [INFO ]  F
+2023-05-23 06:02:56,182 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:02:56,186 [INFO ]  F
+2023-05-23 06:02:56,188 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:02:56,192 [INFO ]  F
+2023-05-23 06:02:56,197 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:02:56,197 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py::test_main
+2023-05-23 06:02:56,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:02:56,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:02:56,199 [INFO ]  ======================== 3 failed, 7 warnings in 0.07s =========================
+2023-05-23 06:02:56,200 [INFO ]  ProductionTestsManager init
+2023-05-23 06:03:01,196 [INFO ]  ['Configuration', 'AbsRawCapTest', 'AdcRangeTest']
+2023-05-23 06:03:01,197 [INFO ]  ProductionTestsManager init
+2023-05-23 06:03:01,199 [INFO ]  TestBridge reset
+2023-05-23 06:03:01,199 [INFO ]  production test thread start
+2023-05-23 06:03:01,234 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:03:01,257 [INFO ]  subpath:
+2023-05-23 06:03:01,258 [INFO ]   
+2023-05-23 06:03:01,260 [INFO ]  
+2023-05-23 06:03:01,261 [INFO ]  query:
+2023-05-23 06:03:01,263 [INFO ]   
+2023-05-23 06:03:01,264 [INFO ]  None
+2023-05-23 06:03:01,266 [INFO ]  arguments:
+2023-05-23 06:03:01,267 [INFO ]   
+2023-05-23 06:03:01,269 [INFO ]  {}
+2023-05-23 06:03:01,270 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:03:01,272 [INFO ]  SSE LOOP!!!
+2023-05-23 06:03:01,288 [INFO ]  ProductionTestsManager init
+2023-05-23 06:03:01,396 [INFO ]  start session: 
+2023-05-23 06:03:01,397 [INFO ]   
+2023-05-23 06:03:01,397 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:03:01,415 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:03:01,416 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:03:01,442 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:03:01,443 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:03:01,481 [INFO ]  collected 3 items
+2023-05-23 06:03:01,484 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py 
+2023-05-23 06:03:01,490 [INFO ]  F
+2023-05-23 06:03:01,494 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:03:01,499 [INFO ]  F
+2023-05-23 06:03:01,502 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:03:01,508 [INFO ]  F
+2023-05-23 06:03:01,514 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:03:01,515 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_Configuration.py::test_main
+2023-05-23 06:03:01,515 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:03:01,516 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:03:01,517 [INFO ]  ======================== 3 failed, 7 warnings in 0.10s =========================
+2023-05-23 06:03:01,518 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:16,670 [INFO ]  ['FirmwareID', 'DevicePackageTest', 'AdcRangeTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 06:12:16,672 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:16,673 [INFO ]  TestBridge reset
+2023-05-23 06:12:16,674 [INFO ]  production test thread start
+2023-05-23 06:12:16,706 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:12:16,728 [INFO ]  subpath:
+2023-05-23 06:12:16,729 [INFO ]   
+2023-05-23 06:12:16,731 [INFO ]  
+2023-05-23 06:12:16,734 [INFO ]  query:
+2023-05-23 06:12:16,736 [INFO ]   
+2023-05-23 06:12:16,737 [INFO ]  None
+2023-05-23 06:12:16,738 [INFO ]  arguments:
+2023-05-23 06:12:16,740 [INFO ]   
+2023-05-23 06:12:16,741 [INFO ]  {}
+2023-05-23 06:12:16,742 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:12:16,762 [INFO ]  SSE LOOP!!!
+2023-05-23 06:12:16,764 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:16,867 [INFO ]  start session: 
+2023-05-23 06:12:16,868 [INFO ]   
+2023-05-23 06:12:16,869 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:12:16,884 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:12:16,885 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:12:16,902 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:12:16,903 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:12:16,994 [INFO ]  collected 5 items
+2023-05-23 06:12:16,996 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_FirmwareID.py 
+2023-05-23 06:12:17,000 [INFO ]  F
+2023-05-23 06:12:17,003 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_DevicePackageTest.py 
+2023-05-23 06:12:17,006 [INFO ]  F
+2023-05-23 06:12:17,009 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:12:17,013 [INFO ]  F
+2023-05-23 06:12:17,015 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_DevicePackageTest.py 
+2023-05-23 06:12:17,019 [INFO ]  F
+2023-05-23 06:12:17,021 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_AbsRawCapTest.py 
+2023-05-23 06:12:17,026 [INFO ]  F
+2023-05-23 06:12:17,031 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:12:17,032 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_FirmwareID.py::test_main
+2023-05-23 06:12:17,032 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_DevicePackageTest.py::test_main
+2023-05-23 06:12:17,033 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:12:17,033 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_DevicePackageTest.py::test_main
+2023-05-23 06:12:17,034 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_AbsRawCapTest.py::test_main
+2023-05-23 06:12:17,035 [INFO ]  ======================== 5 failed, 9 warnings in 0.15s =========================
+2023-05-23 06:12:17,036 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:28,844 [INFO ]  ['FirmwareID', 'DevicePackageTest', 'AdcRangeTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 06:12:28,845 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:28,847 [INFO ]  TestBridge reset
+2023-05-23 06:12:28,847 [INFO ]  production test thread start
+2023-05-23 06:12:28,881 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:12:28,913 [INFO ]  subpath:
+2023-05-23 06:12:28,916 [INFO ]   
+2023-05-23 06:12:28,920 [INFO ]  
+2023-05-23 06:12:28,922 [INFO ]  query:
+2023-05-23 06:12:28,925 [INFO ]   
+2023-05-23 06:12:28,927 [INFO ]  None
+2023-05-23 06:12:28,930 [INFO ]  arguments:
+2023-05-23 06:12:28,932 [INFO ]   
+2023-05-23 06:12:28,958 [INFO ]  {}
+2023-05-23 06:12:28,961 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:12:28,963 [INFO ]  SSE LOOP!!!
+2023-05-23 06:12:28,966 [INFO ]  ProductionTestsManager init
+2023-05-23 06:12:29,078 [INFO ]  start session: 
+2023-05-23 06:12:29,079 [INFO ]   
+2023-05-23 06:12:29,080 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:12:29,095 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:12:29,097 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:12:29,114 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:12:29,116 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:12:29,156 [INFO ]  collected 5 items
+2023-05-23 06:12:29,159 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_FirmwareID.py 
+2023-05-23 06:12:29,163 [INFO ]  F
+2023-05-23 06:12:29,166 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_DevicePackageTest.py 
+2023-05-23 06:12:29,170 [INFO ]  F
+2023-05-23 06:12:29,173 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:12:29,177 [INFO ]  F
+2023-05-23 06:12:29,180 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_DevicePackageTest.py 
+2023-05-23 06:12:29,184 [INFO ]  F
+2023-05-23 06:12:29,187 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_AbsRawCapTest.py 
+2023-05-23 06:12:29,191 [INFO ]  F
+2023-05-23 06:12:29,197 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:12:29,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_FirmwareID.py::test_main
+2023-05-23 06:12:29,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_DevicePackageTest.py::test_main
+2023-05-23 06:12:29,199 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:12:29,200 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_DevicePackageTest.py::test_main
+2023-05-23 06:12:29,200 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_AbsRawCapTest.py::test_main
+2023-05-23 06:12:29,201 [INFO ]  ======================== 5 failed, 9 warnings in 0.11s =========================
+2023-05-23 06:12:29,202 [INFO ]  ProductionTestsManager init
+2023-05-23 06:55:05,353 [INFO ]  ['ResetPinTest', 'AbsRawCapTest', 'AdcRangeTest', 'BSCCalibration', 'DevicePackageTest', 'ExtendedHighResistance', 'ForceButtonOpenGuardPlane', 'ForceButtonOpenGuardTrace', 'FullRawCapTest', 'GPIOOpen', 'GPIOShort', 'HighResistanceTest', 'LockdownTest', 'NoiseTest', 'SensorSpeedTest', 'SyncConnectionTest', 'SyncShortTest', 'TRxGround', 'TRxSensorOpen', 'TagsMoisture', 'TransRawCap', 'TrxTrxShortTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 06:55:05,355 [INFO ]  ProductionTestsManager init
+2023-05-23 06:55:05,356 [INFO ]  TestBridge reset
+2023-05-23 06:55:05,357 [INFO ]  production test thread start
+2023-05-23 06:55:05,416 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 06:55:05,418 [INFO ]  subpath:
+2023-05-23 06:55:05,420 [INFO ]   
+2023-05-23 06:55:05,422 [INFO ]  
+2023-05-23 06:55:05,425 [INFO ]  query:
+2023-05-23 06:55:05,427 [INFO ]   
+2023-05-23 06:55:05,439 [INFO ]  None
+2023-05-23 06:55:05,447 [INFO ]  arguments:
+2023-05-23 06:55:05,449 [INFO ]   
+2023-05-23 06:55:05,451 [INFO ]  {}
+2023-05-23 06:55:05,453 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 06:55:05,456 [INFO ]  SSE LOOP!!!
+2023-05-23 06:55:05,458 [INFO ]  ProductionTestsManager init
+2023-05-23 06:55:05,560 [INFO ]  start session: 
+2023-05-23 06:55:05,561 [INFO ]   
+2023-05-23 06:55:05,562 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 06:55:05,577 [INFO ]  ============================= test session starts ==============================
+2023-05-23 06:55:05,578 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 06:55:05,596 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 06:55:05,597 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 06:55:06,418 [INFO ]  collected 24 items
+2023-05-23 06:55:06,422 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py 
+2023-05-23 06:55:06,426 [INFO ]  F
+2023-05-23 06:55:06,429 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 06:55:06,433 [INFO ]  F
+2023-05-23 06:55:06,436 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 06:55:06,440 [INFO ]  F
+2023-05-23 06:55:06,442 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py 
+2023-05-23 06:55:06,446 [INFO ]  F
+2023-05-23 06:55:06,449 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py 
+2023-05-23 06:55:06,453 [INFO ]  F
+2023-05-23 06:55:06,456 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py 
+2023-05-23 06:55:06,460 [INFO ]  F
+2023-05-23 06:55:06,462 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py 
+2023-05-23 06:55:06,466 [INFO ]  F
+2023-05-23 06:55:06,469 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py 
+2023-05-23 06:55:06,473 [INFO ]  F
+2023-05-23 06:55:06,475 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py 
+2023-05-23 06:55:06,479 [INFO ]  F
+2023-05-23 06:55:06,482 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py 
+2023-05-23 06:55:06,486 [INFO ]  F
+2023-05-23 06:55:06,489 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py 
+2023-05-23 06:55:06,493 [INFO ]  F
+2023-05-23 06:55:06,496 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py 
+2023-05-23 06:55:06,499 [INFO ]  F
+2023-05-23 06:55:06,502 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py 
+2023-05-23 06:55:06,506 [INFO ]  F
+2023-05-23 06:55:06,508 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py 
+2023-05-23 06:55:06,512 [INFO ]  F
+2023-05-23 06:55:06,515 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py 
+2023-05-23 06:55:06,519 [INFO ]  F
+2023-05-23 06:55:06,521 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py 
+2023-05-23 06:55:06,526 [INFO ]  F
+2023-05-23 06:55:06,528 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py 
+2023-05-23 06:55:06,532 [INFO ]  F
+2023-05-23 06:55:06,535 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py 
+2023-05-23 06:55:06,539 [INFO ]  F
+2023-05-23 06:55:06,542 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py 
+2023-05-23 06:55:06,546 [INFO ]  F
+2023-05-23 06:55:06,549 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py 
+2023-05-23 06:55:06,553 [INFO ]  F
+2023-05-23 06:55:06,555 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py 
+2023-05-23 06:55:06,560 [INFO ]  F
+2023-05-23 06:55:06,563 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py 
+2023-05-23 06:55:06,567 [INFO ]  F
+2023-05-23 06:55:06,570 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py 
+2023-05-23 06:55:06,574 [INFO ]  F
+2023-05-23 06:55:06,576 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py 
+2023-05-23 06:55:06,580 [INFO ]  F
+2023-05-23 06:55:06,591 [INFO ]  =========================== short test summary info ============================
+2023-05-23 06:55:06,592 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py::test_main
+2023-05-23 06:55:06,592 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 06:55:06,593 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 06:55:06,594 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py::test_main
+2023-05-23 06:55:06,594 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py::test_main
+2023-05-23 06:55:06,595 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py::test_main
+2023-05-23 06:55:06,596 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py::test_main
+2023-05-23 06:55:06,596 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py::test_main
+2023-05-23 06:55:06,597 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py::test_main
+2023-05-23 06:55:06,598 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py::test_main
+2023-05-23 06:55:06,598 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py::test_main
+2023-05-23 06:55:06,599 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py::test_main
+2023-05-23 06:55:06,599 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py::test_main
+2023-05-23 06:55:06,600 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py::test_main
+2023-05-23 06:55:06,601 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py::test_main
+2023-05-23 06:55:06,601 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py::test_main
+2023-05-23 06:55:06,602 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py::test_main
+2023-05-23 06:55:06,603 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py::test_main
+2023-05-23 06:55:06,603 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py::test_main
+2023-05-23 06:55:06,604 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py::test_main
+2023-05-23 06:55:06,605 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py::test_main
+2023-05-23 06:55:06,605 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py::test_main
+2023-05-23 06:55:06,606 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py::test_main
+2023-05-23 06:55:06,607 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py::test_main
+2023-05-23 06:55:06,607 [INFO ]  ======================= 24 failed, 28 warnings in 1.03s ========================
+2023-05-23 06:55:06,609 [INFO ]  ProductionTestsManager init
+2023-05-23 07:01:59,030 [INFO ]  ['ResetPinTest', 'AbsRawCapTest', 'AdcRangeTest', 'BSCCalibration', 'DevicePackageTest', 'ExtendedHighResistance', 'ForceButtonOpenGuardPlane', 'ForceButtonOpenGuardTrace', 'FullRawCapTest', 'GPIOOpen', 'GPIOShort', 'HighResistanceTest', 'LockdownTest', 'NoiseTest', 'SensorSpeedTest', 'SyncConnectionTest', 'SyncShortTest', 'TRxGround', 'TRxSensorOpen', 'TagsMoisture', 'TransRawCap', 'TrxTrxShortTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 07:01:59,032 [INFO ]  ProductionTestsManager init
+2023-05-23 07:01:59,034 [INFO ]  TestBridge reset
+2023-05-23 07:01:59,035 [INFO ]  production test thread start
+2023-05-23 07:01:59,071 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 07:01:59,092 [INFO ]  subpath:
+2023-05-23 07:01:59,094 [INFO ]   
+2023-05-23 07:01:59,096 [INFO ]  
+2023-05-23 07:01:59,098 [INFO ]  query:
+2023-05-23 07:01:59,100 [INFO ]   
+2023-05-23 07:01:59,102 [INFO ]  None
+2023-05-23 07:01:59,105 [INFO ]  arguments:
+2023-05-23 07:01:59,127 [INFO ]   
+2023-05-23 07:01:59,130 [INFO ]  {}
+2023-05-23 07:01:59,133 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 07:01:59,136 [INFO ]  SSE LOOP!!!
+2023-05-23 07:01:59,140 [INFO ]  ProductionTestsManager init
+2023-05-23 07:01:59,269 [INFO ]  start session: 
+2023-05-23 07:01:59,270 [INFO ]   
+2023-05-23 07:01:59,271 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 07:01:59,287 [INFO ]  ============================= test session starts ==============================
+2023-05-23 07:01:59,288 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 07:01:59,305 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 07:01:59,306 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 07:01:59,459 [INFO ]  collected 24 items
+2023-05-23 07:01:59,463 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py 
+2023-05-23 07:01:59,467 [INFO ]  F
+2023-05-23 07:01:59,470 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 07:01:59,474 [INFO ]  F
+2023-05-23 07:01:59,477 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 07:01:59,482 [INFO ]  F
+2023-05-23 07:01:59,484 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py 
+2023-05-23 07:01:59,489 [INFO ]  F
+2023-05-23 07:01:59,492 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py 
+2023-05-23 07:01:59,497 [INFO ]  F
+2023-05-23 07:01:59,500 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py 
+2023-05-23 07:01:59,504 [INFO ]  F
+2023-05-23 07:01:59,507 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py 
+2023-05-23 07:01:59,511 [INFO ]  F
+2023-05-23 07:01:59,513 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py 
+2023-05-23 07:01:59,517 [INFO ]  F
+2023-05-23 07:01:59,520 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py 
+2023-05-23 07:01:59,524 [INFO ]  F
+2023-05-23 07:01:59,527 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py 
+2023-05-23 07:01:59,531 [INFO ]  F
+2023-05-23 07:01:59,534 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py 
+2023-05-23 07:01:59,538 [INFO ]  F
+2023-05-23 07:01:59,541 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py 
+2023-05-23 07:01:59,545 [INFO ]  F
+2023-05-23 07:01:59,547 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py 
+2023-05-23 07:01:59,551 [INFO ]  F
+2023-05-23 07:01:59,554 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py 
+2023-05-23 07:01:59,558 [INFO ]  F
+2023-05-23 07:01:59,561 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py 
+2023-05-23 07:01:59,565 [INFO ]  F
+2023-05-23 07:01:59,567 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py 
+2023-05-23 07:01:59,572 [INFO ]  F
+2023-05-23 07:01:59,575 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py 
+2023-05-23 07:01:59,579 [INFO ]  F
+2023-05-23 07:01:59,581 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py 
+2023-05-23 07:01:59,586 [INFO ]  F
+2023-05-23 07:01:59,588 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py 
+2023-05-23 07:01:59,592 [INFO ]  F
+2023-05-23 07:01:59,595 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py 
+2023-05-23 07:01:59,599 [INFO ]  F
+2023-05-23 07:01:59,601 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py 
+2023-05-23 07:01:59,606 [INFO ]  F
+2023-05-23 07:01:59,608 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py 
+2023-05-23 07:01:59,613 [INFO ]  F
+2023-05-23 07:01:59,616 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py 
+2023-05-23 07:01:59,620 [INFO ]  F
+2023-05-23 07:01:59,622 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py 
+2023-05-23 07:01:59,626 [INFO ]  F
+2023-05-23 07:01:59,637 [INFO ]  =========================== short test summary info ============================
+2023-05-23 07:01:59,638 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py::test_main
+2023-05-23 07:01:59,639 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 07:01:59,639 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 07:01:59,640 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py::test_main
+2023-05-23 07:01:59,641 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py::test_main
+2023-05-23 07:01:59,642 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py::test_main
+2023-05-23 07:01:59,642 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py::test_main
+2023-05-23 07:01:59,643 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py::test_main
+2023-05-23 07:01:59,644 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py::test_main
+2023-05-23 07:01:59,644 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py::test_main
+2023-05-23 07:01:59,645 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py::test_main
+2023-05-23 07:01:59,646 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py::test_main
+2023-05-23 07:01:59,647 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py::test_main
+2023-05-23 07:01:59,647 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py::test_main
+2023-05-23 07:01:59,648 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py::test_main
+2023-05-23 07:01:59,649 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py::test_main
+2023-05-23 07:01:59,649 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py::test_main
+2023-05-23 07:01:59,650 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py::test_main
+2023-05-23 07:01:59,651 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py::test_main
+2023-05-23 07:01:59,652 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py::test_main
+2023-05-23 07:01:59,652 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py::test_main
+2023-05-23 07:01:59,653 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py::test_main
+2023-05-23 07:01:59,654 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py::test_main
+2023-05-23 07:01:59,654 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py::test_main
+2023-05-23 07:01:59,655 [INFO ]  ======================= 24 failed, 28 warnings in 0.37s ========================
+2023-05-23 07:01:59,657 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:39,569 [INFO ]  ['ResetPinTest', 'AbsRawCapTest', 'AdcRangeTest', 'BSCCalibration', 'DevicePackageTest', 'ExtendedHighResistance', 'ForceButtonOpenGuardPlane', 'ForceButtonOpenGuardTrace', 'FullRawCapTest', 'GPIOOpen', 'GPIOShort', 'HighResistanceTest', 'LockdownTest', 'NoiseTest', 'SensorSpeedTest', 'SyncConnectionTest', 'SyncShortTest', 'TRxGround', 'TRxSensorOpen', 'TagsMoisture', 'TransRawCap', 'TrxTrxShortTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 07:03:39,571 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:39,573 [INFO ]  TestBridge reset
+2023-05-23 07:03:39,573 [INFO ]  production test thread start
+2023-05-23 07:03:39,609 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 07:03:39,633 [INFO ]  subpath:
+2023-05-23 07:03:39,636 [INFO ]   
+2023-05-23 07:03:39,639 [INFO ]  
+2023-05-23 07:03:39,641 [INFO ]  query:
+2023-05-23 07:03:39,644 [INFO ]   
+2023-05-23 07:03:39,647 [INFO ]  None
+2023-05-23 07:03:39,650 [INFO ]  arguments:
+2023-05-23 07:03:39,681 [INFO ]   
+2023-05-23 07:03:39,685 [INFO ]  {}
+2023-05-23 07:03:39,688 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 07:03:39,691 [INFO ]  SSE LOOP!!!
+2023-05-23 07:03:39,695 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:39,810 [INFO ]  start session: 
+2023-05-23 07:03:39,811 [INFO ]   
+2023-05-23 07:03:39,812 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 07:03:39,827 [INFO ]  ============================= test session starts ==============================
+2023-05-23 07:03:39,829 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 07:03:39,848 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 07:03:39,849 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 07:03:39,999 [INFO ]  collected 24 items
+2023-05-23 07:03:40,003 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py 
+2023-05-23 07:03:40,008 [INFO ]  F
+2023-05-23 07:03:40,010 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 07:03:40,014 [INFO ]  F
+2023-05-23 07:03:40,017 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 07:03:40,022 [INFO ]  F
+2023-05-23 07:03:40,025 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py 
+2023-05-23 07:03:40,029 [INFO ]  F
+2023-05-23 07:03:40,032 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py 
+2023-05-23 07:03:40,036 [INFO ]  F
+2023-05-23 07:03:40,038 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py 
+2023-05-23 07:03:40,043 [INFO ]  F
+2023-05-23 07:03:40,045 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py 
+2023-05-23 07:03:40,050 [INFO ]  F
+2023-05-23 07:03:40,053 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py 
+2023-05-23 07:03:40,057 [INFO ]  F
+2023-05-23 07:03:40,060 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py 
+2023-05-23 07:03:40,065 [INFO ]  F
+2023-05-23 07:03:40,068 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py 
+2023-05-23 07:03:40,073 [INFO ]  F
+2023-05-23 07:03:40,076 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py 
+2023-05-23 07:03:40,080 [INFO ]  F
+2023-05-23 07:03:40,082 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py 
+2023-05-23 07:03:40,086 [INFO ]  F
+2023-05-23 07:03:40,089 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py 
+2023-05-23 07:03:40,093 [INFO ]  F
+2023-05-23 07:03:40,096 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py 
+2023-05-23 07:03:40,100 [INFO ]  F
+2023-05-23 07:03:40,102 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py 
+2023-05-23 07:03:40,107 [INFO ]  F
+2023-05-23 07:03:40,110 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py 
+2023-05-23 07:03:40,114 [INFO ]  F
+2023-05-23 07:03:40,117 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py 
+2023-05-23 07:03:40,121 [INFO ]  F
+2023-05-23 07:03:40,124 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py 
+2023-05-23 07:03:40,128 [INFO ]  F
+2023-05-23 07:03:40,130 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py 
+2023-05-23 07:03:40,134 [INFO ]  F
+2023-05-23 07:03:40,137 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py 
+2023-05-23 07:03:40,141 [INFO ]  F
+2023-05-23 07:03:40,144 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py 
+2023-05-23 07:03:40,149 [INFO ]  F
+2023-05-23 07:03:40,151 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py 
+2023-05-23 07:03:40,155 [INFO ]  F
+2023-05-23 07:03:40,158 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py 
+2023-05-23 07:03:40,162 [INFO ]  F
+2023-05-23 07:03:40,165 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py 
+2023-05-23 07:03:40,169 [INFO ]  F
+2023-05-23 07:03:40,180 [INFO ]  =========================== short test summary info ============================
+2023-05-23 07:03:40,181 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py::test_main
+2023-05-23 07:03:40,181 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 07:03:40,182 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 07:03:40,183 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py::test_main
+2023-05-23 07:03:40,184 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py::test_main
+2023-05-23 07:03:40,185 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py::test_main
+2023-05-23 07:03:40,185 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py::test_main
+2023-05-23 07:03:40,186 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py::test_main
+2023-05-23 07:03:40,187 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py::test_main
+2023-05-23 07:03:40,188 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py::test_main
+2023-05-23 07:03:40,189 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py::test_main
+2023-05-23 07:03:40,189 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py::test_main
+2023-05-23 07:03:40,190 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py::test_main
+2023-05-23 07:03:40,191 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py::test_main
+2023-05-23 07:03:40,192 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py::test_main
+2023-05-23 07:03:40,192 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py::test_main
+2023-05-23 07:03:40,193 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py::test_main
+2023-05-23 07:03:40,194 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py::test_main
+2023-05-23 07:03:40,195 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py::test_main
+2023-05-23 07:03:40,195 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py::test_main
+2023-05-23 07:03:40,196 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py::test_main
+2023-05-23 07:03:40,197 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py::test_main
+2023-05-23 07:03:40,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py::test_main
+2023-05-23 07:03:40,198 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py::test_main
+2023-05-23 07:03:40,199 [INFO ]  ======================= 24 failed, 28 warnings in 0.37s ========================
+2023-05-23 07:03:40,201 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:58,957 [INFO ]  ['ResetPinTest', 'AbsRawCapTest', 'AdcRangeTest', 'BSCCalibration', 'DevicePackageTest', 'ExtendedHighResistance', 'ForceButtonOpenGuardPlane', 'ForceButtonOpenGuardTrace', 'FullRawCapTest', 'GPIOOpen', 'GPIOShort', 'HighResistanceTest', 'LockdownTest', 'NoiseTest', 'SensorSpeedTest', 'SyncConnectionTest', 'SyncShortTest', 'TRxGround', 'TRxSensorOpen', 'TagsMoisture', 'TransRawCap', 'TrxTrxShortTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 07:03:58,959 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:58,961 [INFO ]  TestBridge reset
+2023-05-23 07:03:58,961 [INFO ]  production test thread start
+2023-05-23 07:03:58,996 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 07:03:59,023 [INFO ]  subpath:
+2023-05-23 07:03:59,026 [INFO ]   
+2023-05-23 07:03:59,028 [INFO ]  
+2023-05-23 07:03:59,030 [INFO ]  query:
+2023-05-23 07:03:59,032 [INFO ]   
+2023-05-23 07:03:59,034 [INFO ]  None
+2023-05-23 07:03:59,053 [INFO ]  arguments:
+2023-05-23 07:03:59,056 [INFO ]   
+2023-05-23 07:03:59,058 [INFO ]  {}
+2023-05-23 07:03:59,061 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 07:03:59,064 [INFO ]  SSE LOOP!!!
+2023-05-23 07:03:59,066 [INFO ]  ProductionTestsManager init
+2023-05-23 07:03:59,171 [INFO ]  start session: 
+2023-05-23 07:03:59,172 [INFO ]   
+2023-05-23 07:03:59,173 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 07:03:59,189 [INFO ]  ============================= test session starts ==============================
+2023-05-23 07:03:59,191 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 07:03:59,208 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 07:03:59,210 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 07:03:59,358 [INFO ]  collected 24 items
+2023-05-23 07:03:59,361 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py 
+2023-05-23 07:03:59,367 [INFO ]  F
+2023-05-23 07:03:59,370 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 07:03:59,374 [INFO ]  F
+2023-05-23 07:03:59,377 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 07:03:59,382 [INFO ]  F
+2023-05-23 07:03:59,384 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py 
+2023-05-23 07:03:59,389 [INFO ]  F
+2023-05-23 07:03:59,391 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py 
+2023-05-23 07:03:59,396 [INFO ]  F
+2023-05-23 07:03:59,399 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py 
+2023-05-23 07:03:59,403 [INFO ]  F
+2023-05-23 07:03:59,406 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py 
+2023-05-23 07:03:59,411 [INFO ]  F
+2023-05-23 07:03:59,413 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py 
+2023-05-23 07:03:59,417 [INFO ]  F
+2023-05-23 07:03:59,420 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py 
+2023-05-23 07:03:59,424 [INFO ]  F
+2023-05-23 07:03:59,427 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py 
+2023-05-23 07:03:59,431 [INFO ]  F
+2023-05-23 07:03:59,434 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py 
+2023-05-23 07:03:59,438 [INFO ]  F
+2023-05-23 07:03:59,440 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py 
+2023-05-23 07:03:59,445 [INFO ]  F
+2023-05-23 07:03:59,447 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py 
+2023-05-23 07:03:59,452 [INFO ]  F
+2023-05-23 07:03:59,455 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py 
+2023-05-23 07:03:59,459 [INFO ]  F
+2023-05-23 07:03:59,461 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py 
+2023-05-23 07:03:59,466 [INFO ]  F
+2023-05-23 07:03:59,468 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py 
+2023-05-23 07:03:59,472 [INFO ]  F
+2023-05-23 07:03:59,475 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py 
+2023-05-23 07:03:59,479 [INFO ]  F
+2023-05-23 07:03:59,482 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py 
+2023-05-23 07:03:59,486 [INFO ]  F
+2023-05-23 07:03:59,489 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py 
+2023-05-23 07:03:59,493 [INFO ]  F
+2023-05-23 07:03:59,496 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py 
+2023-05-23 07:03:59,500 [INFO ]  F
+2023-05-23 07:03:59,503 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py 
+2023-05-23 07:03:59,507 [INFO ]  F
+2023-05-23 07:03:59,509 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py 
+2023-05-23 07:03:59,514 [INFO ]  F
+2023-05-23 07:03:59,516 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py 
+2023-05-23 07:03:59,520 [INFO ]  F
+2023-05-23 07:03:59,523 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py 
+2023-05-23 07:03:59,527 [INFO ]  F
+2023-05-23 07:03:59,541 [INFO ]  =========================== short test summary info ============================
+2023-05-23 07:03:59,543 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py::test_main
+2023-05-23 07:03:59,543 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 07:03:59,544 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 07:03:59,545 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py::test_main
+2023-05-23 07:03:59,546 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py::test_main
+2023-05-23 07:03:59,547 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py::test_main
+2023-05-23 07:03:59,548 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py::test_main
+2023-05-23 07:03:59,548 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py::test_main
+2023-05-23 07:03:59,549 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py::test_main
+2023-05-23 07:03:59,550 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py::test_main
+2023-05-23 07:03:59,551 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py::test_main
+2023-05-23 07:03:59,552 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py::test_main
+2023-05-23 07:03:59,552 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py::test_main
+2023-05-23 07:03:59,553 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py::test_main
+2023-05-23 07:03:59,554 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py::test_main
+2023-05-23 07:03:59,555 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py::test_main
+2023-05-23 07:03:59,556 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py::test_main
+2023-05-23 07:03:59,556 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py::test_main
+2023-05-23 07:03:59,557 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py::test_main
+2023-05-23 07:03:59,558 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py::test_main
+2023-05-23 07:03:59,559 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py::test_main
+2023-05-23 07:03:59,560 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py::test_main
+2023-05-23 07:03:59,560 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py::test_main
+2023-05-23 07:03:59,561 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py::test_main
+2023-05-23 07:03:59,562 [INFO ]  ======================= 24 failed, 28 warnings in 0.37s ========================
+2023-05-23 07:03:59,563 [INFO ]  ProductionTestsManager init
+2023-05-23 07:04:38,537 [INFO ]  ['ResetPinTest', 'AbsRawCapTest', 'AdcRangeTest', 'BSCCalibration', 'DevicePackageTest', 'ExtendedHighResistance', 'ForceButtonOpenGuardPlane', 'ForceButtonOpenGuardTrace', 'FullRawCapTest', 'GPIOOpen', 'GPIOShort', 'HighResistanceTest', 'LockdownTest', 'NoiseTest', 'SensorSpeedTest', 'SyncConnectionTest', 'SyncShortTest', 'TRxGround', 'TRxSensorOpen', 'TagsMoisture', 'TransRawCap', 'TrxTrxShortTest', 'DevicePackageTest', 'AbsRawCapTest']
+2023-05-23 07:04:38,540 [INFO ]  ProductionTestsManager init
+2023-05-23 07:04:38,541 [INFO ]  TestBridge reset
+2023-05-23 07:04:38,542 [INFO ]  production test thread start
+2023-05-23 07:04:38,580 [INFO ]  HTTPServerRequest(protocol='http', host='localhost:8889', method='GET', uri='/webds/pt2', version='HTTP/1.1', remote_ip='127.0.0.1')
+2023-05-23 07:04:38,601 [INFO ]  subpath:
+2023-05-23 07:04:38,603 [INFO ]   
+2023-05-23 07:04:38,606 [INFO ]  
+2023-05-23 07:04:38,608 [INFO ]  query:
+2023-05-23 07:04:38,611 [INFO ]   
+2023-05-23 07:04:38,613 [INFO ]  None
+2023-05-23 07:04:38,632 [INFO ]  arguments:
+2023-05-23 07:04:38,634 [INFO ]   
+2023-05-23 07:04:38,637 [INFO ]  {}
+2023-05-23 07:04:38,640 [INFO ]  {'task': None, 'target': None, 'level': 0}
+2023-05-23 07:04:38,644 [INFO ]  SSE LOOP!!!
+2023-05-23 07:04:38,646 [INFO ]  ProductionTestsManager init
+2023-05-23 07:04:38,750 [INFO ]  start session: 
+2023-05-23 07:04:38,752 [INFO ]   
+2023-05-23 07:04:38,754 [INFO ]  <Session run exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+2023-05-23 07:04:38,777 [INFO ]  ============================= test session starts ==============================
+2023-05-23 07:04:38,779 [INFO ]  platform linux -- Python 3.7.3, pytest-6.1.2, py-1.10.0, pluggy-0.13.1
+2023-05-23 07:04:38,807 [INFO ]  rootdir: /usr/local/syna/lib/python/production_tests_v2/run
+2023-05-23 07:04:38,809 [INFO ]  plugins: dash-2.0.0, metadata-1.10.0, ordering-0.6, anyio-3.6.1, profiling-1.7.0, html-2.1.1
+2023-05-23 07:04:38,966 [INFO ]  collected 24 items
+2023-05-23 07:04:38,969 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py 
+2023-05-23 07:04:38,974 [INFO ]  F
+2023-05-23 07:04:38,977 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py 
+2023-05-23 07:04:38,981 [INFO ]  F
+2023-05-23 07:04:38,984 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py 
+2023-05-23 07:04:38,989 [INFO ]  F
+2023-05-23 07:04:38,992 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py 
+2023-05-23 07:04:38,997 [INFO ]  F
+2023-05-23 07:04:39,000 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py 
+2023-05-23 07:04:39,004 [INFO ]  F
+2023-05-23 07:04:39,007 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py 
+2023-05-23 07:04:39,012 [INFO ]  F
+2023-05-23 07:04:39,015 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py 
+2023-05-23 07:04:39,019 [INFO ]  F
+2023-05-23 07:04:39,022 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py 
+2023-05-23 07:04:39,028 [INFO ]  F
+2023-05-23 07:04:39,031 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py 
+2023-05-23 07:04:39,035 [INFO ]  F
+2023-05-23 07:04:39,038 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py 
+2023-05-23 07:04:39,047 [INFO ]  F
+2023-05-23 07:04:39,050 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py 
+2023-05-23 07:04:39,054 [INFO ]  F
+2023-05-23 07:04:39,057 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py 
+2023-05-23 07:04:39,061 [INFO ]  F
+2023-05-23 07:04:39,064 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py 
+2023-05-23 07:04:39,068 [INFO ]  F
+2023-05-23 07:04:39,071 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py 
+2023-05-23 07:04:39,075 [INFO ]  F
+2023-05-23 07:04:39,078 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py 
+2023-05-23 07:04:39,083 [INFO ]  F
+2023-05-23 07:04:39,085 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py 
+2023-05-23 07:04:39,258 [INFO ]  F
+2023-05-23 07:04:39,261 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py 
+2023-05-23 07:04:39,266 [INFO ]  F
+2023-05-23 07:04:39,268 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py 
+2023-05-23 07:04:39,273 [INFO ]  F
+2023-05-23 07:04:39,280 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py 
+2023-05-23 07:04:39,285 [INFO ]  F
+2023-05-23 07:04:39,288 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py 
+2023-05-23 07:04:39,292 [INFO ]  F
+2023-05-23 07:04:39,295 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py 
+2023-05-23 07:04:39,301 [INFO ]  F
+2023-05-23 07:04:39,304 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py 
+2023-05-23 07:04:39,308 [INFO ]  F
+2023-05-23 07:04:39,311 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py 
+2023-05-23 07:04:39,316 [INFO ]  F
+2023-05-23 07:04:39,319 [INFO ]  ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py 
+2023-05-23 07:04:39,323 [INFO ]  F
+2023-05-23 07:04:39,334 [INFO ]  =========================== short test summary info ============================
+2023-05-23 07:04:39,336 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_001_ResetPinTest.py::test_main
+2023-05-23 07:04:39,337 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_002_AbsRawCapTest.py::test_main
+2023-05-23 07:04:39,338 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_003_AdcRangeTest.py::test_main
+2023-05-23 07:04:39,339 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_004_BSCCalibration.py::test_main
+2023-05-23 07:04:39,340 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_005_DevicePackageTest.py::test_main
+2023-05-23 07:04:39,341 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_006_ExtendedHighResistance.py::test_main
+2023-05-23 07:04:39,342 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_007_ForceButtonOpenGuardPlane.py::test_main
+2023-05-23 07:04:39,343 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_008_ForceButtonOpenGuardTrace.py::test_main
+2023-05-23 07:04:39,344 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_009_FullRawCapTest.py::test_main
+2023-05-23 07:04:39,346 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_010_GPIOOpen.py::test_main
+2023-05-23 07:04:39,347 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_011_GPIOShort.py::test_main
+2023-05-23 07:04:39,348 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_012_HighResistanceTest.py::test_main
+2023-05-23 07:04:39,349 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_013_LockdownTest.py::test_main
+2023-05-23 07:04:39,350 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_014_NoiseTest.py::test_main
+2023-05-23 07:04:39,351 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_015_SensorSpeedTest.py::test_main
+2023-05-23 07:04:39,352 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_016_SyncConnectionTest.py::test_main
+2023-05-23 07:04:39,353 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_017_SyncShortTest.py::test_main
+2023-05-23 07:04:39,354 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_018_TRxGround.py::test_main
+2023-05-23 07:04:39,355 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_019_TRxSensorOpen.py::test_main
+2023-05-23 07:04:39,356 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_020_TagsMoisture.py::test_main
+2023-05-23 07:04:39,357 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_021_TransRawCap.py::test_main
+2023-05-23 07:04:39,358 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_022_TrxTrxShortTest.py::test_main
+2023-05-23 07:04:39,359 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_023_DevicePackageTest.py::test_main
+2023-05-23 07:04:39,360 [INFO ]  FAILED ../../usr/local/syna/lib/python/production_tests_v2/run/test_024_AbsRawCapTest.py::test_main
+2023-05-23 07:04:39,362 [INFO ]  ======================= 24 failed, 28 warnings in 0.58s ========================
+2023-05-23 07:04:39,363 [INFO ]  ProductionTestsManager init
