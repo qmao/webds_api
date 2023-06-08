@@ -133,9 +133,9 @@ class RamBackdoorHandler(APIHandler):
         ###}
 
         while True:
+            start_time = time.time()
             message = {"status": "run", "data": []}
             for idx, ram in enumerate(data["data"]):
-                start_time = time.time()
                 if RamBackdoorHandler._terminate:
                     break
 
@@ -153,7 +153,11 @@ class RamBackdoorHandler(APIHandler):
             if RamBackdoorHandler._terminate:
                 break
 
-            time.sleep(data["interval"] / 1000)
+            elapsed_time = time.time() - start_time
+            interval_seconds = data["interval"] / 1000  # Convert interval to seconds
+
+            if elapsed_time < interval_seconds:
+                time.sleep(interval_seconds - elapsed_time)
 
             RamBackdoorHandler._queue.put(message)
 
