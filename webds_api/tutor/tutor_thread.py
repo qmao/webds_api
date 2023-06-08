@@ -31,6 +31,7 @@ class Logger(object):
                 self._condition.acquire()
                 self._condition.notify()
                 self._condition.release()
+                EventQueue().close()
                 sys.exit()
         except Exception as e:
             pass
