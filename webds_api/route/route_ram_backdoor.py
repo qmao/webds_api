@@ -54,7 +54,7 @@ class RamBackdoorHandler(APIHandler):
                 RamBackdoorHandler._queue.get()
         print("RESET QUEUE DONE")
 
-    def read_ram(tc, address):
+    def read_ram(chip, tc, address):
         start_time = time.time()
 
         values = []
@@ -64,7 +64,10 @@ class RamBackdoorHandler(APIHandler):
 
         for r in address:
             try:
-                v = tc.function("readRam", args = [r["address"], r["length"]])
+                if chip >= 0:
+                    v = tc.function("readSlaveRam", args = [chip, r["address"], r["length"]])
+                else:
+                    v = tc.function("readRam", args = [r["address"], r["length"]])
                 values.append(v)
             except Exception as e:
                 print(e, hex(r))
@@ -114,7 +117,7 @@ class RamBackdoorHandler(APIHandler):
         else:
             raise HttpNotFound()
 
-    def sse_command(self, data):
+    def sse_command(self, chip, data):
         try:
             tc = TouchcommManager()
         except Exception as e:
@@ -140,7 +143,10 @@ class RamBackdoorHandler(APIHandler):
                     break
 
                 try:
-                    v = tc.function("readRam", args = [ram["address"], ram["length"]])
+                    if chip >= 0:
+                        v = tc.function("readSlaveRam", args = [chip, ram["address"], ram["length"]])
+                    else:
+                        v = tc.function("readRam", args = [ram["address"], ram["length"]])
                     message["data"].append({"address": ram["address"], "data": v})
                     ##print("[MESSAGE] ", message)
                 except Exception as e:
@@ -249,6 +255,11 @@ class RamBackdoorHandler(APIHandler):
                 sse = data["sse"]
             else:
                 sse = False
+                
+            if "chip" in data:
+                chip = data["chip"]
+            else:
+                chip = -1
 
             tc = TouchcommManager()
             tc.function("unlockPrivate")
@@ -257,7 +268,7 @@ class RamBackdoorHandler(APIHandler):
                 RamBackdoorHandler.check_thread_status()
                 RamBackdoorHandler.resetQueue()
                 print("QUEUE RESET")
-                RamBackdoorHandler._thread = threading.Thread(target=self.sse_command, args=(data["data"],))
+                RamBackdoorHandler._thread = threading.Thread(target=self.sse_command, args=(chip, data["data"], ))
                 RamBackdoorHandler._thread.start()
 
                 self.finish(json.dumps({
@@ -268,7 +279,7 @@ class RamBackdoorHandler(APIHandler):
             elif command == "read":
                 alist = data["data"]
                 tc = TouchcommManager()
-                value = RamBackdoorHandler.read_ram(tc, alist)
+                value = RamBackdoorHandler.read_ram(chip, tc, alist)
 
                 self.finish(json.dumps({
                   "data": value
@@ -288,7 +299,11 @@ class RamBackdoorHandler(APIHandler):
                 for r in address:
                     try:
                         ###print("write", hex(r["address"]),  r["value"])
-                        v = tc.function("writeRegister", [r["address"], r["value"]])
+                        if chip >= 0:
+                            v = tc.function("writeSlaveRegister", args = [chip, r["address"], r["value"]])
+                        else:
+                            v = tc.function("writeRegister", args = [r["address"], r["value"]])
+
                         alist.append(r["value"])
                     except Exception as e:
                         status.append({"address": hex(r["address"]), "error": str(e) })
