@@ -67,6 +67,9 @@ tags:
 - name: "Production Tests v2"
   description: "production tests endpoints"
 
+- name: "RAM Backdoor"
+  description: "ram backdoor endpoints"
+
 paths:
   /packrat:
     get:
@@ -763,7 +766,7 @@ paths:
     post:
       tags:
       - "Register"
-      summary: "JSON containing path to .hex file in packrat cache to use for reprogram process"
+      summary: "JSON containing command and data"
       description: "Client requests register Post"
       operationId: "post-register"
       requestBody:
@@ -773,6 +776,34 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Register"
+      responses:
+        '201':
+          description: Created
+
+  /ram-backdoor:
+    get:
+      tags:
+      - "RAM Backdoor"
+      summary: "SSE"
+      description: "Client requests ram backdoor sse"
+      operationId: "get-register"
+      responses:
+        '200':
+          description: "JSON containing progress data of ram backdoor command process"
+
+    post:
+      tags:
+      - "RAM Backdoor"
+      summary: "JSON containing command and data"
+      description: "Client requests ram backdoor Post"
+      operationId: "post-ram-backdoor"
+      requestBody:
+        description: "json content"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RamBackdoor"
       responses:
         '201':
           description: Created
@@ -1203,6 +1234,28 @@ components:
             default: 'ResetPinTest'
 
     Register:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+          - "read"
+          - "write"
+          default: "read"
+        sse:
+          type: boolean
+          enum:
+          - true
+          - false
+          default: true
+        data:
+          type: array
+          items:
+            type: integer
+            format: int32
+          default: [0x20000000, 0x2000000C]
+
+    RamBackdoor:
       type: object
       properties:
         command:

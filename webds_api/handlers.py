@@ -23,6 +23,7 @@ from .route.route_register         import RegisterHandler
 from .route.route_passthrough      import PassthroughHandler
 from .route.route_production_tests_v2 import ProductionTestsV2Handler
 from .route.route_ram_backdoor     import RamBackdoorHandler
+from .route.route_boot_config      import BootConfigHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -67,6 +68,8 @@ def setup_handlers(web_app):
 
     ram_backdoor_pattern = url_path_join(base_url, "webds", "ram-backdoor")
 
+    boot_config_pattern = url_path_join(base_url, "webds", "boot-config" + '(.*)')
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -87,6 +90,7 @@ def setup_handlers(web_app):
                 (passthrough_pattern, PassthroughHandler),
                 (production_tests_v2_pattern, ProductionTestsV2Handler),
                 (ram_backdoor_pattern, RamBackdoorHandler),
+                (boot_config_pattern, BootConfigHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)
