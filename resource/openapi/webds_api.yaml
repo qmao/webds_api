@@ -70,6 +70,9 @@ tags:
 - name: "RAM Backdoor"
   description: "ram backdoor endpoints"
 
+- name: "Boot Config"
+  description: "boot config endpoints"
+
 paths:
   /packrat:
     get:
@@ -1045,6 +1048,63 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid status value"
+
+  /boot-config:
+    get:
+      tags:
+      - "Boot Config"
+      summary: "Client requests boot-config get"
+      operationId: "get-boot-config"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+  /boot-config/{section}:
+    get:
+      tags:
+      - "Boot Config"
+      summary: "Client requests boot-config section get"
+      operationId: "get-boot-config-section"
+      parameters:
+      - name: section
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: ["lockdown", "custom-serialization"]
+          default: "lockdown"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid status value"
+
+    post:
+      tags:
+      - "Boot Config"
+      summary: "JSON containing boot-config section post"
+      operationId: "post-boot-config-section"
+      parameters:
+      - name: section
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: ["lockdown", "custom-serialization"]
+          default: "lockdown"
+      requestBody:
+        description: "passthrough json"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PassthroughParam"
+      responses:
+        '200':
+          description: result
+
 
 components:
   schemas:
