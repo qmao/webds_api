@@ -37,8 +37,13 @@ def little_endian_to_byte_array(values):
 
 class BootConfigHandler(APIHandler):
 
+    def mode_reset(self, tc):
+        if self._mode == "application":
+            tc.function("runApplicationFirmware")
+
     def get_boot_info(self, tc):
         id = tc.function("identify")
+        self._mode = id["mode"]
         if id["mode"] == "application":
             tc.function("enterBootloaderMode")
         return tc.function("getBootInfo")
@@ -153,6 +158,7 @@ class BootConfigHandler(APIHandler):
         else:
             raise HttpNotFound()
 
+        self.mode_reset(tc)
         self.finish(data)
 
     @tornado.web.authenticated
@@ -191,8 +197,10 @@ class BootConfigHandler(APIHandler):
                 else:
                     raise HttpNotFound()
             except Exception as e:
+                self.mode_reset(tc)
                 raise HttpServerError(str(e))
         else:
             raise HttpNotFound()
 
+        self.mode_reset(tc)
         self.finish(data)
