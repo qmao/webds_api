@@ -33,8 +33,7 @@ class TouchcommManager(object):
                                 protocols='report_streamer',
                                 server='127.0.0.1',
                                 packratCachePath=webds.WORKSPACE_PACKRAT_DIR,
-                                streaming=False,
-                                resetOnConnect=False)
+                                streaming=False)
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))
