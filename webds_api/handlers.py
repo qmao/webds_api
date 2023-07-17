@@ -24,6 +24,8 @@ from .route.route_passthrough      import PassthroughHandler
 from .route.route_production_tests_v2 import ProductionTestsV2Handler
 from .route.route_ram_backdoor     import RamBackdoorHandler
 from .route.route_boot_config      import BootConfigHandler
+from .route.route_boot_config      import BootConfigHandler
+from .route.route_image            import ImageHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -70,6 +72,8 @@ def setup_handlers(web_app):
 
     boot_config_pattern = url_path_join(base_url, "webds", "boot-config" + '(.*)')
 
+    image_pattern = url_path_join(base_url, "webds", "image" + '(.*)')
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -90,7 +94,8 @@ def setup_handlers(web_app):
                 (passthrough_pattern, PassthroughHandler),
                 (production_tests_v2_pattern, ProductionTestsV2Handler),
                 (ram_backdoor_pattern, RamBackdoorHandler),
-                (boot_config_pattern, BootConfigHandler)
+                (boot_config_pattern, BootConfigHandler),
+                (image_pattern, ImageHandler)
                ]
 
     web_app.add_handlers(host_pattern, handlers)
