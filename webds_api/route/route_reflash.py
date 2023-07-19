@@ -6,6 +6,7 @@ import json
 from ..errors import HttpBrokenPipe, HttpStreamClosed, HttpServerError
 from .. import webds
 from ..touchcomm.touchcomm_manager import TouchcommManager
+from ..device.device_info import DeviceInfo
 
 import threading
 from queue import Queue
@@ -184,7 +185,9 @@ class ReflashHandler(APIHandler):
             handler.set_status("start")
 
             tc = TouchcommManager()
-            tc.function("reflashImageFile", args = [filename])
+
+            info = DeviceInfo.identify_type(tc)
+            tc.function("reflashImageFile", args = [filename, info["is_multi_chip"], info["has_touchcomm_storage"], False])
             id = tc.function("runApplicationFirmware")
             print(id)
 

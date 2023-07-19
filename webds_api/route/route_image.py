@@ -11,13 +11,13 @@ from ..errors import HttpServerError
 from pathlib import Path
 import zlib
 
-    
+
 class ImageParser:
     def __init__(self, fileName):
         self._fileName = fileName
         with open(fileName, mode='rb') as file: # b is important -> binary
             self._fileContent = file.read()
-    
+
     def le2int(data):
         return int.from_bytes(data, byteorder="little")
 
@@ -33,10 +33,12 @@ class ImageParser:
         ##hexFormat = ' '.join(hex(byte) for byte in fileContentRange)
         identifier = ImageParser.le2int(self._fileContent[0: 4])
         if identifier != 0x4818472B:
-            print("INVALID IMAGE FILE")
+            print("INVALID IMAGE FILE. identifier:", identifier)
+            return False
         else:
             print(hex(identifier))
-        
+            return True
+
     def getNumberOfMemoryAreas(self):
         count = ImageParser.le2int(self._fileContent[4: 8])
         return count
@@ -55,11 +57,11 @@ class ImageParser:
             area["length"] = ImageParser.le2int(self._fileContent[offset + 28 : offset + 32])
             area["offset"] = offset
             area["crc"] = hex(ImageParser.le2int(self._fileContent[offset + 32 : offset + 36]))
-            
+
             ##data = self._fileContent[offset + 36 : offset + 36 + area["length"]]
             ##crc = ImageParser.calculate_crc32(data)
             ##print("CRC:", hex(crc))
-            
+
             alist.append(area)
         return alist
 
@@ -99,16 +101,19 @@ class ImageHandler(APIHandler):
 
         data = json.loads("{}")
         filename = ""
-        if len(param) == 2:
-            filename = param[1]
+        if len(param) == 3:
+            packrat = param[1]
+            filename = param[2]
         else:
             raise HttpNotFound()
 
         try:
-            if filename is not None:
-                filename = '/home/dsdkuser/jupyter/workspace/Packrat/Cache/3487441/PR3487441.img'
+            if packrat is not None and filename is not None:
+                filename = os.path.join(webds.PACKRAT_CACHE, packrat, filename)
+                print("FILE NAME:", filename)
                 f = ImageParser(filename)
-                f.checkHeader()
+                if f.checkHeader() is False:
+                    raise HttpServerError("Unsupported image file format")
                 data["data"] = f.getMemoryAreaList()
                 print(data)
 
