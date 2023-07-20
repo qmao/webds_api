@@ -7,6 +7,7 @@ from ..errors import HttpBrokenPipe, HttpStreamClosed, HttpServerError
 from .. import webds
 from ..touchcomm.touchcomm_manager import TouchcommManager
 from ..device.device_info import DeviceInfo
+from ..image.image_parser import ImageParser
 
 import threading
 from queue import Queue
@@ -31,10 +32,10 @@ class StatusHandler(Queue):
 
     def write(self,msg):
         try:
-            if "/" in msg:
-                m = re.search('(\d+)(?=/\d+)', msg)
+            if "%" in msg and "Progress" in msg:
+                m = re.search(r'\d+', msg).group()
                 if m is not None:
-                    self._progress = int(m.group(0), base=10)
+                    self._progress = int(m, base=10)
             sys.__stdout__.write(msg)
         except Exception as e:
             raise BrokenPipe(str(e))
@@ -187,6 +188,17 @@ class ReflashHandler(APIHandler):
             tc = TouchcommManager()
 
             info = DeviceInfo.identify_type(tc)
+
+            ### SC/MC determine in image file
+            ### FIXME
+            f = ImageParser(filename)
+            if f.checkHeader() is False:
+                raise HttpServerError("Unsupported image file format")
+            alist = f.getMemoryAreaList()
+            has_boot_code = any(item['id'] == 'BOOT_CODE' for item in alist)
+            if has_boot_code:
+                info["is_multi_chip"] = True
+
             tc.function("reflashImageFile", args = [filename, info["is_multi_chip"], info["has_touchcomm_storage"], False])
             id = tc.function("runApplicationFirmware")
             print(id)
