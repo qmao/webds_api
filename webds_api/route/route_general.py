@@ -1,12 +1,12 @@
-import tornado
-from jupyter_server.base.handlers import APIHandler
-import os
 import json
+import os
 from uuid import uuid4
 
-from ..utils import SystemHandler
-from ..errors import HttpServerError
+import tornado
+from jupyter_server.base.handlers import APIHandler
 
+from ..errors import HttpServerError
+from ..utils import SystemHandler
 
 rand_token = str(uuid4())
 
@@ -47,6 +47,23 @@ class GeneralHandler(APIHandler):
                             return
                         else:
                             print("token not matched")
+                            raise HttpServerError("token not matched")
+                    else:
+                        rand_token = str(uuid4())
+                        print(rand_token)
+                        self.finish(json.dumps(rand_token))
+                        return
+                else:
+                    print("target not set")
+            elif "action" in param and param["action"] == "setDate":
+                if "target" in param and param["target"] != "":
+                    if "token" in param:
+                        token = param["token"]
+                        if token == rand_token:
+                            self.finish(json.dumps("done"))
+                            SystemHandler.CallSysCommandFulfil('date -s "{}"'.format(param["target"]))
+                            return
+                        else:
                             raise HttpServerError("token not matched")
                     else:
                         rand_token = str(uuid4())
