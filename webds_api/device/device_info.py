@@ -35,7 +35,7 @@ class DeviceInfo():
             print(id)
 
         if (id['mode'] == 'tddi_slave_bootloader'):
-            return True
+            return {"is_multi_chip": True, "is_smart_bridge": False, "has_touchcomm_storage": hasTouchCommStorageChip}
 
         if (id['mode'] == 'rombootloader'):
             try:
@@ -52,6 +52,6 @@ class DeviceInfo():
                 pass
 
         if is_multi is None and not is_smart_bridge:
-            raise HttpServerError("Cannot determine device type")
+            return {"is_multi_chip": False, "is_smart_bridge": False, "has_touchcomm_storage": hasTouchCommStorageChip}
 
         return {"is_multi_chip": is_multi, "is_smart_bridge": is_smart_bridge, "has_touchcomm_storage": hasTouchCommStorageChip}

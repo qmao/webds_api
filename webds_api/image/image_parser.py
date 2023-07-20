@@ -53,3 +53,24 @@ class ImageParser:
 
             alist.append(area)
         return alist
+
+    def generateSelectedReflashImage(self, selects, dst):
+        count = self.getNumberOfMemoryAreas()
+        for number in range(count):
+            start = 8 + 4*number
+            offset = ImageParser.le2int(self._fileContent[start : start + 4])
+            identifier = ImageParser.le2int(self._fileContent[offset : offset + 4])
+            if identifier != 0x7c05e516:
+                continue
+
+            block = bytes(self._fileContent[offset + 4 : offset + 20]).decode('utf-8', errors='ignore').strip()
+            flag = 0
+            if block in selects:
+                flag = 1
+            ##print(block, flag)
+            new_data = flag.to_bytes(4, 'little')
+            self._fileContent = self._fileContent[:offset + 20] + new_data + self._fileContent[offset + 24:]
+
+        with open(dst, 'wb') as file:
+            file.write(self._fileContent)
+

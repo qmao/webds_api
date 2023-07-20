@@ -142,6 +142,7 @@ class ReflashHandler(APIHandler):
             print("start to reflash!!!")
 
             filename = os.path.join(webds.PACKRAT_CACHE, input_data["filename"])
+            blocks = input_data["blocks"]
             print(filename)
 
             if not os.path.isfile(filename):
@@ -157,7 +158,7 @@ class ReflashHandler(APIHandler):
                 print("create StatusHandler")
                 g_status_handler = StatusHandler()
 
-            g_thread = threading.Thread(target=self.reflash, args=(filename, g_status_handler))
+            g_thread = threading.Thread(target=self.reflash, args=(filename, blocks, g_status_handler))
             g_thread.start()
 
             data = {
@@ -177,7 +178,7 @@ class ReflashHandler(APIHandler):
         print(data)
         self.finish(json.dumps(data))
 
-    def reflash(self, filename, handler):
+    def reflash(self, filename, blocks, handler):
         print("reflash thread start")
         temp = sys.stdout
         sys.stdout = handler
@@ -198,6 +199,10 @@ class ReflashHandler(APIHandler):
             has_boot_code = any(item['id'] == 'BOOT_CODE' for item in alist)
             if has_boot_code:
                 info["is_multi_chip"] = True
+
+            if len(blocks) == 0:
+                raise HttpServerError("0 blocks")
+            f.generateSelectedReflashImage(blocks, filename)
 
             tc.function("reflashImageFile", args = [filename, info["is_multi_chip"], info["has_touchcomm_storage"], False])
             id = tc.function("runApplicationFirmware")
