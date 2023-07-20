@@ -206,7 +206,7 @@ class ReflashHandler(APIHandler):
             if handler.get_progress() != 100:
                 print(handler.get_progress())
                 handler.set_message("Unkwon error")
-                handler.set_progress(-1)
+                ##handler.set_progress(-1)
                 handler.set_status("error")
             else:
                 handler.set_message("Reflash with " + filename)
@@ -214,7 +214,7 @@ class ReflashHandler(APIHandler):
 
         except Exception as error:
             print(error)
-            handler.set_progress(-1)
+            ##handler.set_progress(-1)
             handler.set_message(str(error))
             handler.set_status("error")
         finally:
