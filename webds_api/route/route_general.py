@@ -61,6 +61,7 @@ class GeneralHandler(APIHandler):
                         token = param["token"]
                         if token == rand_token:
                             self.finish(json.dumps("done"))
+                            SystemHandler.CallSysCommandFulfil('timedatectl set-timezone {}'.format(param["timeZone"]))
                             SystemHandler.CallSysCommandFulfil('date -s "{}"'.format(param["target"]))
                             return
                         else:
